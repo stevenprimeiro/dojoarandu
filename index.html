@@ -8,7 +8,7 @@
 <meta name="color-scheme" content="light dark">
 <style>
 /* ============================================================
-   ARANDU · v2.28 — design system
+   ARANDU · v2.31 — design system
    Papel & tinta: editorial, quente, tátil.
    ============================================================ */
 :root{
@@ -615,7 +615,9 @@ tr:hover .td-actions{opacity:1}
 
 .agenda-item{display:flex;gap:13px;padding:13px 0;border-bottom:1px solid var(--line-2)}
 .agenda-item:last-child{border-bottom:0}
-.agenda-time{font-family:var(--mono);font-size:12px;color:var(--ink-3);width:34px;flex:none;padding-top:2px}
+.agenda-time{font-family:var(--mono);font-size:12px;color:var(--ink-2);width:46px;flex:none;padding-top:2px;display:flex;flex-direction:column;line-height:1.35}
+.agenda-time span{font-size:10.5px;color:var(--ink-3)}
+.agenda-time span::before{content:"até "}
 .agenda-body{min-width:0;flex:1}
 .agenda-body b{display:block;font-size:13.5px}
 .agenda-body small{display:block;font-size:11.5px;color:var(--ink-3);margin-top:2px}
@@ -911,7 +913,7 @@ html[data-theme="dark"] .toast .act{color:#a83622}
 .dock.is-collapsed{
   left:auto;right:12px;
   /* alinhado ao centro vertical do menu aberto (--dock-h é medido no init) */
-  bottom:calc(10px + env(safe-area-inset-bottom) + (var(--dock-h,64px) - 40px)/2);
+  bottom:calc(14px + env(safe-area-inset-bottom));
   width:40px;height:40px;padding:0;border-radius:50%;
   display:grid;place-items:center;
   background:linear-gradient(160deg,color-mix(in srgb,var(--vermilion) 88%,var(--ink)) 0%,var(--vermilion) 58%,color-mix(in srgb,var(--vermilion) 62%,var(--indigo)) 100%);
@@ -924,8 +926,8 @@ html[data-theme="dark"] .toast .act{color:#a83622}
 .dock.is-collapsed[data-pos="br"]{left:auto;right:12px}
 .dock.is-collapsed[data-pos="bl"]{left:12px;right:auto}
 /* no topo, o botão fica logo abaixo da barra (não cobre a marca nem os ícones) */
-.dock.is-collapsed[data-pos="tr"]{left:auto;right:12px;top:calc(8px + env(safe-area-inset-top) + var(--topbar-h,59px));bottom:auto}
-.dock.is-collapsed[data-pos="tl"]{left:12px;right:auto;top:calc(8px + env(safe-area-inset-top) + var(--topbar-h,59px));bottom:auto}
+.dock.is-collapsed[data-pos="tr"]{left:auto;right:12px;top:calc(10px + env(safe-area-inset-top) + var(--topbar-h,106px));bottom:auto}
+.dock.is-collapsed[data-pos="tl"]{left:12px;right:auto;top:calc(10px + env(safe-area-inset-top) + var(--topbar-h,106px));bottom:auto}
 .dock.is-collapsed[data-pos="tr"],.dock.is-collapsed[data-pos="tl"]{z-index:70}
 .dock-fab{position:absolute;inset:0;display:none;place-items:center;color:#fff}
 .dock.is-collapsed .dock-fab{display:grid}
@@ -949,19 +951,46 @@ html.lowfx .dock-fab::after{display:none}
 .dock-nav a svg{width:19px;height:19px}
 .dock-nav a[aria-current="page"]{color:var(--vermilion);background:color-mix(in srgb,var(--vermilion) 9%,transparent)}
 
+/* ---------- v2.31 · menu integrado à barra superior (celular) ---------- */
+.mobile-nav{display:none}
+@media(max-width:900px){
+  .topbar{flex-wrap:wrap;row-gap:0;padding-bottom:0}
+  .mobile-nav{
+    display:grid;grid-template-columns:repeat(5,1fr);
+    order:10;width:100%;margin:8px -2px 0;
+    border-top:1px solid var(--line-2);
+  }
+  .mobile-nav a{
+    display:flex;flex-direction:column;align-items:center;gap:4px;
+    padding:9px 2px 10px;border-radius:10px;
+    font-size:10px;font-weight:600;letter-spacing:.01em;color:var(--ink-3);
+    transition:color .18s,background .18s;position:relative;
+  }
+  .mobile-nav a svg{opacity:.8}
+  .mobile-nav a[aria-current="page"]{color:var(--vermilion)}
+  .mobile-nav a[aria-current="page"] svg{opacity:1}
+  .mobile-nav a[aria-current="page"]::after{
+    content:"";position:absolute;left:50%;top:0;width:22px;height:2px;margin-left:-11px;
+    border-radius:2px;background:var(--vermilion);
+  }
+  /* a barra agora tem duas linhas: ao esconder, esconde as duas */
+  .topbar>.brand,.topbar>.topbar-right{zoom:.9}
+  .topbar{padding-top:10px}
+  /* o menu do rodapé saiu: o dock fica só o botão flutuante */
+  .dock{padding:0;border:0;background:none;box-shadow:none;backdrop-filter:none;-webkit-backdrop-filter:none}
+  .dock-nav{display:none}
+  .main{padding-bottom:96px}
+}
+
 @media(max-width:900px){
   .td-actions{flex-wrap:wrap}
   .training-card{gap:12px;padding:14px}
   .nav{display:none}
-  .brand-word span{display:none}
-  .main{padding-bottom:120px}
-  .dock{display:block}
   .kbd-btn span,.kbd-btn kbd{display:none}
   .kbd-btn{padding:8px;width:38px;height:38px;justify-content:center}
   /* v2.23 · barra de topo 15% mais baixa no celular (escala todo o conteúdo) */
   .topbar{transition:transform .42s var(--ease),opacity .34s var(--ease),box-shadow .3s}
   .topbar>.brand,.topbar>.nav,.topbar>.topbar-right{zoom:.85}
-  .topbar{padding-top:12px;padding-bottom:12px}
   /* esconde ao descer, volta ao subir (com histerese, sem piscar) */
   .topbar.is-tucked{transform:translateY(calc(-100% - 2px));opacity:0;pointer-events:none}
   .topbar.is-scrolled{box-shadow:0 10px 26px -22px rgba(0,0,0,.9)}
@@ -1293,6 +1322,12 @@ html.lowfx .map-page-head{backdrop-filter:none;background:var(--paper)}
 .sec-facts span{font-size:11.5px;color:var(--ink-3);line-height:1.55}
 
 /* ---------- ajustes: seções recolhíveis ---------- */
+.page-ver{
+  display:inline-flex;align-items:center;gap:6px;margin-top:7px;
+  font:600 10px/1 var(--mono);letter-spacing:.12em;text-transform:uppercase;
+  color:var(--ink-3);padding:4px 9px;border-radius:999px;
+  border:1px solid var(--line-2);background:color-mix(in srgb,var(--ink) 4%,transparent)
+}
 .set-sec{padding:0;overflow:hidden}
 .set-head{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:17px 18px;
   background:transparent;border:0;cursor:pointer;font:inherit;color:inherit;transition:background .18s}
@@ -1307,7 +1342,10 @@ html.lowfx .map-page-head{backdrop-filter:none;background:var(--paper)}
 .set-body{border-top:1px solid var(--line-2);animation:setIn .24s var(--ease)}
 .set-body[hidden]{display:none}
 @keyframes setIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.set-pad{padding:0 18px 6px}
 .set-pad> .settings-row:first-child{padding-top:14px}
+.set-pad> .card-head,.set-pad> .sub,.set-pad> p{padding-left:0;padding-right:0}
+.set-body .sub,.set-body p{max-width:100%}
 
 /* ---------- celular: posição do FAB + instalar ---------- */
 .fab-pos-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:10px}
@@ -1660,19 +1698,20 @@ html.lowfx .view-anim>*{animation:none !important}
   <header class="topbar">
     <a class="brand" href="#hoje" data-nav="hoje" aria-label="Arandu — início">
       <span class="brand-seal" aria-hidden="true">道</span>
-      <span class="brand-word"><b>ARANDU</b><span>Sistema do Dojo</span></span>
+      <span class="brand-word"><b>ARANDU</b><span id="brandVersion">v2.31</span></span>
     </a>
     <nav class="nav" id="mainNav" aria-label="Navegação principal"></nav>
     <div class="topbar-right">
       <button class="kbd-btn" id="cmdkOpen" aria-label="Abrir busca e comandos">
         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
-        <span>Buscar</span><kbd>⌘K</kbd>
+        <span>Buscar</span>
       </button>
       <button class="icon-btn" id="themeToggle" aria-label="Alternar tema" title="Alternar tema"></button>
       <button class="icon-btn" id="settingsBtn" aria-label="Ajustes" title="Ajustes">
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.03 1.56V21a2 2 0 1 1-4 0v-.09A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.56-1.03H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6h.09A1.7 1.7 0 0 0 10.11 3V3a2 2 0 1 1 4 0v.09A1.7 1.7 0 0 0 15.14 4.6a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9v.09a1.7 1.7 0 0 0 1.56 1.03H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.51 1.03Z"/></svg>
       </button>
     </div>
+    <nav class="mobile-nav" id="mobileNav" aria-label="Navegação no celular"></nav>
   </header>
 
   <main class="main" id="view" tabindex="-1"></main>
@@ -1757,8 +1796,8 @@ const BELTS_BY_GROUP = {
 };
 const METHODS = ['Pix', 'Dinheiro', 'Cartão de crédito', 'Cartão de débito', 'Transferência', 'Outro'];
 const GROUPS = {
-  Adulto: { label: 'Adulto', days: [1, 2, 3, 4, 5], time: '19:00', note: 'seg a sex' },
-  Kids: { label: 'Kids', days: [1, 3, 5], time: '18:00', note: 'seg, qua e sex' }
+  Adulto: { label: 'Adulto', days: [1, 2, 3, 4, 5], start: '19:10', end: '21:00', time: '19:10', until: '21:00', note: 'seg a sex · 19:10 às 21:00' },
+  Kids: { label: 'Kids', days: [1, 3, 5], start: '18:00', end: '19:00', time: '18:00', until: '19:00', note: 'seg, qua e sex · 18:00 às 19:00' }
 };
 const EXPENSE_CATS = ['Salário', 'Aluguel', 'Água 20L', 'Energia', 'Estrutura', 'Equipamentos', 'Faixas e graus', 'Eventos', 'Outros'];
 const EXPENSE_COLORS = {
@@ -1851,7 +1890,7 @@ function hexA(hex, a) {
 }
 
 /* prefs de UI */
-const APP_VERSION = '2.28';
+const APP_VERSION = '2.31';
 /* assinatura do modelo de cobrança (fechamento novo + abertura com "outras pendências") */
 const WA_TPL_VER = 2;
 const WA_EMOJI_DEFAULT = '✅';
@@ -1894,22 +1933,22 @@ function demoData() {
   const monthOf = n => { const d = new Date(TODAY.getFullYear(), TODAY.getMonth() + n, 1); return iso(d).slice(0, 7); };
   const pick = arr => arr[Math.floor(r() * arr.length)];
 
-  /* Lista real de alunos (camisas Blessed) — nome, idade, localidade, faixa, graus, matrícula */
+  /* Lista fictícia de alunos — nome, idade, localidade, faixa, graus, matrícula */
   const adults = [
-    ['Nicholas', 34, 'Centro', 'Marrom', 4, -1980], ['Anderson', 31, 'Redonda', 'Marrom', 3, -1740],
-    ['Carol', 27, 'Cajuais', 'Branca', 0, -120], ['Ricardo', 38, 'Mutamba', 'Branca', 3, -610],
-    ['Guilherme', 22, 'Peroba', 'Azul', 0, -430], ['Denílson', 41, 'Tremembé', 'Branca', 2, -320],
-    ['Aluno Doze', 26, 'Manibú', 'Branca', 4, -520], ['Alex', 29, 'Centro', 'Branca', 3, -280],
-    ['Aluna Onze', 24, 'Tremembé', 'Branca', 4, -640], ['Lucas Gabriel', 20, 'Ibicuitaba', 'Branca', 2, -190],
-    ['Carlos Junior', 19, 'Mutamba', 'Branca', 3, -350]
+    ['Adulto 01', 34, 'Centro', 'Marrom', 4, -1980], ['Adulto 02', 31, 'Bairro Alto', 'Marrom', 3, -1740],
+    ['Adulto 03', 27, 'Vila Nova', 'Branca', 0, -120], ['Adulto 04', 38, 'Centro', 'Branca', 3, -610],
+    ['Adulto 05', 22, 'Praia', 'Azul', 0, -430], ['Adulto 06', 41, 'Centro', 'Branca', 2, -320],
+    ['Adulto 07', 26, 'Bairro Alto', 'Branca', 4, -520], ['Adulto 08', 29, 'Centro', 'Branca', 3, -280],
+    ['Adulto 09', 24, 'Vila Nova', 'Branca', 4, -640], ['Adulto 10', 20, 'Praia', 'Branca', 2, -190],
+    ['Adulto 11', 19, 'Centro', 'Branca', 3, -350]
   ];
   const kids = [
-    ['Liz', 8, 'Redonda', 'Branca', 0, -150], ['Anna Luiza', 6, 'Cajuais', 'Branca', 0, -70],
-    ['Lívia', 8, 'Centro', 'Branca', 0, -110], ['Heitor', 8, 'Tremembé', 'Cinza', 0, -95],
-    ['Felipe P', 7, 'Peroba', 'Branca', 0, -45]
+    ['Kid 01', 8, 'Centro', 'Branca', 0, -150], ['Kid 02', 6, 'Bairro Alto', 'Branca', 0, -70],
+    ['Kid 03', 8, 'Centro', 'Branca', 0, -110], ['Kid 04', 8, 'Vila Nova', 'Cinza', 0, -95],
+    ['Kid 05', 7, 'Praia', 'Branca', 0, -45]
   ];
-  /* aluno de teste do lembrete de vencimento (vence hoje) */
-  const steven = ['Steven Primeiro', 35, "Olho d'Água", 'Azul', 0, -12];
+  /* aluno de exemplo do lembrete de vencimento (vence hoje) */
+  const steven = ['Aluno Exemplo', 35, 'Centro', 'Azul', 0, -12];
 
   const plans = ['Mensal', 'Mensal', 'Mensal', 'Trimestral', 'Mensal', 'Semestral'];
   const students = [];
@@ -1991,7 +2030,7 @@ function demoData() {
   const names = ['Antônio Marcos Silva', 'Juliana Freitas Costa', 'Rafael Souza Teixeira', 'Mariana Oliveira Lima',
     'Pedro Henrique Sousa', 'Camila Rodrigues Alves', 'Lucas Gabriel Ferreira', 'Ana Clara Nascimento',
     'Bruno Costa Ribeiro', 'Isabela Martins Rocha', 'Matheus Almeida Santos', 'Beatriz Carvalho Lopes'];
-  const localities = ['Centro', 'Redonda', 'Cajuais', 'Mutamba', 'Tremembé', 'Manibú', 'Ibicuitaba'];
+  const localities = ['Centro', 'Bairro Alto', 'Vila Nova', 'Praia', 'Centro', 'Centro', 'Centro'];
   let vi = 0;
   for (let back = 40; back >= 0; back -= 4) {
     const date = D(-back);
@@ -2683,6 +2722,12 @@ const NAV = [
 function renderNav() {
   const html = NAV.map(n => `<a href="#${n.page}" data-act="nav" data-page="${n.page}" ${view.page === n.page ? 'aria-current="page"' : ''}>${n.label}</a>`).join('');
   $('#mainNav').innerHTML = html;
+  /* celular: menu dentro da barra superior */
+  const bv = $('#brandVersion');
+  if (bv) bv.textContent = 'v' + APP_VERSION;
+  const mob = $('#mobileNav');
+  if (mob) mob.innerHTML = NAV.map(n =>
+    `<a href="#${n.page}" data-act="nav" data-page="${n.page}" ${view.page === n.page ? 'aria-current="page"' : ''}>${icon(n.icon, 13)}<span>${n.label}</span></a>`).join('');
   $('#dockNav').innerHTML = NAV.map(n =>
     `<a href="#${n.page}" data-act="nav" data-page="${n.page}" ${view.page === n.page ? 'aria-current="page"' : ''}>
       ${icon(n.icon, 19)}<span>${n.label}</span></a>`).join('');
@@ -2763,12 +2808,8 @@ function dockInit() {
   const dock = $('#dock'), fab = $('#dockFab');
   if (!dock || !fab) return;
   /* mede a altura do menu aberto para centralizar o botão recolhido */
-  const syncDockH = () => {
-    dock.classList.remove('is-collapsed');
-    const h = dock.getBoundingClientRect().height;
-    if (h > 0) dock.style.setProperty('--dock-h', Math.round(h) + 'px');
-    dock.classList.add('is-collapsed');
-  };
+  /* o dock agora é só o botão flutuante: nada de medir altura de menu */
+  const syncDockH = () => { dock.classList.add('is-collapsed'); };
   syncDockH();
   dock.dataset.pos = prefs.fabPos || 'br';
   window.addEventListener('resize', () => { if (window.innerWidth <= 900) syncDockH(); }, { passive: true });
@@ -2821,6 +2862,7 @@ function pageHead({ crumb, title, sub, actions = '' }) {
     <div>
       <div class="crumb eyebrow">${esc(crumb || 'Dojo Arandu')}</div>
       ${title}
+      <div class="page-ver" title="Versão do Arandu">Arandu v${APP_VERSION}</div>
       ${sub ? `<p class="page-sub">${sub}</p>` : ''}
     </div>
     ${actions ? `<div class="page-actions">${actions}</div>` : ''}
@@ -3444,6 +3486,26 @@ function waAutoRun() {
   else waTimer = setTimeout(() => { fire(); render(); }, at - now);
 }
 
+/* estado do treino de hoje: 'antes' | 'durante' | 'encerrado' | 'fora' (dia sem aula) */
+function sessionPhase(date = TODAY, g = 'Adulto') {
+  const cfg = GROUPS[g];
+  const dow = date.getDay();
+  const ativo = cfg.days.includes(dow);
+  const now = date.getTime() === TODAY.getTime() ? new Date() : null;
+  const min = t => { const [h, m] = t.split(':').map(Number); return h * 60 + m; };
+  if (!ativo) return { fase: 'fora', inicio: cfg.start, fim: cfg.end };
+  if (!now) return { fase: 'durante', inicio: cfg.start, fim: cfg.end };
+  const atual = now.getHours() * 60 + now.getMinutes();
+  const fase = atual < min(cfg.start) ? 'antes' : atual >= min(cfg.end) ? 'encerrado' : 'durante';
+  return { fase, inicio: cfg.start, fim: cfg.end, atual };
+}
+
+/* texto curto do estado do tatame (ticker e título do hero) */
+function gruposHojeTexto(n, durante, curto = false) {
+  if (curto) return n ? 'Ao vivo no tatame' : durante ? 'Treino em andamento' : 'Tatame em espera';
+  return n ? 'O tatame está <em>aberto</em>.' : durante ? 'O tatame está <em>vivo</em>.' : 'O tatame <em>descansa</em>.';
+}
+
 function pageHoje() {
   const active = activeStudents();
   const todayIds = attendanceOf(TODAY_ISO);
@@ -3465,6 +3527,9 @@ function pageHoje() {
     for (let i = 1; i <= 7; i++) { const d = new Date(TODAY); d.setDate(d.getDate() + i); if (GROUPS.Adulto.days.includes(d.getDay())) return d; }
     return TODAY;
   })();
+  const faseAdulto = sessionPhase(TODAY, 'Adulto');
+  const encerrado = faseAdulto.fase === 'encerrado';
+  const durante = faseAdulto.fase === 'durante';
   const agenda = Object.keys(GROUPS).map(g => {
     const open = sessionOpen(TODAY_ISO, g);
     const roster = rosterOf(g);
@@ -3521,7 +3586,7 @@ function pageHoje() {
       </svg>
       ${(() => {
         const streak = dojoStreak();
-        const items = `<span class="live"><i></i>${groupsToday.length ? 'Ao vivo no tatame' : 'Tatame em espera'}</span>
+        const items = `<span class="live"><i></i>${gruposHojeTexto(groupsToday.length, durante, true)}</span>
           <span class="tk">${groupsToday.length} turma${groupsToday.length === 1 ? '' : 's'} hoje</span>
           <span class="tk">${present}/${active.length} no tatame</span>
           <span class="tk">${pending.length} mensalidade${pending.length === 1 ? '' : 's'} em aberto</span>
@@ -3536,10 +3601,16 @@ function pageHoje() {
             <div class="eyebrow" style="color:var(--vermilion)">${esc(greeting())} · ${esc(cap(WEEKDAYS_LONG[TODAY.getDay()]))}</div>
             ${visitorsToday.length ? `<span class="badge badge--info">${icon('users', 12)} ${visitorsToday.length} visita${visitorsToday.length > 1 ? 's' : ''} hoje</span>` : ''}
           </div>
-          <h2 style="margin-top:10px">${groupsToday.length ? 'O tatame está <em>aberto</em>.' : 'O tatame <em>descansa</em>.'}</h2>
-          <p style="margin-top:10px">${groupsToday.length
-            ? `${groupsToday.length} turma${groupsToday.length > 1 ? 's' : ''} confirmada${groupsToday.length > 1 ? 's' : ''} hoje. Registre as presenças enquanto a memória do treino está fresca.`
-            : `Nenhuma turma confirmada hoje. Próximo treino adulto: ${WEEKDAYS_LONG[nextDay.getDay()]}, ${GROUPS.Adulto.time}.`}</p>
+          <h2 style="margin-top:10px">${encerrado
+            ? 'Treino <em>encerrado</em>.'
+            : gruposHojeTexto(groupsToday.length, durante)}</h2>
+          <p style="margin-top:10px">${encerrado
+            ? `O treino adulto de hoje foi das ${GROUPS.Adulto.start} às ${GROUPS.Adulto.end}. ${todayIds.length ? `Ficaram <b>${present} presenças</b> registradas no tatame.` : 'Ninguém foi marcado na chamada — se o treino aconteceu, registre agora.'} Próximo treino: ${WEEKDAYS_LONG[nextDay.getDay()]}, ${GROUPS.Adulto.start}.`
+            : groupsToday.length
+              ? `${groupsToday.length} turma${groupsToday.length > 1 ? 's' : ''} confirmada${groupsToday.length > 1 ? 's' : ''} hoje. Registre as presenças enquanto a memória do treino está fresca.`
+              : (durante
+                  ? `O treino adulto está rolando agora — ${GROUPS.Adulto.start} às ${GROUPS.Adulto.end}. Abra a chamada e marque quem está no tatame.`
+                  : `Nenhuma turma confirmada hoje. Próximo treino adulto: ${WEEKDAYS_LONG[nextDay.getDay()]}, ${GROUPS.Adulto.start}.`)}</p>
           <div class="hero-actions">
             <button class="btn btn--seal" data-act="go-att">${icon('check', 15)} ${groupsToday.length ? 'Abrir chamada' : 'Confirmar treino'}</button>
             <button class="btn btn--ghost" data-act="new-training">${icon('layers', 15)} Planejar treino</button>
@@ -3550,7 +3621,9 @@ function pageHoje() {
           <div class="hs"><b class="num">${groupsToday.length}<span style="font-size:13px;color:var(--ink-3)">/2</span></b><span>turmas confirmadas</span></div>
           <div class="hs"><b class="num" style="color:${pending.length ? 'var(--vermilion-ink)' : 'var(--moss)'}">${pending.length}</b><span>mensalidade${pending.length === 1 ? '' : 's'} em aberto</span></div>
           <div class="hs"><b class="num">${visitorsToday.length}</b><span>visita${visitorsToday.length === 1 ? '' : 's'} hoje</span></div>
-          <div class="hs hs--wide"><span>Próximo treino adulto</span><b class="num">${WEEKDAYS[nextDay.getDay()]} ${pad(nextDay.getDate())}/${pad(nextDay.getMonth() + 1)} · ${GROUPS.Adulto.time}</b></div>
+          <div class="hs hs--wide"><span>${encerrado ? 'Próximo treino adulto' : 'Treino adulto hoje'}</span><b class="num">${encerrado
+            ? `${WEEKDAYS[nextDay.getDay()]} ${pad(nextDay.getDate())}/${pad(nextDay.getMonth() + 1)} · ${GROUPS.Adulto.start}`
+            : `${GROUPS.Adulto.start}–${GROUPS.Adulto.end}`}</b></div>
         </div>
         </div>
       </div>
@@ -6742,7 +6815,7 @@ const isStandalone = () => window.matchMedia('(display-mode: standalone)').match
 const isFile = () => location.protocol === 'file:';
 function installHintText() {
   if (isStandalone()) return 'Já está instalado — abrindo como app.';
-  if (isFile()) return 'Arquivo aberto direto do celular: o navegador não libera o atalho assim.';
+  if (isFile()) return '';
   if (deferredInstall) return 'Pronto para instalar neste aparelho.';
   return 'Se o botão não abrir o instalador, use as instruções abaixo.';
 }
