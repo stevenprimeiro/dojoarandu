@@ -21,7 +21,7 @@
 <meta name="application-name" content="Arandu">
 <style>
 /* ============================================================
-   ARANDU · v2.40 — design system
+   ARANDU · v2.43 — design system
    Papel & tinta: editorial, quente, tátil.
    ============================================================ */
 :root{
@@ -161,11 +161,13 @@ img,svg{display:block;max-width:100%}
 
 .nav{display:flex;align-items:center;gap:2px;margin-left:8px}
 .nav a{
-  position:relative;padding:10px 12px;border-radius:9px;
+  position:relative;padding:10px 10px;border-radius:9px;
   font:700 11.5px/1 var(--cond);letter-spacing:.11em;text-transform:uppercase;
   color:var(--ink-2);transition:color .2s,background .2s;white-space:nowrap
 }/* no celular a navegação é o menu do botão: a barra de links do desktop sai de cena */
-@media(max-width:900px){.nav{display:none!important}}
+@media(max-width:900px){.nav{display:none!important}
+  /* a aba Ajustes da barra é coisa de desktop; no celular ela vive no menu do botão */
+  .nav-desk{display:none!important}}
 
 .nav a:hover{color:var(--ink);background:color-mix(in srgb,var(--ink) 6%,transparent)}
 .nav a[aria-current="page"]{color:var(--vermilion)}
@@ -356,8 +358,9 @@ html[data-theme="dark"] .card--ink{background:#232019;color:var(--ink);border-co
 .cloud-dot[data-estado="erro"] .dot-estado{background:var(--vermilion)}
 .cloud-dot[data-estado="offline"] .dot-estado{background:var(--ink-3)}
 .cloud-dot .nuvem-ico{opacity:.85}
+@media(max-width:900px){.kbd-btn .kbd-label{display:none} .kbd-btn{padding:0;width:34px;height:34px;justify-content:center}}
 @keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.45;transform:scale(.8)}}
-@media(max-width:900px){.cloud-dot{display:none!important}}  /* no celular fica no Ajustes */
+/* no celular fica visível, à esquerda do menu (pedido do Steven, v2.42) */
 
 /* ---------- KPI ---------- */
 .kpi{
@@ -918,15 +921,18 @@ html[data-theme="dark"] .chart-tip{background:#f3ede3;color:#151311}
 .toasts{position:fixed;z-index:130;left:50%;bottom:26px;transition:bottom .25s var(--ease);transform:translateX(-50%);display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none;width:min(460px,calc(100% - 24px))}
 .toast{
   display:flex;align-items:center;gap:11px;width:100%;
-  background:var(--ink);color:var(--paper);padding:11px 12px 11px 15px;border-radius:12px;
-  box-shadow:var(--shadow-l);font-size:13px;
-  animation:toast-in .45s var(--spring) both;position:relative;overflow:hidden;pointer-events:auto
+  padding:11px 12px 11px 15px;border-radius:12px;
+  box-shadow:var(--shadow-m);font-size:13px;
+  animation:toast-in .45s var(--spring) both;position:relative;overflow:hidden;pointer-events:auto;
+  /* o toast acompanha o tema (v2.42): cartão claro no claro, escuro no escuro */
+  background:color-mix(in srgb,var(--ink) 5%,#fff);color:var(--ink);
+  border:1px solid var(--line);backdrop-filter:blur(18px) saturate(1.3)
 }
-html[data-theme="dark"] .toast{background:#f3ede3;color:#151311}
+html[data-theme="dark"] .toast{background:color-mix(in srgb,#0b0d16 78%,#1b1f33);color:var(--ink)}
 .toast.out{animation:toast-out .3s var(--ease) both}
 .toast .bar{position:absolute;left:0;bottom:0;height:2px;background:var(--vermilion);animation:toast-bar 4s linear both}
 .toast .act{margin-left:auto;font-weight:700;font-size:12px;letter-spacing:.02em;color:var(--vermilion);padding:4px 7px;border-radius:6px}
-html[data-theme="dark"] .toast .act{color:#a83622}
+html[data-theme="dark"] .toast .act{color:var(--vermilion-ink)}
 .toast .act:hover{background:color-mix(in srgb,var(--vermilion) 15%,transparent)}
 .toast .x{color:inherit;opacity:.5;padding:4px}
 .toast .x:hover{opacity:1}
@@ -1854,7 +1860,7 @@ html.lowfx .view-anim>*{animation:none !important}
     <div class="topbar-right">
       <button class="kbd-btn" id="cmdkOpen" aria-label="Abrir busca e comandos">
         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
-        <span>Buscar</span>
+        <span class="kbd-label">Buscar</span>
       </button>
       <button class="icon-btn cloud-dot" id="cloudDot" hidden aria-live="polite" aria-label="Estado da nuvem" title="Nuvem"></button>
       <button class="icon-btn menu-btn" id="menuBtn" aria-label="Menu de páginas" aria-expanded="false" aria-controls="pageMenu"></button>
@@ -1869,7 +1875,7 @@ html.lowfx .view-anim>*{animation:none !important}
 <div class="scrim" id="scrim"></div>
 <div class="demo-banner" id="demoBanner" hidden>
   <span>Base de demonstração — dados fictícios</span>
-  <button class="btn btn--sm" data-act="gate-abrir-pin">Digitar PIN</button>
+  <button class="btn btn--sm" data-act="entrar-nuvem">Entrar com a minha conta</button>
 </div>
 <aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle" aria-hidden="true"></aside>
 <div class="modal-wrap" id="modalWrap" aria-hidden="true"></div>
@@ -1919,7 +1925,6 @@ const TODAY_ISO = iso(TODAY);
    ============================================================ */
 const SEED_BACKUP_NAME = 'base-exemplo.json';
 const SEED_BACKUP_LABEL = 'Base de exemplo (sem dados)';
-const COFRE = {"real": {"v": 1, "iter": 250000, "salt": "QXJhbmR1LWRvam8tcmVhbC12MQ==", "iv": "eKT0WSXHn8O0hptW", "ct": "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"}, "demo": {"v": 1, "iter": 250000, "salt": "QXJhbmR1LWRvam8tZGVtby12MQ==", "iv": "CrTRPWsYNbCoFOge", "ct": "n6d7ZxZW0D0rNMaDM3myIUJGtKX1dXKucDAWAhmMDuo/EvJHgFhMmQRqNlXfaogL8FgDQVngtpLCPDu17yjvpfel4bBed/9iqvyIFj6KiSDF8QWNPniPPLoAvcq62hMZDrGpWUejR8YxuWw+rpuUS851FEdMV1wDdopY9Fcuq1AL/ga5fGn7nfz61he8QMHKuJlYtHoYCxy535Q/W5NcqjIVqNBfX4+zZx2v2KTWGHQvXc7aaQyVj8qHTYdtuvRTGMbyBqMJH9i2yHpK4wwNMXgVP9aR9wk/fJeGlcTnTav98TBEbbip7Ch/VrDvEYnTGcWjPBoyhl2oi6poFDoUQyw7F88oC/5pDsz5Qie9yz3CDFJUKPbetZwoxaT/Z1vF9XvncPx9hDPjhkGflvn6c+4hvnHAZWO9bjglrbhhk96NbZNBaTkSZeWFIo5WiV8oVMfjg0DwzRSdriI8cgs5gQF1sHsfuBG+CMi6eMld9X+fVO9ZjY6OWFvy8h1+/weGg00L/RrmEW33eXHJtAsrQiAoHDAlqirq343Q4zC5nIuP1b1w7QXQqQtRRq1fRlanJW3BwnexnzU2SCeWeI5YKkrVHDQpaJm90+WoAcQoOruGJGc07dHhNKmwX5nTWhgQ8jRq5mJf/HVTdR9Trq7lS64lnGDj/lR/+nF4rDdm0oc5u1LEcohQGtUBGSdiuJglKlDC8UztCkjSsK64ePSYkt2Ck5hn7uZOrWmWRbEnIZuzkrlT64BDXg+MvoWnkdWLEatwDFRxbyXDJp0itxRS9nsGvbE9H2kh/ffbUAYUZEkLkvgnma/vjC+Eq/24dpGQetL3uo5SI/q0CADYnf5ZWyC4+iWf+jRkgQ50vZMMYyamlmmmYRr2MtsgAAxowmry9PRrPSUyCQREWB5X5YrAq5QhhnoTJeEfsJv8J7dGpBXZmiaYnuR9EbV8Y8f27dxBIm8hqPeheSf0OTObSrCDLLRLYcux349DRRq0KL8i2YWlglRGl072In4KpI7e3xa9exrwrJSgK36LJoojpE0CxqE2SYxoHQCglnHth8ZgnkX37UlrrFpCp8AbHVVjj6BIjKXryUkB1clSlc+Mw8SXMVxce2W0rfP9frrEkYI8df4yjPUCA8eN6+YJvR6rnz7FLsDkmTC6IseuDOeSFoTr1Ww6yiAAlMVraF082bIpi0SSSut94D2TeWZjDF93UEl3l66hiCYamZZo7bqLMO+N72lSezZXniNlfGg="}};
 const SEED_DATA = {"students":[{"id":"demo-a0","name":"Aluno Exemplo","age":30,"locality":"Centro","belt":"Branca","degrees":0,"plan":"Mensal","fee":70,"dueDay":10,"joinDate":"2026-01-10","status":"Ativo","classGroup":"Adulto","phone":"(00) 00000-0000","role":"","guardian":""},{"id":"demo-k0","name":"Criança Exemplo","age":9,"locality":"Centro","belt":"Branca","degrees":0,"plan":"Mensal","fee":70,"dueDay":10,"joinDate":"2026-02-01","status":"Ativo","classGroup":"Kids","phone":"(00) 00000-0000","guardian":"Responsável Exemplo","role":""}],"payments":[{"id":"demo-p1","studentId":"demo-a0","month":"2026-11","dueDate":"2026-11-10","amount":70,"status":"Pendente","paidAt":"","method":""},{"id":"demo-p2","studentId":"demo-k0","month":"2026-11","dueDate":"2026-11-10","amount":70,"status":"Pago","paidAt":"2026-11-08","method":"Pix"}],"expenses":[],"attendance":{},"attendanceOpen":{},"trainings":[],"visitors":[],"customPositions":[]}
 const seedData = () => JSON.parse(JSON.stringify(SEED_DATA));
 
@@ -1981,8 +1986,9 @@ function load() {
   let data = null;
   try { data = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { data = null; }
   if (!data || typeof data !== 'object') {
-    /* primeiro acesso: abre com a base real do dojo */
-    data = seedData();
+    /* primeiro acesso num aparelho com banco: NÃO mostra a base de exemplo
+       (a do dojo vem do login). Sem banco configurado, segue a base da máquina. */
+    data = cloudTemConfig() ? BLANK() : seedData();
     BASE.origin = 'seed';
   }
   const base = BLANK();
@@ -2041,7 +2047,7 @@ function hexA(hex, a) {
 }
 
 /* prefs de UI */
-const APP_VERSION = '2.40';
+const APP_VERSION = '2.43';
 /* assinatura do modelo de cobrança (fechamento novo + abertura com "outras pendências") */
 const WA_TPL_VER = 2;
 const WA_EMOJI_DEFAULT = '✅';
@@ -2119,7 +2125,7 @@ function demoData() {
       guardian: ['Ana ' + name, 'Rafael ' + name, 'Carla ' + name][i % 3]
     });
   });
-  /* Steven Primeiro — aluno de teste do lembrete (vence hoje, WhatsApp informado) */
+  /* Aluno Exemplo — aluno de teste do lembrete (vence hoje, WhatsApp informado) */
   students.push({
     id: 'demo-steven', name: steven[0], age: steven[1], locality: steven[2], belt: steven[3],
     degrees: steven[4], plan: 'Mensal', fee: 70, dueDay: TODAY.getDate(), joinDate: D(steven[5]),
@@ -2867,11 +2873,12 @@ const NAV = [
   { page: 'alunos', label: 'Alunos', icon: 'users' },
   { page: 'frequencia', label: 'Frequência', icon: 'check' },
   { page: 'treinos', label: 'Treinos', icon: 'layers' },
-  { page: 'financeiro', label: 'Financeiro', icon: 'wallet' }
+  { page: 'financeiro', label: 'Financeiro', icon: 'wallet' },
+  { page: 'ajustes', label: 'Ajustes', icon: 'settings', soDesk: true }
 ];
 
 function renderNav() {
-  const html = NAV.map(n => `<a href="#${n.page}" data-act="nav" data-page="${n.page}" ${view.page === n.page ? 'aria-current="page"' : ''}>${n.label}</a>`).join('');
+  const html = NAV.map(n => `<a href="#${n.page}" data-act="nav" data-page="${n.page}"${n.soDesk ? ' class="nav-desk"' : ''} ${view.page === n.page ? 'aria-current="page"' : ''}>${n.label}</a>`).join('');
   $('#mainNav').innerHTML = html;
   /* celular: menu dentro da barra superior */
   const bv = $('#brandVersion');
@@ -2883,13 +2890,14 @@ function menuBuild() {
   const pop = $('#pageMenu');
   if (!pop) return;
   const atual = view.page;
-  pop.innerHTML = NAV.map(n =>
+  /* o menu do celular já tem o próprio item Ajustes no fim: não repete o da barra */
+  pop.innerHTML = NAV.filter(n => !n.soDesk).map(n =>
     `<a href="#${n.page}" role="menuitem" data-act="nav" data-page="${n.page}" ${atual === n.page ? 'aria-current="page"' : ''}>
       ${icon(n.icon, 16)}<span>${n.label}</span></a>`).join('') +
     `<div class="menu-sep"></div>
-     <button type="button" role="menuitem" data-act="set-theme" data-id="${prefs.theme === 'dark' ? 'light' : prefs.theme === 'light' ? 'auto' : 'dark'}">
-       ${icon(prefs.theme === 'dark' ? 'sun' : prefs.theme === 'light' ? 'monitor' : 'moon', 16)}
-       <span>Tema: ${prefs.theme === 'dark' ? 'escuro' : prefs.theme === 'light' ? 'claro' : 'sistema'}</span></button>
+     <button type="button" role="menuitem" data-act="set-theme" data-id="${temaClaro() ? 'dark' : 'light'}">
+       ${icon(temaClaro() ? 'moon' : 'sun', 16)}
+       <span>${temaClaro() ? 'Tema escuro' : 'Tema claro'}</span></button>
      <a href="#ajustes" role="menuitem" data-act="nav" data-page="ajustes" ${atual === 'ajustes' ? 'aria-current="page"' : ''}>
        ${icon('settings', 16)}<span>Ajustes</span></a>`;
 }
@@ -3623,7 +3631,7 @@ function waSettings() {
       const prev = root.querySelector('#waPreview');
       const paint = () => {
         /* aluno-exemplo: o de teste, ou o primeiro com mensalidade em aberto */
-        const st = db.students.find(x => x.name === 'Steven Primeiro') || activeStudents()[0] || { name: 'Aluno', dueDay: 10 };
+        const st = db.students.find(x => x.name === 'Aluno Exemplo') || activeStudents()[0] || { name: 'Aluno', dueDay: 10 };
         const open = waOpenMonths(st.id).length ? waOpenMonths(st.id)
           : [{ month: MONTH, dueDate: dueFor(st, MONTH), amount: st.fee || 70, status: 'Pendente' }];
         const snapshot = prefs.waEmoji;
@@ -5175,18 +5183,20 @@ function pageAjustes() {
       </div>
     </div>`);
 
-  const seguranca = sec('seguranca', 'Segurança', 'A base real é aberta com o PIN do dojo.', `<div class="set-pad">
+  const seguranca = sec('seguranca', 'Acesso', 'Quem entra é quem abre a base — não existe mais PIN.', `<div class="set-pad">
       <div class="settings-row" style="padding-top:0">
         <div class="txt" style="width:100%">
-          <h4>Cofre da base real</h4>
-          <p>Os dados dos alunos vão <b>cifrados</b> dentro do app (AES-GCM, chave derivada do PIN). Quem abrir o link sem o PIN vê apenas a base de demonstração — nomes e telefones reais não ficam legíveis em nenhum lugar do arquivo.</p>
+          <h4>Entrada pelo login do professor</h4>
+          <p>O app pede o <b>nome</b> e a <b>senha</b> de quem está entrando. Sem login não há acesso à base do dojo — não existe PIN separado.</p>
           <div class="sec-facts" style="margin-top:10px">
-            <div><b>Nesta sessão</b><span>${view.baseModo === 'real' ? 'Base real aberta — o PIN fica guardado só nesta aba.' : 'Base de demonstração: os dados são fictícios e não vão para a base real.'}</span></div>
-            <div><b>Trocar o PIN</b><span>O PIN é definido no gerador de publicação; para mudar, gere a versão de novo com outro PIN.</span></div>
+            <div><b>Nesta sessão</b><span>${CLOUD.ativo ? (esc(CLOUD.user.nome || CLOUD.user.email) + ' (' + esc(CLOUD.user.papel) + ') — sessão na nuvem.') : 'Sem conta na nuvem: ou você escolheu "só neste aparelho", ou a nuvem não está configurada.'}</span></div>
+            <div><b>Quem pode entrar</b><span>Só os três nomes do dojo. Ninguém se cadastra sozinho; a conta é criada no Supabase.</span></div>
           </div>
           <div class="acts" style="margin-top:12px">
-            <button class="btn btn--sm btn--primary" data-act="gate-abrir-pin">${icon('shield', 14)} Digitar o PIN</button>
-            ${view.baseModo === 'demo' ? `<button class="btn btn--sm" data-act="gate-sair-demo">${icon('x', 14)} Sair do modo demonstração</button>` : ''}
+            ${CLOUD.ativo
+              ? `<button class="btn btn--sm btn--danger" data-act="cloud-sair">${icon('x', 14)} Sair da conta</button>`
+              : `<button class="btn btn--sm btn--primary" data-act="entrar-nuvem">${icon('userPlus', 14)} Entrar com a minha conta</button>`}
+            ${view.baseModo === 'demo' ? `<button class="btn btn--sm" data-act="descartar-demo">${icon('x', 14)} Sair do modo demonstração</button>` : ''}
           </div>
         </div>
       </div>
@@ -6792,7 +6802,14 @@ const ACTIONS = {
     db.expenses = db.expenses.filter(x => x.id !== id); save(); render(); toast('Despesa excluída.');
   },
   'rep-metric': id => { view.repMetric = id; render(); },
-  'set-theme': id => { prefs.theme = id; savePrefs(); applyTheme(); render(); },
+  /* o menu fica aberto (para conferir o tema); sem fechar, o próximo toque
+     no botão precisa abrir — por isso o aria-expanded acompanha o estado real */
+  'set-theme': id => { prefs.theme = id; savePrefs(); applyTheme(); render();
+    /* o próximo tema depende do atual: reconstrói o menu (fica aberto) para
+       que o segundo toque já mude de novo — era aqui que o tema travava */
+    const btn = $('#menuBtn'), pop = $('#pageMenu');
+    if (btn && pop) { const aberto = !pop.hidden; if (aberto) menuBuild();
+      btn.setAttribute('aria-expanded', String(aberto)); } },
   'rd-print': () => exportResumoGerencial(),
   'set-palette': id => { prefs.palette = id; savePrefs(); applyTheme(); render(); toast('Paleta: ' + currentPalette().name, { icon: 'spark' }); },
   'export-backup': () => exportBackup(),
@@ -6813,35 +6830,13 @@ const ACTIONS = {
     card.classList.toggle('is-open', abrir);
     body.hidden = !abrir;
   },
-  'gate-entrar': async () => {
-    const pin = String($('#gatePin')?.value || '').trim();
-    const erro = $('#gateErro');
-    const btn = document.querySelector('[data-act="gate-entrar"]');
-    if (!/^\d{4,8}$/.test(pin)) { if (erro) erro.textContent = 'Digite os números do PIN.'; return; }
-    if (btn) { btn.disabled = true; btn.textContent = 'Abrindo…'; }
-    try {
-      const dados = await cofreAbrir(pin);
-      if (!dados) throw new Error('sem cofre');
-      aplicarBase(dados, 'seed', 'Base real · protegida por PIN', SEED_BACKUP_NAME);
-      sessionStorage.setItem(COFRE_KEY, pin);          /* lembra só nesta aba */
-      view.baseModo = 'real';
-      hideGate();
-      render();
-      toast('Base do dojo aberta.', { icon: 'checkCircle' });
-    } catch (e) {
-      if (erro) erro.textContent = 'PIN incorreto. Tente de novo ou use a base de teste.';
-      const inp = $('#gatePin'); if (inp) { inp.value = ''; inp.focus(); }
-      if (btn) { btn.disabled = false; btn.textContent = 'Abrir a base'; }
-    }
+  /* v2.42: o PIN saiu. Quem porta a entrada é o login por nome.
+     "Entrar na nuvem" reabre o login de onde estiver. */
+  'entrar-nuvem': () => {
+    if (!cloudConfigurado()) { toast('Configure o banco primeiro: Ajustes → Nuvem.', { icon: 'alert' }); return; }
+    showCloudLogin();
   },
-  'gate-abrir-pin': () => showGate(),
-  'gate-sair-demo': () => { view.baseModo = ''; showGate(); render(); },
-  'gate-demo': () => {
-    hideGate();
-    view.baseModo = 'demo';
-    toast('Modo de demonstração: dados fictícios.', { icon: 'alert' });
-    render();
-  },
+  'descartar-demo': () => { view.baseModo = 'real'; render(); },
   'cloud-escolher': id => {
     const pessoa = acharEquipe(id);
     if (!pessoa) return;
@@ -6864,21 +6859,33 @@ const ACTIONS = {
     try {
       await cloudLogin(email, senha);
       hideCloudLogin();
+      /* o aparelho agora tem conta: a base oficial é a do banco */
+      try { localStorage.removeItem('arandu-cloud-local'); } catch (e) {}
       await cloudPrimeiroContato();
       cloudPoll();
       render();
+      cloudPintar();
       toast('Bem-vindo, ' + (CLOUD.user.nome || 'professor') + '.', { icon: 'checkCircle' });
     } catch (e) {
       const m = String(e.message || '');
       if (erro) erro.textContent = /invalid login|credentials/i.test(m)
         ? 'Senha incorreta. Tente de novo.'
         : (/network|failed to fetch/i.test(m) ? 'Sem conexão com o banco. Verifique a internet.' : 'Não foi possível entrar: ' + m);
+      /* com banco configurado não existe "seguir sem entrar": sem a conta,
+         o aparelho mostraria a base de demonstração, não a do dojo */
+      if (!/network|failed to fetch/i.test(m)) {
+        const cd = $('#cloudSenhaBox'); if (cd) cd.hidden = false;
+      }
       if (btn) { btn.disabled = false; btn.textContent = 'Entrar'; }
     }
   },
   'cloud-modo-local': () => {
     hideCloudLogin();
-    toast('Modo local: a base fica só neste aparelho.', { icon: 'checkCircle' });
+    /* lembra a escolha: na próxima abertura não pergunta de novo
+       (quem quiser entrar depois vai em Ajustes → Nuvem) */
+    try { localStorage.setItem('arandu-cloud-local', '1'); } catch (e) {}
+    view.baseModo = 'real';
+    toast('Modo local: a base fica só neste aparelho. Para entrar na nuvem, Ajustes → Nuvem.', { icon: 'checkCircle' });
     render();
   },
   'cloud-sair': () => cloudSair(),
@@ -6964,6 +6971,8 @@ const INPUTS = {
    18. TEMA
    ============================================================ */
 const mqDark = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : { matches: false, addEventListener() {} };
+/* tema que está na tela agora — "sistema" resolve pelo aparelho */
+function temaClaro() { return document.documentElement.getAttribute('data-theme') !== 'dark'; }
 function applyTheme() {
   const dark = prefs.theme === 'dark' || (prefs.theme === 'auto' && mqDark.matches);
   document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
@@ -7004,6 +7013,13 @@ const acharEquipe = (loginOuEmail) => {
   return EQUIPE.find(p => p.login === t) || EQUIPE.find(p => p.email === t) || null;
 };
 const cloudConfigurado = () => !!(CLOUD.url && CLOUD.key);
+/* a config vive no localStorage; o load() roda antes do cloudInit(), então
+   precisa desta leitura direta para não abrir a base de exemplo por engano */
+const cloudTemConfig = () => {
+  if (cloudConfigurado()) return true;
+  try { const c = JSON.parse(localStorage.getItem('arandu-cloud-cfg') || 'null'); return !!(c && c.url && c.key); }
+  catch (e) { return false; }
+};
 const cloudSessionKey = 'arandu-cloud-session';
 
 /* chamada simples à API REST do Supabase */
@@ -7085,6 +7101,7 @@ async function cloudSessaoSalva() {
     await cloudCarregarPerfil();
     CLOUD.ativo = true;
     try { localStorage.setItem(cloudSessionKey, JSON.stringify(CLOUD.user)); } catch (e) {}
+    hideCloudLogin();                    /* sessão boa: cortina de login sai da frente */
     return true;
   } catch (e) { return false; }
 }
@@ -7147,6 +7164,9 @@ async function cloudPull() {
   novo.attendanceOpen = aberto;
   const vazio = !linhas.length;
   db = novo;
+  /* o que veio do banco é a base do dojo: tira a faixa de demonstração */
+  view.baseModo = 'real';
+  BASE.label = 'Base do banco compartilhado';
   /* guarda local como cópia de segurança (e para abrir offline) */
   save({ local: true });
   return { db: novo, vazio };
@@ -7226,30 +7246,13 @@ async function cloudSair() {
   try { await cloudPushAgora(); } catch (e) {}
   CLOUD.ativo = false; CLOUD.user = null;
   try { localStorage.removeItem(cloudSessionKey); } catch (e) {}
-  toast('Sessão encerrada. O app voltou ao modo local.', { icon: 'checkCircle' });
+  toast('Sessão encerrada.', { icon: 'checkCircle' });
   render();
+  cloudPintar();
+  /* sem conta, o acesso à base volta a ser pedido (v2.42: login, não PIN) */
+  if (cloudConfigurado()) showCloudLogin();
 }
 
-/* ============================================================
-   COFRE — a base real vem cifrada no arquivo e só abre com o PIN
-   ------------------------------------------------------------
-   O arquivo público não tem nomes nem telefones legíveis: os dados
-   reais estão em AES-GCM (chave derivada do PIN por PBKDF2). Quem
-   abre sem o PIN usa a base de demonstração.
-   ============================================================ */
-const COFRE_KEY = 'arandu-cofre-sessao';
-
-async function cofreAbrir(entrada) {
-  const cfg = typeof COFRE !== 'undefined' && COFRE && COFRE.real;
-  if (!cfg) return null;                       /* app de desenvolvimento: sem cofre */
-  const b64 = t => Uint8Array.from(atob(t), c => c.charCodeAt(0));
-  const salt = b64(cfg.salt);
-  const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(entrada), 'PBKDF2', false, ['deriveBits']);
-  const bits = await crypto.subtle.deriveBits({ name: 'PBKDF2', salt, iterations: cfg.iter, hash: 'SHA-256' }, base, 256);
-  const chave = await crypto.subtle.importKey('raw', bits, 'AES-GCM', false, ['decrypt']);
-  const claro = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64(cfg.iv) }, chave, b64(cfg.ct));
-  return JSON.parse(new TextDecoder().decode(claro));
-}
 
 /* aplica uma base recém-importada (real ou de demonstração) */
 function aplicarBase(dados, origem, rotulo, arquivo) {
@@ -7263,50 +7266,28 @@ function aplicarBase(dados, origem, rotulo, arquivo) {
   view.baseModo = origem;
 }
 
-function gateHTML() {
-  return `<div class="lock-wrap">
-    <div class="lock-card">
-      <span class="brand-seal" style="width:54px;height:54px;margin:0 auto 14px">道</span>
-      <div class="eyebrow" style="text-align:center">Arandu · Sistema do Dojo</div>
-      <h2 class="lock-title">Digite o PIN do dojo</h2>
-      <p class="small dim" style="text-align:center;margin-bottom:16px">A base dos alunos está protegida. Sem o PIN, o app abre em modo de demonstração.</p>
-      <input class="field lock-input" id="gatePin" type="password" inputmode="numeric" maxlength="8"
-        placeholder="••••" autocomplete="off" aria-label="PIN do dojo">
-      <div class="lock-erro" id="gateErro"></div>
-      <button class="btn btn--primary" style="width:100%;margin-top:10px" data-act="gate-entrar">Abrir a base</button>
-      <button class="link small" style="display:block;margin:16px auto 0" data-act="gate-demo">Entrar só com a base de teste</button>
-    </div>
-  </div>`;
-}
-function showGate() {
-  if ($('#gateScreen')) return;
-  const el = document.createElement('div');
-  el.id = 'gateScreen'; el.className = 'lock-screen';
-  el.innerHTML = gateHTML();
-  document.body.appendChild(el);
-  setTimeout(() => $('#gatePin')?.focus(), 90);
-  $('#gatePin')?.addEventListener('keydown', e => { if (e.key === 'Enter') ACTIONS['gate-entrar'](); });
-}
-function hideGate() { $('#gateScreen')?.remove(); }
 
 /* ============================================================
    SEGURANÇA — trava local por PIN + limpeza automática
    Os dados nunca saem deste navegador; a trava impede que alguém
    que pegue o celular abra a lista de alunos.
    ============================================================ */
-/* ao abrir: pede o PIN do dojo (ou libera direto se já foi digitado nesta aba) */
+/* ao abrir: quem entra decide.
+   • com banco configurado → login por nome (é a única porteira; não existe mais PIN)
+   • aparelho que já escolheu "só neste aparelho" → base local, como sempre foi
+   • desenvolvimento (sem banco) → base da máquina do Steven
+   O PIN antigo deixou de existir na v2.42: os dados passam a ser protegidos
+   pelo login de cada professor. */
 async function abrirGate() {
-  const cfg = typeof COFRE !== 'undefined' && COFRE && COFRE.real;
-  if (!cfg) { view.baseModo = 'real'; return; }   /* desenvolvimento: sem cofre, sem gate */
-  let guardado = null;
-  try { guardado = sessionStorage.getItem(COFRE_KEY); } catch (e) {}
-  if (guardado) {
-    try {
-      const dados = await cofreAbrir(guardado);
-      if (dados) { aplicarBase(dados, 'seed', 'Base real · protegida por PIN', SEED_BACKUP_NAME); view.baseModo = 'real'; render(); return; }
-    } catch (e) { try { sessionStorage.removeItem(COFRE_KEY); } catch (e2) {} }
+  /* v2.42: sem PIN. A entrada quem resolve é cloudInit() — sessão salva,
+     login por nome ou a escolha "só neste aparelho". Aqui só resta liberar
+     a base local quando não existe banco configurado. */
+  if (!cloudConfigurado()) { view.baseModo = 'real'; return; }
+  if (!CLOUD.ativo && !$('#cloudLogin')) {
+    let local = null;
+    try { local = localStorage.getItem('arandu-cloud-local'); } catch (e) {}
+    if (local !== '1') showCloudLogin();     /* ainda não entrou nem escolheu */
   }
-  showGate();
 }
 
 function cloudLoginHTML() {
@@ -7334,11 +7315,15 @@ function cloudLoginHTML() {
   </div>`;
 }
 
+let cloudSessaoTentada = false;        /* o boot já tentou renovar a sessão? */
 function showCloudLogin() {
-  if ($('#cloudLogin')) return;
+  if ($('#cloudGate')) {                 /* já existe cortina: só regarante o conteúdo */
+    if (!$('#cloudLogin')) $('#cloudGate').innerHTML = cloudLoginHTML();
+    return;
+  }
   const el = document.createElement('div');
   el.id = 'cloudGate';
-  el.className = 'lock-screen';        /* mesma cortina de tela cheia do gate do PIN */
+  el.className = 'lock-screen';
   el.innerHTML = cloudLoginHTML();
   document.body.appendChild(el);
   /* foca a lista sem marcar ninguém como escolhido */
@@ -7354,11 +7339,13 @@ function cloudPintar() {
     el.innerHTML = `<span class="nuvem-ico">${icon('cloud', 17)}</span><span class="dot-estado"></span>`;
     el.dataset.pronto = '1';
   }
-  if (!cloudConfigurado() || !CLOUD.ativo) { el.hidden = true; return; }
-  el.hidden = false;
+  el.hidden = false;                 /* sempre visível: é o único aviso de nuvem no celular */
   const online = navigator.onLine !== false;
   let estado = 'ok', rotulo = '';
-  if (!online) { estado = 'offline'; rotulo = 'Sem internet — a base fica só neste aparelho até a conexão voltar.'; }
+  /* sem banco configurado ou sem sessão: ponto cinza, não some */
+  if (!cloudConfigurado()) { estado = 'offline'; rotulo = 'Nuvem desligada: a base fica só neste aparelho. Ative em Ajustes → Nuvem.'; }
+  else if (!CLOUD.ativo) { estado = 'offline'; rotulo = 'Sem sessão na nuvem: entre com o seu nome em Ajustes → Nuvem.'; }
+  else if (!online) { estado = 'offline'; rotulo = 'Sem internet — a base fica só neste aparelho até a conexão voltar.'; }
   else if (CLOUD.erro) { estado = 'erro'; rotulo = 'Falha ao falar com o banco: ' + CLOUD.erro; }
   else if (CLOUD.salvando) { estado = 'enviando'; rotulo = 'Enviando para o banco…'; }
   else if (CLOUD.pendente) { estado = 'enviando'; rotulo = 'Alterações na fila para enviar.'; }
@@ -7389,12 +7376,20 @@ async function cloudInit() {
     if (cfg && cfg.url && cfg.key) { CLOUD.url = cfg.url; CLOUD.key = cfg.key; }
   } catch (e) {}
   if (!cloudConfigurado()) return;          /* sem configuração: tudo local, como sempre */
+  if (cloudSessaoTentada) return;           /* a renovação da sessão acontece uma vez só */
+  cloudSessaoTentada = true;
   const voltou = await cloudSessaoSalva();
   if (voltou) {
-    try { await cloudPull(); cloudPoll(); render(); } catch (e) { CLOUD.erro = e.message; }
+    try { await cloudPull(); cloudPoll(); render(); view.baseModo = 'real'; } catch (e) { CLOUD.erro = e.message; }
   } else {
-    showCloudLogin();                       /* primeira vez neste aparelho */
+    /* "só neste aparelho" já foi escolhido: não pergunta de novo */
+    let local = null;
+    try { local = localStorage.getItem('arandu-cloud-local'); } catch (e) {}
+    if (local === '1') { view.baseModo = 'real'; render(); }
+    else { showCloudLogin();                /* primeira vez neste aparelho */
+      if (CLOUD.erro) { const e2 = $('#cloudErro'); if (e2) e2.textContent = 'Sem conexão com o banco. Verifique a internet.'; } }
   }
+  cloudPintar();                            /* o ponto já nasce no estado certo */
 }
 
 /* ---------- atalho na home do celular (PWA) ---------- */
@@ -7787,6 +7782,9 @@ function boot() {
   const hash = location.hash.replace('#', '');
   if (PAGES[hash]) view.page = hash;
   applyTheme();
+  /* aparelho que já tem conta na nuvem: não abre em modo de exemplo,
+     nem por um instante — o login/sessão decide o que entra na tela */
+  try { view.baseModo = (cloudTemConfig() && localStorage.getItem(cloudSessionKey)) ? 'real' : view.baseModo; } catch (e) {}
   render();
   menuInit();
   topbarInit();

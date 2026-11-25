@@ -1,7 +1,7 @@
 /* Arandu — service worker.
    Guarda o app em cache para abrir pelo atalho e funcionar offline.
    Funciona com qualquer nome de arquivo (index.html, DojoArandu vXp.html…). */
-const CACHE = 'arandu-v2';
+const CACHE = 'arandu-v2.43';
 /* arquivos fixos do atalho (as imagens ficam em assets/) */
 const ASSETS = ['manifest.webmanifest', 'assets/icon-192.png', 'assets/icon-512.png'];
 
@@ -29,17 +29,33 @@ self.addEventListener('fetch', e => {
   const url = new URL(e.request.url);
   if (url.origin !== location.origin) return;   /* não mexe em wa.me, CDNs etc. */
 
-  /* rede primeiro, cache como rede de segurança */
+  /* página (navegação): rede primeiro, cache só quando estiver offline —
+     assim uma versão nova aparece assim que o arquivo é atualizado no GitHub */
+  const ehPagina = e.request.mode === 'navigate' ||
+    /(?:^|\/)(index\.html|DojoArandu[^/]*\.html)$/.test(url.pathname);
+  if (ehPagina) {
+    e.respondWith(
+      fetch(e.request, { cache: 'no-store' })
+        .then(res => {
+          if (res && res.ok) {
+            const copy = res.clone();
+            caches.open(CACHE).then(c => c.put(e.request, copy)).catch(() => {});
+          }
+          return res;
+        })
+        .catch(() => caches.match(e.request).then(hit => hit || caches.match('./')))
+    );
+    return;
+  }
+
+  /* imagens e manifest: cache primeiro (são arquivos que não mudam) */
   e.respondWith(
-    fetch(e.request)
-      .then(res => {
-        /* guarda uma cópia do que foi baixado com sucesso */
-        if (res && res.ok) {
-          const copy = res.clone();
-          caches.open(CACHE).then(c => c.put(e.request, copy)).catch(() => {});
-        }
-        return res;
-      })
-      .catch(() => caches.match(e.request).then(hit => hit || caches.match('./')))
+    caches.match(e.request).then(hit => hit || fetch(e.request).then(res => {
+      if (res && res.ok) {
+        const copy = res.clone();
+        caches.open(CACHE).then(c => c.put(e.request, copy)).catch(() => {});
+      }
+      return res;
+    }))
   );
 });

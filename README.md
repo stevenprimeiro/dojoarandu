@@ -4,6 +4,12 @@
 
 Criado por **Steven Primeiro** · versão **2.31**
 
+![Tela inicial no computador](assets/print-desktop.jpg)
+
+<p align="center">
+  <img src="assets/print-celular.jpg" width="300" alt="Tela inicial no celular">
+</p>
+
 ---
 
 ## O que ele faz
@@ -16,7 +22,8 @@ Criado por **Steven Primeiro** · versão **2.31**
 | **Financeiro** | Mensalidades mês a mês, extrato por aluno, despesas por categoria, recebido × em aberto, atrasados. |
 | **Cobrança** | Texto de cobrança pronto para o WhatsApp, com Pix, emoji escolhido por você e envio em um toque. |
 | **Celular** | Atalho na tela inicial (PWA), funciona offline e a barra de topo se esconde ao rolar. |
-| **Segurança** | PIN de entrada, trancar ao sair do app e "limpar ao sair" para aparelho emprestado. |
+| **Segurança** | Entrada pelo login do professor (nome + senha), sem PIN separado. |
+| **Vários professores** | Base compartilhada opcional no Supabase: uma conta por pessoa, o que um marca aparece nos outros. Veja `SUPABASE.md`. |
 
 ## Como abrir
 
@@ -24,7 +31,21 @@ Criado por **Steven Primeiro** · versão **2.31**
 
 **No celular (recomendado):** abra o endereço publicado, use **Ajustes → Celular → Criar atalho** e o app fica na tela inicial, em tela cheia e com funcionamento offline.
 
+> **Modo equipe (opcional):** por padrão a base fica no aparelho. Para usar a mesma
+> base com os professores, conecte um banco compartilhado — passo a passo em `SUPABASE.md`.
+> Sem essa configuração, o app continua 100% local, como sempre foi.
+
 > O atalho só funciona quando o app está publicado num endereço web (`https://…`). Aberto direto do arquivo (`file://`), o navegador não libera a instalação — o próprio app avisa isso.
+
+## Como publicar (GitHub Pages)
+
+1. Baixe o pacote `DojoArandu vXp.zip` (ou use os arquivos desta pasta).
+2. Crie um repositório no GitHub e envie **só estes arquivos**:
+   `index.html`, `sw.js`, `manifest.webmanifest` e a pasta `assets/`
+   (com `icon-192.png`, `icon-512.png`, `icon-maskable-512.png` e `apple-touch-icon.png`).
+3. **Settings → Pages → Deploy from a branch → main / (root)** → Save.
+4. Em 1–2 minutos o app abre em `https://SEU-USUARIO.github.io/NOME-DO-REPO/`.
+5. No celular, abra o endereço e crie o atalho.
 
 ## Dados: onde ficam
 
@@ -37,7 +58,7 @@ Criado por **Steven Primeiro** · versão **2.31**
 
 - **Aparência** — tema escuro/claro/sistema, 8 padrões de cor (incluindo *Vermelho tatame* e *Verde musgo*) e densidade da lista de alunos.
 - **Celular** — posição do botão flutuante, esconder a barra ao rolar e criar atalho.
-- **Segurança** — PIN de 4 a 8 dígitos (guardado embaralhado em SHA-256), trancar ao trocar de aba, limpar ao fechar.
+- **Segurança** — login por nome do professor (Steven, Nicholas, Anderson) com senha; a base do dojo só abre para quem entrou.
 - As seções abrem ao toque no título e se recolhem no toque seguinte.
 
 ## Horários
@@ -57,7 +78,7 @@ HTML, CSS e JavaScript puros — sem bibliotecas, sem build, sem dependências. 
 
 ```
 index.html                       o app inteiro
-DojoArandu v2.32p.html           a mesma coisa, com o nome da versão
+DojoArandu v2.43p.html           a mesma coisa, com o nome da versão
 sw.js                            service worker (offline e atalho)
 manifest.webmanifest             nome, ícone e cor do atalho
 README.md                        esta apresentação
@@ -74,6 +95,6 @@ assets/
 ---
 
 **Criador:** Steven Primeiro
-**Versão:** 2.32 · novembro de 2026
+**Versão:** 2.43 · novembro de 2026
 
 *Disciplina · Respeito · Evolução*
