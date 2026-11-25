@@ -8,7 +8,7 @@
 <meta name="color-scheme" content="light dark">
 <style>
 /* ============================================================
-   ARANDU · v2.26 — design system
+   ARANDU · v2.28 — design system
    Papel & tinta: editorial, quente, tátil.
    ============================================================ */
 :root{
@@ -419,7 +419,7 @@ html[data-theme="dark"] .hero{background:linear-gradient(115deg,var(--card) 0%,v
   border-color:transparent;color:#fff;
   box-shadow:0 10px 24px -16px color-mix(in srgb,var(--vermilion) 90%,transparent)
 }
-.chip[aria-pressed="true"] .count{background:rgba(255,255,255,.24);color:#fff}
+.chip[aria-pressed="true"] .count{opacity:1;color:color-mix(in srgb,var(--paper) 72%,var(--ink))}
 .chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--paper)}
 .chip .count{font:600 10.5px/1 var(--mono);opacity:.6}
 
@@ -528,11 +528,19 @@ tr:hover .td-actions{opacity:1}
 /* cartões de aluno — versão compacta no celular (menos paint) */
 @media(max-width:900px){
   .student-cards{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
-  .student-card{padding:12px !important;border-radius:14px !important}
+  .student-card{padding:12px !important;border-radius:14px !important;min-width:0}
   .student-card .card-extra{display:none}
   .student-card .avatar{width:30px;height:30px;border-radius:10px;font-size:12px}
 }
-@media(max-width:460px){.student-cards{grid-template-columns:1fr}}
+/* v2.28 · cartão nunca mais largo que a tela: 1 coluna com minmax(0) e
+   conteúdo interno autorizado a encolher (o nome longo empurrava o cartão) */
+@media(max-width:460px){
+  .student-cards{grid-template-columns:minmax(0,1fr)}
+  .student-card>*,.student-card div{min-width:0}
+  .student-card .small,.student-card .badge{white-space:normal}
+  .student-card .status-badge,.student-card [class*="badge"]{flex:none}
+  .student-card .card-top{flex-wrap:wrap}
+}
 
 /* frequência em barrinhas */
 .freqbars{display:flex;align-items:flex-end;gap:3px;height:22px}
@@ -1267,6 +1275,40 @@ html.lowfx .map-page-head{backdrop-filter:none;background:var(--paper)}
 
 .badge--role{background:color-mix(in srgb,var(--gold) 22%,transparent);color:var(--gold);border:1px solid color-mix(in srgb,var(--gold) 38%,transparent);font-size:9px;letter-spacing:.05em;text-transform:uppercase;padding:2px 6px;border-radius:6px;vertical-align:middle;font-weight:700}
 
+/* ---------- segurança: tela de PIN ---------- */
+.lock-screen{position:fixed;inset:0;z-index:200;display:grid;place-items:center;padding:20px;
+  background:radial-gradient(120% 100% at 50% 0%,color-mix(in srgb,var(--accent) 18%,var(--paper)),var(--paper) 70%);
+  backdrop-filter:blur(6px)}
+.lock-card{width:100%;max-width:330px;background:var(--card);border:1px solid var(--line);border-radius:22px;
+  padding:26px 22px;box-shadow:var(--shadow-l)}
+.lock-title{font-family:var(--serif);font-size:24px;font-weight:500;text-align:center;margin:4px 0 8px}
+.lock-card .brand-seal{width:54px;height:54px;border-radius:50%;display:grid;place-items:center;
+  background:var(--vermilion);color:#fff7f2;font-family:var(--serif);font-size:27px;
+  box-shadow:inset 0 0 0 1px rgba(255,255,255,.22),0 6px 18px -8px rgba(196,67,44,.8)}
+.lock-input{text-align:center;font-size:24px;letter-spacing:.35em;padding:14px 10px;height:auto}
+.lock-erro{min-height:18px;font-size:11.5px;color:var(--vermilion);text-align:center;margin-top:6px}
+.sec-facts{display:grid;gap:9px;margin-top:10px}
+.sec-facts>div{border:1px solid var(--line-2);border-radius:12px;padding:10px 12px;background:color-mix(in srgb,var(--ink) 3%,transparent)}
+.sec-facts b{display:block;font-size:12.5px;margin-bottom:2px}
+.sec-facts span{font-size:11.5px;color:var(--ink-3);line-height:1.55}
+
+/* ---------- ajustes: seções recolhíveis ---------- */
+.set-sec{padding:0;overflow:hidden}
+.set-head{display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:17px 18px;
+  background:transparent;border:0;cursor:pointer;font:inherit;color:inherit;transition:background .18s}
+.set-head:hover{background:color-mix(in srgb,var(--ink) 4%,transparent)}
+.set-titles{display:flex;flex-direction:column;gap:2px;min-width:0;flex:1}
+.set-title{font-family:var(--serif);font-size:18px;font-weight:500;letter-spacing:-.01em}
+.set-sub{font-size:12px;color:var(--ink-3)}
+.set-chev{display:grid;place-items:center;width:26px;height:26px;border-radius:8px;flex:none;
+  color:var(--ink-3);transition:transform .22s var(--ease),background .18s,color .18s}
+.set-head[aria-expanded="true"] .set-chev{transform:rotate(180deg);color:var(--accent);
+  background:color-mix(in srgb,var(--accent) 12%,transparent)}
+.set-body{border-top:1px solid var(--line-2);animation:setIn .24s var(--ease)}
+.set-body[hidden]{display:none}
+@keyframes setIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.set-pad> .settings-row:first-child{padding-top:14px}
+
 /* ---------- celular: posição do FAB + instalar ---------- */
 .fab-pos-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;margin-top:10px}
 .fab-pos{display:flex;flex-direction:column;align-items:center;gap:6px;padding:9px 6px 7px;border-radius:12px;
@@ -1688,9 +1730,9 @@ const TODAY_ISO = iso(TODAY);
    Backup importado em 24/11/2026 — é a base que abre no primeiro acesso
    e o "restaurar base inicial" em Ajustes.
    ============================================================ */
-const SEED_BACKUP_NAME = 'arandu-backup-2026-11-24.json';
-const SEED_BACKUP_LABEL = 'Base inicial · 24/11/2026';
-const SEED_DATA = {"students":[{"name":"Steven Primeiro","classGroup":"Adulto","status":"Ativo","belt":"Azul","degrees":0,"age":35,"phone":"(85) 99819-8515","locality":"Olho Dágua","guardian":"","plan":"Mensal","fee":70,"dueDay":10,"joinDate":"2026-11-24","id":"mwv8m1jaw946k"},{"name":"Ruthe Costa Silva","classGroup":"Adulto","status":"Ativo","belt":"Branca","degrees":3,"age":21,"phone":"88981830030","locality":"Cajuais","guardian":"","plan":"Mensal","fee":70,"dueDay":5,"joinDate":"2026-11-24","id":"mwv8q6nt1sopj"},{"name":"Lucas Gabriel Rebouças","classGroup":"Adulto","status":"Ativo","belt":"Branca","degrees":2,"age":12,"phone":"88992044435","locality":"Olho d'água","guardian":"Jean Rebouças","plan":"Mensal","fee":70,"dueDay":24,"joinDate":"2026-11-24","id":"mwv8s3kw2g5zi"},{"name":"Guilherme Luis de Oliveira Silva","classGroup":"Adulto","status":"Ativo","belt":"Branca","degrees":0,"age":18,"phone":"88988257351","locality":"Olho d'água","guardian":"","plan":"Mensal","fee":70,"dueDay":3,"joinDate":"2026-11-24","id":"mwv8tn489g0m5"},{"name":"Cleiton Charles Nogueira Holanda Filho","classGroup":"Adulto","status":"Ativo","belt":"Branca","degrees":4,"age":17,"phone":"84994117113","locality":"Olho Dágua","guardian":"Cleiton Charles Nogueira Holanda","plan":"Mensal","fee":70,"dueDay":20,"joinDate":"2026-11-24","id":"mwv8vsppw4o8v"},{"name":"Christian Kalil Maia Rebouças","classGroup":"Adulto","status":"Ativo","belt":"Branca","degrees":2,"age":18,"phone":"88988142390","locality":"Morro Pintado","guardian":"","plan":"Mensal","fee":70,"dueDay":23,"joinDate":"2026-11-24","id":"mwv8xc75k6gcz"},{"name":"João Pedro de Oliveira Silva","classGroup":"Adulto","status":"Ativo","belt":"Branca","degrees":3,"age":17,"phone":"8599965062","locality":"Tremembe","guardian":"José da Paz da Silva","plan":"Mensal","fee":70,"dueDay":27,"joinDate":"2026-11-24","id":"mwv9053rus9eg"},{"name":"Máyra Karine Fernandes Barboza","classGroup":"Adulto","status":"Ativo","belt":"Branca","degrees":1,"age":18,"phone":"84992268265","locality":"Centro","guardian":"","plan":"Mensal","fee":70,"dueDay":24,"joinDate":"2026-11-24","id":"mwv944awgxdin"},{"name":"Luis Guilherme Rebouças Silva","classGroup":"Adulto","status":"Ativo","belt":"Azul","degrees":0,"age":22,"phone":"88981437970","locality":"Centro","guardian":"","plan":"Mensal","fee":70,"dueDay":19,"joinDate":"2026-11-24","id":"mwv96c6vs12ny"},{"name":"Wadryan Cunha Rebouças","classGroup":"Adulto","status":"Ativo","belt":"Branca","degrees":0,"age":13,"phone":"88981830731","locality":"Ibicuitaba","guardian":"Edvaldo Rodrigues de Oliveira","plan":"Mensal","fee":70,"dueDay":10,"joinDate":"2026-11-24","id":"mwv99z7on2puv"}],"payments":[{"id":"mwv8m1jak439p","studentId":"mwv8m1jaw946k","month":"2026-11","dueDate":"2026-11-10","amount":70,"status":"Pendente","paidAt":"","method":""},{"id":"mwv8q6nt12yvn","studentId":"mwv8q6nt1sopj","month":"2026-11","dueDate":"2026-11-05","amount":70,"status":"Pendente","paidAt":"","method":""},{"id":"mwv8s3kwp1ul3","studentId":"mwv8s3kw2g5zi","month":"2026-11","dueDate":"2026-11-10","amount":70,"status":"Pendente","paidAt":"","method":""},{"id":"mwv8tn48w0q7e","studentId":"mwv8tn489g0m5","month":"2026-11","dueDate":"2026-11-03","amount":70,"status":"Pendente","paidAt":"","method":""},{"id":"mwv8vspplv393","studentId":"mwv8vsppw4o8v","month":"2026-11","dueDate":"2026-11-20","amount":70,"status":"Pendente","paidAt":"","method":""},{"id":"mwv8xc75yynp5","studentId":"mwv8xc75k6gcz","month":"2026-11","dueDate":"2026-11-23","amount":70,"status":"Pendente","paidAt":"","method":""},{"id":"mwv9053rq9q6z","studentId":"mwv9053rus9eg","month":"2026-11","dueDate":"2026-11-27","amount":70,"status":"Pendente","paidAt":"","method":""},{"id":"mwv944awqc7hz","studentId":"mwv944awgxdin","month":"2026-11","dueDate":"2026-11-24","amount":70,"status":"Pendente","paidAt":"","method":""},{"id":"mwv96c6wqrbck","studentId":"mwv96c6vs12ny","month":"2026-11","dueDate":"2026-11-19","amount":70,"status":"Pendente","paidAt":"","method":""},{"id":"mwv99z7o7nrra","studentId":"mwv99z7on2puv","month":"2026-11","dueDate":"2026-11-10","amount":70,"status":"Pendente","paidAt":"","method":""}],"expenses":[],"attendance":{"2026-11-24":["mwv8q6nt1sopj","mwv8s3kw2g5zi","mwv8tn489g0m5","mwv8vsppw4o8v","mwv8xc75k6gcz","mwv9053rus9eg","mwv944awgxdin","mwv96c6vs12ny","mwv99z7on2puv"]},"attendanceOpen":{"2026-11-24":{"Adulto":true}},"trainings":[],"visitors":[],"customPositions":[]};
+const SEED_BACKUP_NAME = 'base-exemplo.json';
+const SEED_BACKUP_LABEL = 'Base de exemplo (sem dados)';
+const SEED_DATA = {"students":[{"id":"demo-a0","name":"Aluno Exemplo","age":30,"locality":"Centro","belt":"Branca","degrees":0,"plan":"Mensal","fee":70,"dueDay":10,"joinDate":"2026-01-10","status":"Ativo","classGroup":"Adulto","phone":"(00) 00000-0000","role":"","guardian":""},{"id":"demo-k0","name":"Criança Exemplo","age":9,"locality":"Centro","belt":"Branca","degrees":0,"plan":"Mensal","fee":70,"dueDay":10,"joinDate":"2026-02-01","status":"Ativo","classGroup":"Kids","phone":"(00) 00000-0000","guardian":"Responsável Exemplo","role":""}],"payments":[{"id":"demo-p1","studentId":"demo-a0","month":"2026-11","dueDate":"2026-11-10","amount":70,"status":"Pendente","paidAt":"","method":""},{"id":"demo-p2","studentId":"demo-k0","month":"2026-11","dueDate":"2026-11-10","amount":70,"status":"Pago","paidAt":"2026-11-08","method":"Pix"}],"expenses":[],"attendance":{},"attendanceOpen":{},"trainings":[],"visitors":[],"customPositions":[]};
 const seedData = () => JSON.parse(JSON.stringify(SEED_DATA));
 
 const MONTH = TODAY_ISO.slice(0, 7);
@@ -1809,13 +1851,14 @@ function hexA(hex, a) {
 }
 
 /* prefs de UI */
-const APP_VERSION = '2.26';
+const APP_VERSION = '2.28';
 /* assinatura do modelo de cobrança (fechamento novo + abertura com "outras pendências") */
 const WA_TPL_VER = 2;
 const WA_EMOJI_DEFAULT = '✅';
 let prefs = { theme: 'dark', view: 'table', beltCompact: true, pv: 3, palette: 'violet',
   waNumber: '', waTime: '09:00', waTemplate: '', waLate: true, waPix: 'dojoarandu@gmail.com', waTplVer: WA_TPL_VER, waEmoji: WA_EMOJI_DEFAULT,
-  fabPos: 'br', hideTopbar: true };
+  fabPos: 'br', hideTopbar: true,
+  pinHash: '', pinHint: '', lockOnBlur: true, wipeOnExit: false };
 function savePrefs() { try { localStorage.setItem(COL_KEY, JSON.stringify(prefs)); } catch (e) {} }
 (() => {
   let stored = null;
@@ -1856,8 +1899,8 @@ function demoData() {
     ['Nicholas', 34, 'Centro', 'Marrom', 4, -1980], ['Anderson', 31, 'Redonda', 'Marrom', 3, -1740],
     ['Carol', 27, 'Cajuais', 'Branca', 0, -120], ['Ricardo', 38, 'Mutamba', 'Branca', 3, -610],
     ['Guilherme', 22, 'Peroba', 'Azul', 0, -430], ['Denílson', 41, 'Tremembé', 'Branca', 2, -320],
-    ['Cleiton', 26, 'Manibú', 'Branca', 4, -520], ['Alex', 29, 'Centro', 'Branca', 3, -280],
-    ['Ruthe', 24, 'Tremembé', 'Branca', 4, -640], ['Lucas Gabriel', 20, 'Ibicuitaba', 'Branca', 2, -190],
+    ['Aluno Doze', 26, 'Manibú', 'Branca', 4, -520], ['Alex', 29, 'Centro', 'Branca', 3, -280],
+    ['Aluna Onze', 24, 'Tremembé', 'Branca', 4, -640], ['Lucas Gabriel', 20, 'Ibicuitaba', 'Branca', 2, -190],
     ['Carlos Junior', 19, 'Mutamba', 'Branca', 3, -350]
   ];
   const kids = [
@@ -1891,7 +1934,7 @@ function demoData() {
   students.push({
     id: 'demo-steven', name: steven[0], age: steven[1], locality: steven[2], belt: steven[3],
     degrees: steven[4], plan: 'Mensal', fee: 70, dueDay: TODAY.getDate(), joinDate: D(steven[5]),
-    status: 'Ativo', classGroup: 'Adulto', phone: '(85) 99819-8515', role: ''
+    status: 'Ativo', classGroup: 'Adulto', phone: '(00) 00000-0000', role: ''
   });
 
   /* mensalidades — 4 meses */
@@ -3308,7 +3351,7 @@ function waSettings() {
         <b>3.</b> Sem conexão, ele abre o WhatsApp com o texto pronto — você só toca em enviar.
       </div>
     </div>
-    ${fieldHTML({ name: 'waNumber', label: 'WhatsApp do dojo (com DDD)', value: prefs.waNumber || '', placeholder: '(85) 99819-8515', hint: 'Número que assina os lembretes automáticos.' })}
+    ${fieldHTML({ name: 'waNumber', label: 'WhatsApp do dojo (com DDD)', value: prefs.waNumber || '', placeholder: '(00) 00000-0000', hint: 'Número que assina os lembretes automáticos.' })}
     ${fieldHTML({ name: 'waTime', label: 'Horário do envio', type: 'select', value: prefs.waTime || '09:00', options: ['08:00', '09:00', '10:00', '12:00', '18:00'] })}
     ${fieldHTML({ name: 'waPix', label: 'Chave Pix', value: prefs.waPix || WA_PIX_DEFAULT, full: true, placeholder: 'dojoarandu@gmail.com', hint: 'Entra no lugar de {pix} na mensagem.' })}
     ${fieldHTML({ name: 'waTemplate', label: 'Mensagem', type: 'textarea', value: prefs.waTemplate || WA_TEMPLATE_DEFAULT, full: true, rows: 8,
@@ -3627,7 +3670,6 @@ function pageHoje() {
       </div>
       <div style="display:flex;align-items:center;gap:8px;margin-top:auto;padding-top:16px;border-top:1px solid var(--line-2)">
         <span class="small dim" style="flex:1">Dica: <b style="color:var(--ink-2)">⌘K</b> abre tudo — páginas, alunos e ações.</span>
-        <button class="btn btn--sm btn--ghost" data-act="nav" data-page="ajustes">Atalhos</button>
       </div>
     </div>
 
@@ -3699,15 +3741,15 @@ function studentRowsHTML(mode) {
   if ((mode || view.studentsView) === 'cards') {
     return `<div style="padding:14px">
       ${arr.length ? `<div class="grid-3 student-cards">${arr.map(s => `<button class="card card--paper student-card" style="text-align:left;padding:16px;border-radius:18px" data-act="open-profile" data-id="${s.id}">
-        <div style="display:flex;align-items:center;gap:11px">
+        <div class="card-top" style="display:flex;align-items:center;gap:11px;min-width:0">
           ${avatarHTML(s.name)}
-          <div style="min-width:0"><div style="font-weight:650;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(s.name)}${s.role ? ` <span class="badge badge--role">${esc(s.role)}</span>` : ''}</div>
+          <div style="min-width:0;flex:1"><div style="font-weight:650;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(s.name)}${s.role ? ` <span class="badge badge--role">${esc(s.role)}</span>` : ''}</div>
           <div class="small dim">${esc(groupOf(s))}${s.age ? ' · ' + esc(s.age) + ' anos' : ''}</div></div>
-          <div style="margin-left:auto">${statusBadge(s.status)}</div>
+          <div style="margin-left:auto;flex:none">${statusBadge(s.status)}</div>
         </div>
-        <div style="display:flex;align-items:center;gap:10px;margin-top:14px">${beltHTML(s)}</div>
-        <div style="display:flex;align-items:center;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line-2)">
-          <span class="small dim">${esc(s.locality || '—')}</span>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:14px;min-width:0">${beltHTML(s)}</div>
+        <div style="display:flex;align-items:center;gap:10px;margin-top:12px;padding-top:12px;border-top:1px solid var(--line-2);min-width:0">
+          <span class="small dim" style="min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap">${esc(s.locality || '—')}</span>
           <span style="margin-left:auto">${freqBars(s)}</span>
         </div>
       </button>`).join('')}</div>`
@@ -4816,8 +4858,16 @@ function pageAjustes() {
       <b style="display:flex;align-items:center;gap:5px">${icon(iconName, 13)} ${label}</b><small>${note}</small>
     </button>`;
 
-  const aparencia = `<div class="card">
-      <div class="card-head"><div><h3>Aparência</h3><div class="sub">Escuro é o padrão — claro e sistema continuam à mão</div></div></div>
+  const sec = (id, title, sub, body, opts = {}) => `<div class="card set-sec${opts.open ? ' is-open' : ''}" data-sec="${id}">
+      <button type="button" class="set-head" data-act="toggle-sec" data-id="${id}" aria-expanded="${opts.open ? 'true' : 'false'}">
+        <span class="set-titles"><span class="set-title">${title}</span><span class="set-sub">${sub}</span></span>
+        <span class="set-chev">${icon('chevronDown', 16)}</span>
+      </button>
+      <div class="set-body"${opts.open ? '' : ' hidden'}>${body}</div>
+    </div>`;
+
+  const aparencia = sec('aparencia', 'Aparência', 'Escuro é o padrão — claro e sistema continuam à mão', `
+    <div class="set-pad">
       <div class="theme-grid">
         ${themeOpt('dark', 'Escuro', 'Sumi noturno · padrão', 'moon')}
         ${themeOpt('light', 'Claro', 'Papel e tinta', 'sun')}
@@ -4844,7 +4894,7 @@ function pageAjustes() {
         <div class="txt"><h4>Visitas no gráfico mensal</h4><p>Exibe a linha de visitantes junto à frequência por turma.</p></div>
         <label class="switch"><input type="checkbox" data-on="toggle-visits" ${view.showVisits ? 'checked' : ''}><span class="track"></span></label>
       </div>
-    </div>`;
+    </div>`);
 
   const seedCor = BASE.origin === 'seed' ? 'badge--ok' : BASE.origin === 'empty' ? 'badge--late' : 'badge--warn';
   const seedNome = BASE.origin === 'seed' ? 'Base inicial do dojo' : BASE.origin === 'import' ? 'Backup importado' : BASE.origin === 'demo' ? 'Demonstração' : 'Base vazia';
@@ -4873,8 +4923,7 @@ function pageAjustes() {
       <span class="fab-pos-box"><i style="--x:${id[1] === 'l' ? 'left' : 'right'};--y:${id[0] === 't' ? 'top' : 'bottom'}"></i></span>
       <span class="fab-pos-lbl">${label}</span></button>`;
 
-  const celular = `<div class="card">
-      <div class="card-head"><div><h3>Celular</h3><div class="sub">Só aparece no aparelho — no computador nada muda</div></div></div>
+  const celular = sec('celular', 'Celular', 'Só aparece no aparelho — no computador nada muda', `<div class="set-pad">
       <div class="settings-row" style="padding-top:0">
         <div class="txt" style="width:100%">
           <h4>Posição do botão flutuante</h4>
@@ -4905,10 +4954,9 @@ function pageAjustes() {
       <div class="settings-row" style="border-bottom:0">
         <div class="txt" style="width:100%">${publishCardHTML()}</div>
       </div>
-    </div>`;
+    </div>`);
 
-  const dados = `<div class="card">
-      <div class="card-head"><div><h3>Dados</h3><div class="sub">Tudo salvo neste navegador</div></div></div>
+  const dados = sec('dados', 'Dados', 'Tudo salvo neste navegador', `<div class="set-pad">
       <div class="settings-row" style="padding-top:0;border-bottom:0">
         <div class="txt" style="width:100%">
           <h4>Base em uso</h4>
@@ -4941,24 +4989,53 @@ function pageAjustes() {
           <div class="acts"><button class="btn btn--sm btn--danger" data-act="clear-db">${icon('trash', 14)} Limpar tudo</button></div>
         </div>
       </div>
-    </div>`;
+    </div></div>`);
 
-  const armazenamento = `<div class="card">
-      <div class="card-head"><div><h3>Armazenamento</h3><div class="sub">localStorage · ${kb} KB em uso</div></div></div>
+  const pinTxt = pinSet() ? 'PIN ativo neste aparelho.' : 'Sem PIN — quem abrir o app vê a base inteira.';
+  const seguranca = sec('seguranca', 'Segurança', pinTxt, `<div class="set-pad">
+      <div class="settings-row" style="padding-top:0">
+        <div class="txt" style="width:100%">
+          <h4>Trava de acesso (PIN)</h4>
+          <p>Protege a base real: ao abrir o app, ele pede um PIN de 4 a 8 dígitos. O PIN é guardado como código de embaralhamento (SHA-256) neste navegador — ninguém consegue ler a senha, nem eu.</p>
+          <div class="acts">
+            <button class="btn btn--sm btn--primary" data-act="pin-set">${icon('shield', 14)} ${pinSet() ? 'Trocar PIN' : 'Criar PIN'}</button>
+            ${pinSet() ? `<button class="btn btn--sm" data-act="pin-lock-now">${icon('x', 14)} Trancar agora</button>
+            <button class="btn btn--sm btn--danger" data-act="pin-remove">${icon('trash', 14)} Remover PIN</button>` : ''}
+          </div>
+          ${pinSet() ? `<div class="field-note">${icon('shield', 12)} Dica cadastrada: “${esc(prefs.pinHint || 'sem dica')}”</div>` : ''}
+          <div class="field-note" style="margin-top:10px">${icon('bell', 12)} <b>Se esquecer o PIN</b> não há como recuperar — por segurança. A saída é apagar os dados do site (Ajustes do navegador → Dados do site) e importar um backup. Por isso: baixe backups e guarde o PIN junto.</div>
+        </div>
+      </div>
+      <div class="settings-row">
+        <div class="txt"><h4>Trancar ao sair do app</h4><p>Pede o PIN de novo assim que você troca de aba ou deixa o celular parado.</p></div>
+        <label class="switch"><input type="checkbox" data-on="toggle-lock-on-blur" ${prefs.lockOnBlur !== false ? 'checked' : ''}><span class="track"></span></label>
+      </div>
+      <div class="settings-row">
+        <div class="txt"><h4>Limpar dados ao sair</h4><p>Apaga a base deste navegador quando você fecha a aba. Use só em aparelho emprestado — e tenha backup.</p></div>
+        <label class="switch"><input type="checkbox" data-on="toggle-wipe-on-exit" ${prefs.wipeOnExit ? 'checked' : ''}><span class="track"></span></label>
+      </div>
+      <div class="settings-row" style="border-bottom:0">
+        <div class="txt" style="width:100%">
+          <h4>Onde os dados ficam</h4>
+          <div class="sec-facts">
+            <div><b>Neste aparelho</b><span>Só no navegador (localStorage). Nada de alunos, telefones ou mensalidades vai para o GitHub.</span></div>
+            <div><b>Página no GitHub Pages</b><span>Só o app vazio: HTML, ícones e manifest. Quem abrir o link vê um sistema sem dados.</span></div>
+            <div><b>Sem nuvem</b><span>Não existe servidor, login ou sincronização. Backup é o JSON que você baixa.</span></div>
+            <div><b>Dispositivo emprestado</b><span>Use PIN + “Limpar dados ao sair” e importe o backup quando devolver.</span></div>
+          </div>
+          <div class="field-note" style="margin-top:10px">${icon('alert', 12)} O link do GitHub Pages é público. Se você publicar <b>um HTML com dados de teste dentro</b>, esses dados ficam públicos. Publique sempre a versão limpa — a pasta <b>publicar-github/</b> já vem assim.</div>
+        </div>
+      </div>
+    </div>`);
+
+  const armazenamento = sec('armazenamento', 'Armazenamento', `localStorage · ${kb} KB em uso`, `<div class="set-pad">
       <div style="height:8px;border-radius:99px;background:var(--line-2);overflow:hidden">
         <div style="height:100%;width:${pctStorage}%;background:var(--vermilion);border-radius:99px;transition:width .6s var(--ease)"></div>
       </div>
       <div class="row" style="border:0;padding-top:10px"><span class="small dim">Estimativa sobre ~5 MB disponíveis</span><span class="tail small num">${kb} KB</span></div>
       <p class="small dim" style="margin-top:6px">Os dados vivem apenas neste navegador. Limpar cache/cookies do site apaga tudo — mantenha backups.</p>
-    </div>`;
+    </div></div>`);
 
-  const atalhos = `<div class="card">
-      <div class="card-head"><div><h3>Atalhos</h3><div class="sub">Para quem vive no teclado</div></div></div>
-      <div class="rows keymap">
-        ${[['⌘ / Ctrl + K', 'Busca e comandos'], ['H', 'Hoje'], ['A', 'Alunos'], ['F', 'Frequência'], ['T', 'Treinos'], ['N', 'Nova matrícula'], ['Esc', 'Fechar painéis']].map(([k, l]) =>
-          `<div class="row" style="padding:7px 0"><span class="small">${l}</span><span class="tail"><kbd style="font:500 10.5px var(--mono);border:1px solid var(--line);border-radius:5px;padding:3px 6px;background:var(--card-2)">${k}</kbd></span></div>`).join('')}
-      </div>
-    </div>`;
 
   return `
   ${pageHead({
@@ -4970,7 +5047,7 @@ function pageAjustes() {
   <div class="cols-2">
     ${aparencia}
     ${celular}
-    ${atalhos}
+    ${seguranca}
     ${dados}
     ${armazenamento}
   </div>
@@ -6466,6 +6543,59 @@ const ACTIONS = {
     if (!ok) return;
     db = demoData(); baseSnapshotMeta('demo', 'demonstração fictícia', db); save(); render(); toast('Demonstração carregada.', { icon: 'spark' });
   },
+  'pin-set': () => {
+    const body = `<div class="form-grid">
+      ${fieldHTML({ name: 'pin', label: pinSet() ? 'Novo PIN (4 a 8 dígitos)' : 'PIN (4 a 8 dígitos)', type: 'password', value: '', required: true, placeholder: '••••', inputmode: 'numeric' })}
+      ${fieldHTML({ name: 'pin2', label: 'Repita o PIN', type: 'password', value: '', required: true, placeholder: '••••', inputmode: 'numeric' })}
+      ${fieldHTML({ name: 'hint', label: 'Dica (opcional, aparece no Ajustes)', value: prefs.pinHint || '', placeholder: 'Ex.: aniversário do dojo', full: true })}
+      ${pinSet() ? fieldHTML({ name: 'atual', label: 'PIN atual', type: 'password', value: '', required: true, full: true }) : ''}
+    </div>`;
+    openModal({
+      title: pinSet() ? 'Trocar o PIN' : 'Criar PIN', eyebrow: 'Segurança', body, submitText: 'Salvar',
+      onSubmit: async data => {
+        const pin = String(data.pin || '').trim();
+        if (!/^\d{4,8}$/.test(pin)) { toast('O PIN precisa ter de 4 a 8 números.', { icon: 'alert' }); return false; }
+        if (pin !== String(data.pin2 || '').trim()) { toast('Os dois PINs não conferem.', { icon: 'alert' }); return false; }
+        if (pinSet() && (await sha256(String(data.atual || '').trim())) !== prefs.pinHash) { toast('PIN atual incorreto.', { icon: 'x' }); return false; }
+        prefs.pinHash = await sha256(pin);
+        prefs.pinHint = String(data.hint || '').trim();
+        savePrefs(); render();
+        toast('PIN salvo. Ele será pedido na próxima abertura.', { icon: 'shield' });
+      }
+    });
+  },
+  'pin-remove': async () => {
+    const ok = await confirmDialog({ title: 'Remover o PIN', danger: true, confirmText: 'Remover', message: 'Sem PIN, qualquer pessoa que abrir este navegador vê a base do dojo.' });
+    if (!ok) return;
+    prefs.pinHash = ''; prefs.pinHint = ''; savePrefs(); render();
+    toast('PIN removido.', { icon: 'checkCircle' });
+  },
+  'pin-lock-now': () => { showLock(); },
+  unlock: async () => {
+    const v = String($('#lockPin')?.value || '').trim();
+    if ((await sha256(v)) === prefs.pinHash) { hideLock(); toast('Bem-vindo de volta.', { icon: 'checkCircle' }); }
+    else {
+      const er = $('#lockErro'); if (er) { er.textContent = 'PIN incorreto.'; }
+      const inp = $('#lockPin'); if (inp) { inp.value = ''; inp.focus(); }
+    }
+  },
+  'forgot-pin': async () => {
+    await confirmDialog({
+      title: 'Esqueci o PIN', confirmText: 'Entendi', cancelText: 'Fechar',
+      message: 'O PIN não tem recuperação — é o que garante que ninguém entre sem ele.\n\nPara voltar a usar: apague os dados do site nas configurações do navegador e importe seu último backup (Ajustes → Dados → Importar).'
+    });
+  },
+  'toggle-sec': id => {
+    const card = document.querySelector(`.set-sec[data-sec="${id}"]`);
+    if (!card) return;
+    const head = card.querySelector('.set-head');
+    const body = card.querySelector('.set-body');
+    const open = head.getAttribute('aria-expanded') !== 'true';
+    head.setAttribute('aria-expanded', String(open));
+    card.classList.toggle('is-open', open);
+    body.hidden = !open;
+    if (open) view.openSec = id;
+  },
   'set-fab-pos': id => {
     prefs.fabPos = id; savePrefs(); applyFabPos(); render();
     toast(`Botão do menu no ${({ tl: 'topo esquerdo', tr: 'topo direito', bl: 'base esquerda', br: 'base direita' })[id]}.`, { icon: 'grid' });
@@ -6496,7 +6626,13 @@ const ACTIONS = {
 };
 
 const INPUTS = {
-  'toggle-hide-topbar': el => { prefs.hideTopbar = el.checked; savePrefs(); applyFabPos(); }, 
+  'toggle-hide-topbar': el => { prefs.hideTopbar = el.checked; savePrefs(); applyFabPos(); },
+  'toggle-lock-on-blur': el => { prefs.lockOnBlur = el.checked; savePrefs(); },
+  'toggle-wipe-on-exit': el => {
+    prefs.wipeOnExit = el.checked; savePrefs();
+    if (!el.checked) { try { sessionStorage.removeItem('arandu-armed'); } catch (e) {} }
+    else toast('A base será apagada quando você fechar a aba.', { icon: 'alert' });
+  }, 
   'student-search': el => {
     view.q = el.value;
     const body = $('#studentsBody');
@@ -6523,6 +6659,83 @@ function applyTheme() {
   updateThemeButton();
   applyFabPos();
 }
+/* ============================================================
+   SEGURANÇA — trava local por PIN + limpeza automática
+   Os dados nunca saem deste navegador; a trava impede que alguém
+   que pegue o celular abra a lista de alunos.
+   ============================================================ */
+const sha256 = async (txt) => {
+  try {
+    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(txt + '::arandu'));
+    return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
+  } catch (e) {
+    /* file:// em navegador antigo: hash simples de emergência */
+    let h = 5381;
+    for (const ch of txt) h = ((h << 5) + h + ch.charCodeAt(0)) >>> 0;
+    return 'x' + h.toString(16);
+  }
+};
+const pinSet = () => !!(prefs.pinHash && prefs.pinHash.length > 10);
+let locked = false;
+
+function lockScreenHTML() {
+  return `<div class="lock-wrap">
+    <div class="lock-card">
+      <span class="brand-seal" style="width:54px;height:54px;font-size:27px;margin:0 auto 14px">道</span>
+      <div class="eyebrow" style="text-align:center">Arandu · Sistema do Dojo</div>
+      <h2 class="lock-title">Digite seu PIN</h2>
+      <p class="small dim" style="text-align:center;margin-bottom:16px">A base tem dados reais do dojo. O PIN fica só neste aparelho.</p>
+      <input class="field lock-input" id="lockPin" type="password" inputmode="numeric" maxlength="8"
+        placeholder="••••" autocomplete="off" aria-label="PIN">
+      <div class="lock-erro" id="lockErro"></div>
+      <button class="btn btn--primary" style="width:100%;margin-top:10px" data-act="unlock">Entrar</button>
+      <button class="link small" style="display:block;margin:14px auto 0" data-act="forgot-pin">Esqueci o PIN</button>
+    </div>
+  </div>`;
+}
+function showLock() {
+  if (!pinSet()) return;
+  locked = true;
+  const el = document.createElement('div');
+  el.id = 'lockScreen'; el.className = 'lock-screen';
+  el.innerHTML = lockScreenHTML();
+  document.body.appendChild(el);
+  setTimeout(() => $('#lockPin')?.focus(), 80);
+  $('#lockPin')?.addEventListener('keydown', e => { if (e.key === 'Enter') ACTIONS.unlock(); });
+}
+function hideLock() {
+  locked = false;
+  $('#lockScreen')?.remove();
+}
+
+function securityInit() {
+  /* 1) pede o PIN ao abrir */
+  if (pinSet()) showLock();
+
+  /* 2) tranca ao sair do app (troca de aba/janela) */
+  document.addEventListener('visibilitychange', () => {
+    if (!pinSet() || prefs.lockOnBlur === false) return;
+    if (document.visibilityState === 'hidden') locked = true;
+    else if (locked) showLock();
+  });
+
+  /* 3) limpa a base ao fechar, se o usuário escolheu isso */
+  if (prefs.wipeOnExit) {
+    try { sessionStorage.setItem('arandu-armed', '1'); } catch (e) {}
+  }
+  window.addEventListener('pagehide', () => {
+    if (!prefs.wipeOnExit) return;
+    try { localStorage.removeItem(KEY); localStorage.removeItem(BASE_KEY); } catch (e) {}
+  });
+  /* se o app foi reaberto depois de uma limpeza, avisa */
+  try {
+    if (prefs.wipeOnExit && !sessionStorage.getItem('arandu-armed') && !db.students.length) {
+      toast('Base apagada ao sair. Importe um backup para continuar.', { icon: 'alert' });
+    }
+    sessionStorage.setItem('arandu-armed', '1');
+  } catch (e) {}
+}
+
 /* ---------- atalho na home do celular (PWA) ---------- */
 let deferredInstall = null;
 const isStandalone = () => window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
@@ -6918,6 +7131,7 @@ function boot() {
   dockInit();
   topbarInit();
   pwaSetup();
+  securityInit();
   /* lembrete automático: varre os vencimentos do dia ao abrir o app */
   try { waAutoRun(); render(); } catch (e) {}
 }
