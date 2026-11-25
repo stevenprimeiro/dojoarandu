@@ -6,7 +6,7 @@
 <title>Arandu · Sistema do Dojo</title>
 <meta name="description" content="Arandu — gestão de dojo de Jiu-Jitsu: alunos, frequência, treinos e financeiro em um só lugar.">
 <meta name="color-scheme" content="light dark">
-<meta name="theme-color" content="#c4432c">
+<meta name="theme-color" content="#0f1117">
 <!-- atalho na tela inicial: declarado no HTML (não só via JS) para o
      navegador achar o ícone mesmo antes do script rodar -->
 <link rel="manifest" href="manifest.webmanifest">
@@ -21,7 +21,7 @@
 <meta name="application-name" content="Arandu">
 <style>
 /* ============================================================
-   ARANDU · v2.45 — design system
+   ARANDU · v2.48 — design system
    Papel & tinta: editorial, quente, tátil.
    ============================================================ */
 :root{
@@ -312,6 +312,40 @@ html[data-theme="dark"] .card--ink{background:#232019;color:var(--ink);border-co
 /* Acesso rápido: quando o card fica estreito, os atalhos vão para uma coluna só */
 @container (max-width:420px){.grid-2{grid-template-columns:1fr}}
 
+/* ---- log de alterações ---- */
+/* a página do log não estica o Voltar: ele é navegação, não ação primária */
+#view .page-head .page-actions .btn[data-act="log-voltar"]{flex:0 0 auto;padding:9px 14px;font-size:12.5px}
+.log-card{padding:0;overflow:hidden}
+.log-bar{display:flex;flex-direction:column;gap:12px;padding:16px 18px;border-bottom:1px solid var(--line-2)}
+.log-busca{display:flex;align-items:center;gap:9px;padding:10px 13px;border:1px solid var(--line);border-radius:11px;background:var(--bg-2);color:var(--ink-3)}
+.log-busca input{flex:1;min-width:0;border:0;background:transparent;color:var(--ink);font:inherit;font-size:14px;outline:none}
+.log-busca input::placeholder{color:var(--ink-3)}
+.log-chips{display:flex;gap:7px;flex-wrap:wrap}
+.log-lista{max-height:min(62vh,620px);overflow:auto;padding:6px 0 8px}
+.log-dia{padding:0}
+.log-dia-lbl{position:sticky;top:0;z-index:2;padding:9px 18px 7px;font:750 10.5px/1 var(--cond);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-3);background:color-mix(in srgb,var(--card) 92%,transparent);backdrop-filter:blur(8px)}
+.log-linha{display:flex;align-items:baseline;gap:9px;padding:7px 18px;font-size:13.5px;line-height:1.45;border-left:2px solid transparent}
+.log-linha:hover{background:color-mix(in srgb,var(--ink) 4%,transparent)}
+.log-linha--forte{border-left-color:var(--danger)}
+.log-hora{font-size:11.5px;color:var(--ink-3);flex:0 0 auto;font-variant-numeric:tabular-nums}
+.log-ponto{width:6px;height:6px;border-radius:50%;flex:0 0 auto;transform:translateY(-1px)}
+.log-txt{flex:1;min-width:0;color:var(--ink-2);word-break:break-word}
+.log-txt b{color:var(--ink);font-weight:700}
+.log-tag{flex:0 0 auto;font:700 9.5px/1 var(--cond);letter-spacing:.07em;text-transform:uppercase;opacity:.85}
+.log-vazio{display:flex;flex-direction:column;align-items:center;gap:7px;padding:52px 22px;text-align:center;color:var(--ink-3)}
+.log-vazio b{color:var(--ink);font-size:15px}
+.log-vazio p{font-size:13px;max-width:34ch}
+.log-foot{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:13px 18px;border-top:1px solid var(--line-2)}
+@media(max-width:640px){
+  .log-bar{padding:13px 14px}
+  .log-linha{padding:8px 14px;gap:7px;font-size:13px;flex-wrap:wrap}
+  .log-dia-lbl{padding:8px 14px 6px}
+  .log-txt{flex:1 1 100%;order:3;padding-left:15px}
+  .log-tag{order:2;margin-left:auto;font-size:9px;opacity:.75}
+  .log-hora{font-size:11px}
+  .log-lista{max-height:none}
+  .log-foot{padding:12px 14px}
+}
 .set-stack{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:start}
 .set-stack>.card{width:100%;margin:0}
 .set-stack>.set-wide{grid-column:1/-1}
@@ -527,6 +561,51 @@ label.lbl{display:block;font:600 11px/1 var(--mono);letter-spacing:.11em;text-tr
 .form-grid .full{grid-column:1/-1}
 @media(max-width:560px){.form-grid{grid-template-columns:1fr}}
 .field-note{font-size:11.5px;color:var(--ink-3);margin-top:5px}
+/* ---------- autocompletar da localidade ---------- */
+.ac-wrap{position:relative}
+.ac-box{position:relative}
+.ac-list{
+  position:absolute;left:0;right:0;top:calc(100% + 5px);z-index:40;
+  background:color-mix(in srgb,var(--paper) 94%,var(--ink));border:1px solid var(--line);border-radius:12px;
+  box-shadow:var(--shadow-m);padding:5px;max-height:232px;overflow:auto;
+  animation:acIn .16s var(--ease);
+}
+@keyframes acIn{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
+.ac-item{
+  display:flex;align-items:center;gap:8px;width:100%;text-align:left;
+  padding:9px 10px;border:0;border-radius:8px;background:transparent;
+  font:inherit;font-size:13.5px;color:var(--ink-2);cursor:pointer;
+}
+.ac-item:hover,.ac-item.is-ativo{background:color-mix(in srgb,var(--vermilion) 12%,transparent);color:var(--ink)}
+.ac-item.is-ativo{font-weight:600}
+.ac-pin{display:inline-flex;color:var(--ink-3);flex:0 0 auto}
+.ac-item.is-ativo .ac-pin,.ac-item:hover .ac-pin{color:var(--vermilion)}
+
+/* ---------- bloco do responsável no cadastro ---------- */
+@keyframes respIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+.resp-block{
+  border:1px solid var(--line);border-radius:14px;padding:13px 14px;
+  background:color-mix(in srgb,var(--vermilion) 5%,transparent);
+}
+.resp-block[hidden]{display:none}
+.resp-head{display:flex;align-items:flex-start;gap:10px}
+.resp-ico{
+  display:inline-flex;align-items:center;justify-content:center;flex:0 0 auto;
+  width:26px;height:26px;border-radius:8px;background:color-mix(in srgb,var(--vermilion) 16%,transparent);
+  color:var(--vermilion);
+}
+.resp-head b{display:block;font-size:13px}
+.resp-head small{display:block;font-size:11.5px;color:var(--ink-3);line-height:1.45;margin-top:2px}
+.resp-block .lbl{font-size:11px}
+
+/* ---------- aviso de destinatário (modal do WhatsApp) ---------- */
+.wa-dest{
+  display:flex;align-items:flex-start;gap:8px;margin-bottom:12px;padding:9px 11px;
+  border:1px solid color-mix(in srgb,var(--vermilion) 30%,var(--line));border-radius:10px;
+  background:color-mix(in srgb,var(--vermilion) 8%,transparent);
+  font-size:12px;color:var(--ink-2);line-height:1.45;
+}
+.wa-dest svg{flex:0 0 auto;color:var(--vermilion);margin-top:1px}
 .fee-block{display:flex;flex-direction:column;gap:9px}
 .fee-mode{display:flex;gap:6px;flex-wrap:wrap}
 .fee-mode .chip{gap:5px}
@@ -1909,6 +1988,7 @@ html.lowfx .view-anim>*{animation:none !important}
    1. DADOS
    ============================================================ */
 const KEY = 'arandu-dojo-data';
+const LOG_KEY = 'arandu-dojo-log';
 const BASE_KEY = 'arandu-dojo-base';
 const PREF_KEY = 'arandu-theme';
 const COL_KEY = 'arandu-v2-prefs';
@@ -1973,7 +2053,7 @@ const POSITION_DB = [
 ['Finalizações','Armlock reto (chave de braço)','submission'],['Finalizações','Kimura','submission'],['Finalizações','Americana','submission'],['Finalizações','Omoplata','submission'],['Finalizações','Triângulo','submission'],['Finalizações','Triângulo de braço','submission'],['Finalizações','Mata-leão (estrangulamento pelas costas)','submission'],['Finalizações','Estrangulamento cruzado da montada (gola)','submission'],['Finalizações','Ezequiel','submission'],['Finalizações','Guilhotina','submission'],['Finalizações','D’Arce','submission'],['Finalizações','Anaconda','submission'],['Finalizações','Estrangulamento norte-sul','submission'],['Finalizações','Estrangulamento arco e flecha (bow and arrow)','submission'],['Finalizações','Estrangulamento de lapela (loop choke)','submission'],['Finalizações','Chave de pé reta (restrições por faixa/idade)','submission'],['Finalizações','Chave de joelho (restrições por faixa/idade)','submission'],['Finalizações','Toe hold (restrições por faixa/idade)','submission']
 ].map(([category, name], i) => ({ id: 'pos' + i, category, name }));
 
-const BLANK = () => ({ students: [], payments: [], expenses: [], attendance: {}, attendanceOpen: {}, trainings: [], visitors: [], customPositions: [] });
+const BLANK = () => ({ students: [], payments: [], expenses: [], attendance: {}, attendanceOpen: {}, trainings: [], visitors: [], customPositions: [], log: [] });
 
 let db;
 /* qual base está ativa: 'seed' (backup inicial) ou 'import' (arquivo do usuário) */
@@ -2000,16 +2080,23 @@ function load() {
   }
   const base = BLANK();
   db = Object.assign(base, data);
-  db.trainings ||= []; db.visitors ||= []; db.customPositions ||= [];
+  db.trainings ||= []; db.visitors ||= []; db.customPositions ||= []; db.log ||= [];
   db.attendance ||= {}; db.attendanceOpen ||= {};
   /* metadados da base ativa (persistidos entre sessões) */
   let meta = null;
   try { meta = JSON.parse(localStorage.getItem(BASE_KEY) || 'null'); } catch (e) { meta = null; }
   if (meta && meta.origin) Object.assign(BASE, meta);
+  /* log: usa o que já estava salvo e tira a foto inicial da base */
+  try { const lg = JSON.parse(localStorage.getItem(LOG_KEY) || 'null'); if (Array.isArray(lg) && (!db.log || !db.log.length)) db.log = lg; } catch (e) {}
+  logPreparar();
 }
 function save(opts = {}) {
+  /* antes de gravar: narra no log tudo o que mudou desde a última gravação */
+  if (opts.log !== false) { try { logAnotar(); } catch (e) {} }
+  if (LOG_ANTES === null) { try { logPreparar(); } catch (e) {} }
   try { localStorage.setItem(KEY, JSON.stringify(db)); }
   catch (e) { toast('Não foi possível salvar: o armazenamento está cheio.'); }
+  guardarBoa(db);   /* cópia de segurança para a trava da nuvem */
   /* nuvem: cada gravação local também vai para o banco compartilhado */
   if (CLOUD.ativo && !opts.local) cloudPush();
 }
@@ -2054,7 +2141,7 @@ function hexA(hex, a) {
 }
 
 /* prefs de UI */
-const APP_VERSION = '2.45';
+const APP_VERSION = '2.48';
 /* assinatura do modelo de cobrança (fechamento novo + abertura com "outras pendências") */
 const WA_TPL_VER = 2;
 const WA_EMOJI_DEFAULT = '✅';
@@ -2298,6 +2385,32 @@ const sum = (arr, f) => arr.reduce((a, x) => a + Number(f(x) || 0), 0);
 /* ----- derivados ----- */
 const activeStudents = () => db.students.filter(s => s.status === 'Ativo');
 const groupOf = s => s.classGroup || 'Adulto';
+
+/* ------------------------------------------------------------
+   LOCALIDADES DE ICAPUÍ
+   Praias, distritos, sítios e assentamentos do município — a lista
+   base do autocompletar do cadastro. O cadastro também aproveita
+   qualquer localidade já escrita na base, então a lista cresce com
+   o uso (bairro novo, sítio, etc.) sem precisar mexer no código.
+   ------------------------------------------------------------ */
+const LOCALIDADES_ICAPUI = [
+  'Centro',
+  /* distritos e sedes */
+  'Ibicuitaba', 'Manibu', 'Manibú',
+  /* praias, de leste a oeste */
+  'Barra Grande', 'Requenguela', 'Barrinha', 'Barrinha de Mutamba', 'Barrinha Nova Morada',
+  'Retiro Grande', 'Ponta Grossa', 'Redonda', 'Peroba', 'Picos', 'Barreiras', 'Quitérias',
+  'Tremembé', 'Melancias', 'Melancia de Baixo', 'Melancia de Cima', 'Peixe Gordo',
+  'Arrombado', 'Mutamba', 'Serra da Mutamba', 'Cajuais', 'Praia do Ceará',
+  /* comunidades, sítios e assentamentos */
+  "Olho D'Água", 'Morro Pintado', 'Morro Alto', 'Córrego do Sal',
+  'Mata Fresca', 'Bebedouro', 'Bebe Água', 'Curral Grande', 'Canto do Coco', 'Canto do Torto',
+  'Cacimba Funda', 'Quatro Bocas', 'Triângulo do Belém', 'Assentamento Redonda',
+  'Assentamento Lagoa do Mato', 'Zumbi dos Palmares', 'Cajazeiras', 'Cajuás', 'Guajiru',
+  'Gamboa', 'Manguinho', 'Miranda', 'Bandeira', 'Tijuco', 'Vila Nova', 'Paulinas',
+  'Ilha do Meio', 'Mundo Novo', 'Lagoa Redonda', 'Lagoa do Sal', 'Lagoa do Junco',
+  'Salinas', 'Sítio Clemente'
+];
 const rosterOf = g => activeStudents().filter(s => groupOf(s) === g);
 const attendanceOf = d => db.attendance[d] || [];
 const dayVisitors = d => db.visitors.filter(v => v.date === d);
@@ -2512,6 +2625,105 @@ function openModal({ title, eyebrow = 'Dojo Arandu', body, onSubmit, submitText 
   return { close, el: wrap };
 }
 
+/* ============================================================
+   AUTOCOMPLETAR DE LOCALIDADE
+   Campo de texto normal que sugere as localidades de Icapuí e
+   também o que já foi digitado na base. Aceita qualquer texto:
+   quem mora num sítio que não está na lista continua livre.
+   ============================================================ */
+/* normaliza para comparar: sem acento, sem caixa */
+function semAcento(t) {
+  return String(t || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+}
+function localidadesBase() {
+  const usadas = new Map();
+  (db.students || []).forEach(x => {
+    const v = (x.locality || '').trim();
+    if (v) usadas.set(semAcento(v), v);
+  });
+  const lista = [...usadas.values()];
+  LOCALIDADES_ICAPUI.forEach(v => { if (!usadas.has(semAcento(v))) { usadas.set(semAcento(v), v); lista.push(v); } });
+  return lista;
+}
+/* ranqueia: começa com → contém → o resto; local da base vale um empurrão */
+function localidadesSugerir(termo, limite = 8) {
+  const q = semAcento(termo);
+  const usadas = new Set((db.students || []).map(x => semAcento(x.locality)));
+  const todas = localidadesBase();
+  const pontos = v => {
+    const n = semAcento(v);
+    let p = 0;
+    if (!q) return usadas.has(n) ? 2 : 1;
+    if (n === q) p = 100;
+    else if (n.startsWith(q)) p = 80;
+    else if (n.includes(' ' + q)) p = 60;
+    else if (n.includes(q)) p = 40;
+    if (!p) return -1;
+    return p + (usadas.has(n) ? 10 : 0);
+  };
+  return todas
+    .map(v => ({ v, p: pontos(v) }))
+    .filter(x => x.p > 0 && semAcento(x.v) !== q)
+    .sort((a, b) => b.p - a.p || a.v.localeCompare(b.v, 'pt-BR'))
+    .slice(0, limite)
+    .map(x => x.v);
+}
+
+/* campo com sugestões: input + lista flutuante */
+function fieldAutocompleteHTML(f) {
+  const id = 'f_' + f.name;
+  return `<div class="form-field ${f.full ? 'full' : ''} ac-wrap" id="ac_${f.name}">
+    <label class="lbl" for="${id}">${esc(f.label)}</label>
+    <div class="ac-box">
+      <input class="field" id="${id}" name="${f.name}" type="text" autocomplete="off"
+        value="${esc(f.value ?? '')}" placeholder="${esc(f.placeholder || '')}"
+        role="combobox" aria-autocomplete="list" aria-expanded="false" aria-controls="acl_${f.name}">
+      <div class="ac-list" id="acl_${f.name}" role="listbox" hidden></div>
+    </div>
+    ${f.hint ? `<div class="field-note">${esc(f.hint)}</div>` : ''}
+  </div>`;
+}
+function mountAutocomplete(root, name, opts = {}) {
+  const wrap = root.querySelector('#ac_' + name);
+  if (!wrap) return;
+  const input = wrap.querySelector('input');
+  const lista = wrap.querySelector('.ac-list');
+  if (!input || !lista) return;
+  let ativo = -1;
+  let itens = [];
+  const fechar = () => { lista.hidden = true; lista.innerHTML = ''; input.setAttribute('aria-expanded', 'false'); ativo = -1; itens = []; };
+  const pintar = () => {
+    lista.innerHTML = itens.map((v, i) => `<button type="button" role="option" class="ac-item${i === ativo ? ' is-ativo' : ''}" data-i="${i}" aria-selected="${i === ativo}">
+        <span class="ac-pin">${icon('pin', 12)}</span>${esc(v)}
+      </button>`).join('');
+    lista.hidden = !itens.length;
+    input.setAttribute('aria-expanded', String(!!itens.length));
+  };
+  const abrir = () => {
+    itens = localidadesSugerir(input.value, 8);
+    ativo = -1;
+    pintar();
+  };
+  const escolher = v => { input.value = v; fechar(); input.dispatchEvent(new Event('input', { bubbles: true })); };
+  input.addEventListener('focus', abrir);
+  input.addEventListener('input', abrir);
+  input.addEventListener('keydown', e => {
+    if (lista.hidden) { if (e.key === 'ArrowDown') { abrir(); e.preventDefault(); } return; }
+    if (e.key === 'ArrowDown') { e.preventDefault(); ativo = Math.min(itens.length - 1, ativo + 1); pintar(); }
+    else if (e.key === 'ArrowUp') { e.preventDefault(); ativo = Math.max(-1, ativo - 1); pintar(); }
+    else if (e.key === 'Enter' && ativo >= 0) { e.preventDefault(); escolher(itens[ativo]); }
+    else if (e.key === 'Escape') { fechar(); }
+    else if (e.key === 'Tab') { fechar(); }
+  });
+  lista.addEventListener('mousedown', e => e.preventDefault());   /* não tira o foco do campo */
+  lista.addEventListener('click', e => {
+    const b = e.target.closest('.ac-item');
+    if (b) escolher(itens[Number(b.dataset.i)]);
+  });
+  input.addEventListener('blur', () => setTimeout(fechar, 120));
+  if (opts.after) opts.after(input);
+}
+
 /* campos */
 function fieldHTML(f) {
   const id = 'f_' + f.name;
@@ -2588,6 +2800,42 @@ function mountFeeMode(root) {
   });
   input.addEventListener('input', syncPreview);
   syncPreview();
+}
+
+/* ------------------------------------------------------------
+   RESPONSÁVEL LEGAL
+   Só aparece quando o aluno é de menor (idade < 18) ou está na
+   turma Kids — quer dizer, quando faz sentido. Ao esconder, os
+   campos são limpos para não sobrar dado de outra ficha.
+   ------------------------------------------------------------ */
+function mountResponsavel(root) {
+  const bloco = root.querySelector('#respBlock');
+  const idade = root.querySelector('#f_age');
+  const turma = root.querySelector('#f_classGroup');
+  if (!bloco || !idade || !turma) return;
+  const sync = () => {
+    const anos = Number(idade.value);
+    const menor = Number.isFinite(anos) && anos > 0 && anos < 18;
+    const kids = (turma.value || '') === 'Kids';
+    const mostrar = menor || kids;
+    if (bloco.hidden === mostrar) {
+      bloco.hidden = !mostrar;
+      bloco.style.animation = mostrar ? 'respIn .28s var(--spring)' : '';
+      if (mostrar) {
+        const nota = bloco.querySelector('.resp-head small');
+        if (nota) nota.textContent = kids && !menor
+          ? 'Turma Kids: o lembrete de mensalidade vai para o WhatsApp do responsável, com o nome dele e o do aluno.'
+          : 'O lembrete de mensalidade vai para o WhatsApp do responsável, com o nome dele e o do aluno.';
+      } else {
+        /* aluno adulto fora do Kids: não guarda responsável pela metade */
+        ['#f_guardian', '#f_guardianPhone'].forEach(sel => { const el = root.querySelector(sel); if (el) el.value = ''; });
+      }
+    }
+  };
+  idade.addEventListener('input', sync);
+  idade.addEventListener('change', sync);
+  turma.addEventListener('change', sync);
+  sync();
 }
 
 function mountBeltPicker(root) {
@@ -3021,6 +3269,8 @@ function scheduleRender() {
 
 function go(page, opts = {}) {
   if (!PAGES[page]) page = 'hoje';
+  /* a página do log não é aba: guarda de onde viemos para o botão Voltar */
+  if (page === 'log' && view.page !== 'log') view.logVoltaDe = view.page;
   view.page = page;
   Object.assign(view, opts.state || {});
   if (location.hash !== '#' + page) history.replaceState(null, '', '#' + page);
@@ -3399,17 +3649,69 @@ function waIntro(s, open) {
   /* mês do aviso: o que vence hoje; se não houver, o mais recente em aberto */
   const ref = open.find(p => p.dueDate === TODAY_ISO) || open[open.length - 1];
   const dd = Number(String(ref.dueDate || '').slice(8, 10)) || Number(s.dueDay) || 10;
-  const when = ref.dueDate === TODAY_ISO ? `vence hoje (dia ${dd})`
-    : isLatePayment(ref) ? `venceu em ${dateShort(ref.dueDate)} (dia ${dd}) e segue em aberto`
-      : `vence em ${dateShort(ref.dueDate)} (dia ${dd})`;
-  /* mês por extenso ("novembro"); o ano entra só se não for o ano corrente */
-  const [anoAtual] = TODAY_ISO.split('-');
-  const [anoRef] = (ref.month || MONTH).split('-');
-  const mesNome = MONTHS[Number((ref.month || MONTH).split('-')[1]) - 1].toLowerCase();
-  const mesTxt = `${mesNome}${anoRef === anoAtual ? '' : ' de ' + anoRef}`;
+  /* frase enxuta (pedido do Steven, v2.46): "sua mensalidade venceu dia 10
+     e segue em aberto" — sem repetir o mês nem a data por extenso */
+  const when = ref.dueDate === TODAY_ISO ? `vence hoje, dia ${dd}`
+    : isLatePayment(ref) ? `venceu dia ${dd}`
+      : `vence dia ${dd}`;
   /* além do mês citado, há outras mensalidades em aberto? */
-  const extra = open.length > 1 ? ' e identificamos outras pendências' : '';
-  return `Passando para lembrar que sua mensalidade de ${mesTxt} ${when}${extra}. Este é o resumo:`;
+  const extra = open.length > 1 ? ', e identificamos outras pendências' : '';
+  /* indo para o responsável, a frase é sobre o aluno (senão o pai lê
+     "sua mensalidade" e não sabe de quem é) */
+  const alvo = waDestino(s);
+  if (alvo.ehResponsavel) {
+    const aluno = alvo.aluno || 'o aluno';
+    return `Passando para lembrar que a mensalidade de ${aluno} ${when} e segue em aberto${extra}. Este é o resumo:`;
+  }
+  return `Passando para lembrar que sua mensalidade ${when} e segue em aberto${extra}. Este é o resumo:`;
+}
+
+/* ------------------------------------------------------------
+   PARA QUEM VAI A MENSAGEM
+   Aluno de menor (ou da turma Kids) com telefone do responsável
+   cadastrado → o lembrete vai para o responsável, e a mensagem
+   fala com ele pelo nome, citando o nome do aluno.
+   Sem esse telefone, continua indo para o aluno/responsável
+   cadastrado no campo telefone, como antes.
+   ------------------------------------------------------------ */
+const ehMenor = s => {
+  const anos = Number(s && s.age);
+  return Number.isFinite(anos) && anos > 0 && anos < 18;
+};
+/* o cadastro precisa do responsável? (menor de 18 ou turma Kids) */
+const precisaResponsavel = s => !!s && (ehMenor(s) || groupOf(s) === 'Kids');
+
+function waDestino(s) {
+  const gTel = (s && s.guardianPhone ? String(s.guardianPhone) : '').trim();
+  const alunoTel = (s && s.phone ? String(s.phone) : '').trim();
+  const nomeResp = (s && s.guardian ? String(s.guardian).trim() : '');
+  const primeiro = String((s && s.name) || '').trim().split(' ')[0];
+  if (precisaResponsavel(s) && gTel) {
+    return {
+      phone: gTel,
+      ehResponsavel: true,
+      nome: nomeResp || 'Responsável',
+      primeiroNome: (nomeResp.split(' ')[0] || 'Responsável'),
+      aluno: s.name || '',
+      alunoPrimeiro: primeiro,
+      motivo: nomeResp ? `responsável por ${primeiro}` : `responsável por ${primeiro}`
+    };
+  }
+  return {
+    phone: alunoTel,
+    ehResponsavel: false,
+    nome: (s && s.name) || '',
+    primeiroNome: primeiro,
+    aluno: (s && s.name) || '',
+    alunoPrimeiro: primeiro,
+    motivo: ''
+  };
+}
+/* para quem vai o aviso, em uma linha (usado nas listas) */
+function waDestinoResumo(s) {
+  const d = waDestino(s);
+  if (!d.ehResponsavel) return { tel: d.phone || '', txt: 'aluno' };
+  return { tel: d.phone, txt: `${d.nome} · responsável` };
 }
 
 /* lista apenas os meses em aberto (+ total quando há mais de um) */
@@ -3430,9 +3732,10 @@ function waFillTemplate(tpl, s, p) {
   /* se o registro clicado não está em aberto (ex.: já pago), o resumo fala do que está */
   const list = open.length ? open : [];
   const total = list.reduce((a, x) => a + (Number(x.amount) || 0), 0);
-  const menor = Number(s.age) > 0 && Number(s.age) < 18;
-  const saudacao = menor
-    ? ((s.guardian || '').trim() ? `${s.guardian.trim()} (responsável por ${(s.name || '').split(' ')[0]})` : `responsável por ${(s.name || '').split(' ')[0]}`)
+  /* destinatário: responsável (menor/Kids com telefone dele) ou o próprio aluno */
+  const alvo = waDestino(s);
+  const saudacao = alvo.ehResponsavel
+    ? `${alvo.nome} (responsável por ${alvo.alunoPrimeiro})`
     : (s.name || '').split(' ')[0];
   const tplUse = waWithClosing(tpl);
   let msg = tplUse
@@ -3440,6 +3743,10 @@ function waFillTemplate(tpl, s, p) {
     .replaceAll('{saudacao}', saudacao)
     .replaceAll('{nome}', (s.name || '').split(' ')[0])
     .replaceAll('{nomeCompleto}', s.name || '')
+    .replaceAll('{aluno}', alvo.alunoPrimeiro || '')
+    .replaceAll('{alunoCompleto}', alvo.aluno || '')
+    .replaceAll('{responsavel}', alvo.ehResponsavel ? alvo.nome : '')
+    .replaceAll('{primeiroNome}', alvo.ehResponsavel ? alvo.primeiroNome : (s.name || '').split(' ')[0])
     .replaceAll('{mes}', list.length ? waMonthLabel(list[0].month) : waMonthLabel(p.month || MONTH))
     .replaceAll('{valor}', waMoney(list.length ? total : (p.amount || s.fee || 0)))
     .replaceAll('{dia}', String(Number(s.dueDay) || d.getDate()))
@@ -3480,16 +3787,33 @@ function waMarkSent(id, mode) {
 }
 
 /* abre o WhatsApp (app ou web) com a mensagem pronta */
-function waSend(paymentId, opts = {}) {
+async function waSend(paymentId, opts = {}) {
   const p = db.payments.find(x => x.id === paymentId);
   if (!p) { toast('Mensalidade não encontrada.', { icon: 'alert' }); return; }
   const s = studentById(p.studentId);
   if (!s) { toast('Aluno não encontrado.', { icon: 'alert' }); return; }
-  const num = waNumber(s.phone);
-  if (!num) { toast(`${s.name.split(' ')[0]} está sem telefone válido para o WhatsApp.`, { icon: 'alert' }); return; }
+  const alvo = waDestino(s);
+  const num = waNumber(alvo.phone);
+  if (!num) {
+    toast(alvo.ehResponsavel
+      ? `${s.name.split(' ')[0]} está sem telefone do responsável — preencha na ficha para avisar por lá.`
+      : `${s.name.split(' ')[0]} está sem telefone válido para o WhatsApp.`, { icon: 'alert' });
+    return;
+  }
   const msg = waFillTemplate(prefs.waTemplate, s, p);
   const url = `https://wa.me/${num}?text=${encodeURIComponent(msg)}`;
   if (opts.silent) return url;
+
+  /* v2.46: nenhum botão sai direto para o WhatsApp. Mostra a mensagem e só
+     abre depois do "Enviar no WhatsApp" (pedido do Steven). */
+  if (!opts.confirmado) {
+    const aberto = showWaFallback(s, p, url, num, { confirmar: true });
+    if (aberto) {
+      /* a aba só é aberta no toque do botão: ao abrir de verdade, registra */
+      aberto.addEventListener('click', () => { waMarkSent(paymentId, 'manual'); render(); }, { once: true });
+    }
+    return url;
+  }
 
   /* 1ª tentativa: aba nova. Se o navegador bloquear pop-up, a aba volta nula
      e a mensagem se perde — então confirmamos antes de registrar o envio. */
@@ -3504,18 +3828,28 @@ function waSend(paymentId, opts = {}) {
   return url;
 }
 
-/* plano B quando o pop-up é bloqueado: mostra a mensagem e um botão de verdade */
-function showWaFallback(s, p, url, num) {
-  openModal({
-    title: 'Abrir no WhatsApp', eyebrow: s.name + ' · ' + money(p.amount), submitText: '', onSubmit: () => true,
-    body: `<p class="small dim" style="margin-bottom:12px">O navegador bloqueou a janela automática. Toque no botão abaixo para abrir a conversa — a mensagem já vai escrita.</p>
+/* confirmação (e plano B do pop-up): mostra a mensagem e um botão de verdade.
+   Devolve o elemento do botão para quem chamou poder registrar o envio. */
+function showWaFallback(s, p, url, num, opts = {}) {
+  const texto = waFillTemplate(prefs.waTemplate, s, p);
+  const alvoM = waDestino(s);
+  const quemM = alvoM.ehResponsavel ? `${alvoM.nome} (responsável por ${alvoM.alunoPrimeiro})` : alvoM.alunoPrimeiro;
+  const telBonito = num.replace(/^55/, '').replace(/^(\d{2})(\d{4,5})(\d{4})$/, '($1) $2-$3');
+  const m = openModal({
+    title: 'Enviar mensagem?', eyebrow: s.name + ' · ' + money(p.amount), submitText: '', onSubmit: () => true,
+    body: `<p class="small dim" style="margin-bottom:10px">${opts.confirmar
+        ? `Esta é a mensagem que vai para <b>${esc(quemM)}</b> em ${esc(telBonito)}.`
+        : 'O navegador bloqueou a janela automática. Toque no botão abaixo para abrir a conversa — a mensagem já vai escrita.'}</p>
+      ${alvoM.ehResponsavel ? `<div class="wa-dest">${icon('users', 13)} <span>Aviso do aluno <b>${esc(alvoM.aluno)}</b> — vai para o WhatsApp do responsável.</span></div>` : ''}
+      ${opts.confirmar ? `<pre class="wa-preview" style="max-height:220px;overflow:auto;margin-bottom:12px">${esc(texto)}</pre>` : ''}
       <div class="lock-wrap" style="display:block">
         <a class="btn btn--primary" style="width:100%;justify-content:center;text-decoration:none" href="${url}" target="_blank" rel="noopener" data-wa-abrir>
-          ${icon('whatsapp', 15)} Abrir conversa de ${esc(s.name.split(' ')[0])}
+          ${icon('whatsapp', 15)} Abrir conversa de ${esc(alvoM.ehResponsavel ? alvoM.nome.split(' ')[0] : s.name.split(' ')[0])}
         </a>
       </div>
-      <div class="field-note" style="margin-top:10px">Número: <b>${esc(num.replace(/^55/, '').replace(/^(\d{2})(\d{4,5})(\d{4})$/, '($1) $2-$3'))}</b></div>`
+      <div class="field-note" style="margin-top:10px">Número: <b>${esc(telBonito)}</b>${alvoM.ehResponsavel ? ' · do responsável' : ''}</div>`
   });
+  return m && m.el ? m.el.querySelector('[data-wa-abrir]') : null;
 }
 
 /* roteiro do dia — mostra o que a automação faria */
@@ -3549,7 +3883,9 @@ function waCardHTML() {
           ${avatarHTML(s.name)}
           <div style="min-width:0">
             <div class="title">${esc(s.name)} ${done ? '<span class="badge badge--ok" style="margin-left:4px">avisado</span>' : ''}</div>
-            <div class="meta">${kind === 'hoje' ? `vence <b>hoje</b>` : `vence ${dateShort(p.dueDate)}`} · ${money(p.amount)} · ${esc(s.phone || 'sem telefone')}</div>
+            <div class="meta">${kind === 'hoje' ? `vence <b>hoje</b>` : `vence ${dateShort(p.dueDate)}`} · ${money(p.amount)} · ${waDestino(s).ehResponsavel
+              ? `${icon('users', 10)} ${esc(waDestino(s).nome.split(' ')[0])} <span class="dim">(resp.)</span>`
+              : esc(waDestino(s).phone || 'sem telefone')}</div>
           </div>
           <div class="tail wa-acts">
             <button class="mini-btn wa-btn" data-act="wa-send" data-id="${p.id}" title="Enviar lembrete no WhatsApp">${icon('whatsapp', 15)}</button>
@@ -3572,7 +3908,9 @@ function waCenter() {
       ${avatarHTML(s.name)}
       <div style="min-width:0;flex:1">
         <div style="font-weight:650;font-size:13px">${esc(s.name)}</div>
-        <div class="small dim">${kind === 'hoje' ? 'vence hoje' : 'vencida em ' + dateBR(p.dueDate)} · ${money(p.amount)} · ${esc(s.phone || 'sem telefone')}</div>
+        <div class="small dim">${kind === 'hoje' ? 'vence hoje' : 'vencida em ' + dateBR(p.dueDate)} · ${money(p.amount)} · ${waDestino(s).ehResponsavel
+          ? `para ${esc(waDestino(s).nome)} <span class="dim">(resp. de ${esc(waDestino(s).alunoPrimeiro)})</span>`
+          : esc(waDestino(s).phone || 'sem telefone')}</div>
       </div>
       ${done ? '<span class="badge badge--ok">avisado</span>' : ''}
       <button class="btn btn--sm" data-act="wa-send" data-id="${p.id}">${icon('whatsapp', 14)} Enviar</button>
@@ -3604,15 +3942,15 @@ function waSettings() {
     <div class="form-field full"><label class="lbl">Como funciona</label>
       <div class="wa-help">
         <b>1.</b> O app calcula sozinho quem vence hoje (e quem está em atraso).<br>
-        <b>2.</b> Com o número do dojo conectado, a mensagem sai automática na data.<br>
-        <b>3.</b> Sem conexão, ele abre o WhatsApp com o texto pronto — você só toca em enviar.
+        <b>2.</b> Na hora marcada, ele avisa quantos lembretes estão esperando — para menor de idade, o aviso vai para o WhatsApp do responsável, com o nome dele e o do aluno.<br>
+        <b>3.</b> Você toca no ícone do WhatsApp: o app mostra a mensagem e só abre a conversa depois que você confirmar.
       </div>
     </div>
     ${fieldHTML({ name: 'waNumber', label: 'WhatsApp do dojo (com DDD)', value: prefs.waNumber || '', placeholder: '(00) 00000-0000', hint: 'Número que assina os lembretes automáticos.' })}
     ${fieldHTML({ name: 'waTime', label: 'Horário do envio', type: 'select', value: prefs.waTime || '09:00', options: ['08:00', '09:00', '10:00', '12:00', '18:00'] })}
     ${fieldHTML({ name: 'waPix', label: 'Chave Pix', value: prefs.waPix || WA_PIX_DEFAULT, full: true, placeholder: 'dojoarandu@gmail.com', hint: 'Entra no lugar de {pix} na mensagem.' })}
     ${fieldHTML({ name: 'waTemplate', label: 'Mensagem', type: 'textarea', value: prefs.waTemplate || WA_TEMPLATE_DEFAULT, full: true, rows: 8,
-      hint: 'Variáveis: {intro} {saudacao} {nome} {mes} {valor} {dia} {resumo} {pix} {dojo}' })}
+      hint: 'Variáveis: {saudacao} {intro} {resumo} {nome} {aluno} {nomeCompleto} {alunoCompleto} {responsavel} {mes} {valor} {dia} {pix} {dojo}' })}
     <div class="form-field full">
       <label class="lbl">Emoji do comprovante</label>
       <input type="hidden" name="waEmoji" id="f_waEmoji" value="${esc(prefs.waEmoji ?? WA_EMOJI_DEFAULT)}">
@@ -3683,15 +4021,13 @@ function waAutoRun() {
   clearTimeout(waTimer);
   if (!waConfigured()) return;
   const fire = () => {
-    const sent = [];
-    waQueue({ includeLate: prefs.waLate !== false }).forEach(({ p, s }) => {
-      if (waDoneToday(p.id) || !onlyDigits(s.phone)) return;
-      waMarkSent(p.id, 'auto');
-      sent.push(s.name);
-    });
-    if (sent.length) {
-      render();
-      toast(`${sent.length} lembrete${sent.length > 1 ? 's' : ''} de vencimento enviado${sent.length > 1 ? 's' : ''}.`, { icon: 'whatsapp' });
+    /* v2.46: o app NÃO envia mensagem sozinho (o WhatsApp não permite abrir
+       conversa sem um toque). Antes ele marcava "enviado" sem enviar nada —
+       agora só avisa quantos estão na fila; quem envia é o professor. */
+    const fila = waQueue({ includeLate: prefs.waLate !== false })
+      .filter(({ p, s }) => !waDoneToday(p.id) && onlyDigits(s.phone));
+    if (fila.length) {
+      toast(`${fila.length} lembrete${fila.length > 1 ? 's' : ''} de vencimento esperando você enviar${fila.length > 1 ? 'm' : ''} no WhatsApp.`, { icon: 'whatsapp' });
     }
   };
   const [hh, mm] = (prefs.waTime || '09:00').split(':').map(Number);
@@ -3779,6 +4115,7 @@ function pageHoje() {
 
   const pendingList = pending.slice().sort((a, b) => cmp(a.dueDate, b.dueDate)).slice(0, 5);
   const upcoming = db.trainings.slice().sort((a, b) => (a.date || '').localeCompare(b.date || '')).filter(t => (t.date || '') >= TODAY_ISO).slice(0, 3);
+
 
   return `
   ${pageHead({
@@ -4011,7 +4348,7 @@ function filteredStudents() {
     else if (f === 'Adulto' || f === 'Kids') ok = groupOf(s) === f;
     if (!ok) return false;
     if (!q) return true;
-    return `${s.name} ${s.phone} ${s.belt} ${s.locality}`.toLowerCase().includes(q);
+    return `${s.name} ${s.phone} ${s.belt} ${s.locality} ${s.guardian || ''} ${s.guardianPhone || ''}`.toLowerCase().includes(q);
   });
 }
 const SORT_GET = {
@@ -5184,9 +5521,6 @@ function pageAjustes() {
         <div class="txt"><h4>Esconder a barra ao rolar</h4><p>No celular, a barra do app sai de cena quando você desce e volta ao chegar no topo.</p></div>
         <label class="switch"><input type="checkbox" data-on="toggle-hide-topbar" ${prefs.hideTopbar !== false ? 'checked' : ''}><span class="track"></span></label>
       </div>
-      <div class="settings-row" style="border-bottom:0">
-        <div class="txt" style="width:100%">${publishCardHTML()}</div>
-      </div>
     </div>`, { wide: true });
 
   const celular = sec('celular', 'Celular', 'Atalho na tela inicial e barra do navegador', `<div class="set-pad">
@@ -5195,7 +5529,7 @@ function pageAjustes() {
           <h4>Atalho na tela inicial</h4>
           <p>Instala o Arandu como app: ícone na tela inicial, tela cheia e acesso em um toque.</p>
           <div class="acts">
-            <button class="btn btn--sm btn--primary" data-act="install-app">${icon('download', 14)} Criar atalho</button>
+            <button class="btn btn--sm btn--seal" data-act="install-app">${icon('download', 14)} Criar atalho</button>
             <span class="small dim" id="installHint">${installHintText()}</span>
           </div>
           <div class="install-steps">${installStepsHTML()}</div>
@@ -5204,9 +5538,6 @@ function pageAjustes() {
       <div class="settings-row">
         <div class="txt"><h4>Esconder a barra ao rolar</h4><p>No celular, a barra do app sai de cena quando você desce e volta ao chegar no topo.</p></div>
         <label class="switch"><input type="checkbox" data-on="toggle-hide-topbar" ${prefs.hideTopbar !== false ? 'checked' : ''}><span class="track"></span></label>
-      </div>
-      <div class="settings-row" style="border-bottom:0">
-        <div class="txt" style="width:100%">${publishCardHTML()}</div>
       </div>
     </div>`);
 
@@ -5269,7 +5600,19 @@ function pageAjustes() {
       </div>
     </div>`;
 
-  const dados = sec('dados', 'Dados', 'Tudo salvo neste navegador', `<div class="set-pad">
+  const dev = sec('desenvolvedor', 'Desenvolvedor', 'Backups, manutenção da base e registro de tudo que muda', `
+    <div class="set-pad">
+      <div class="settings-row" style="padding-top:0;border-bottom:0">
+        <div class="txt" style="width:100%">
+          <h4>Registro de alterações</h4>
+          <p>O sistema anota cada mudança feita na base — aluno incluído, mensalidade confirmada, presença marcada — com hora e nome de quem fez.${db.log && db.log.length ? ` <b>${db.log.length}</b> registro(s) guardado(s).` : ' Nada registrado ainda.'}</p>
+          <div class="acts">
+            <button class="btn btn--sm btn--seal" data-act="go-log">${icon('list', 14)} Visualizar o log</button>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="set-pad" style="border-top:1px solid var(--line-2)">
       <div class="settings-row" style="padding-top:0;border-bottom:0">
         <div class="txt" style="width:100%">
           <h4>Base em uso</h4>
@@ -5302,17 +5645,15 @@ function pageAjustes() {
           <div class="acts"><button class="btn btn--sm btn--danger" data-act="clear-db">${icon('trash', 14)} Limpar tudo</button></div>
         </div>
       </div>
-    </div></div>`, { wide: true });
-
-
-  const armazenamento = sec('armazenamento', 'Armazenamento', `localStorage · ${kb} KB em uso`, `<div class="set-pad">
+    </div>
+    <div class="set-pad" style="border-top:1px solid var(--line-2)">
       <div style="height:8px;border-radius:99px;background:var(--line-2);overflow:hidden">
         <div style="height:100%;width:${pctStorage}%;background:var(--vermilion);border-radius:99px;transition:width .6s var(--ease)"></div>
       </div>
       <div class="row" style="border:0;padding-top:10px"><span class="small dim">Estimativa sobre ~5 MB disponíveis</span><span class="tail small num">${kb} KB</span></div>
       <p class="small dim" style="margin-top:6px">Os dados vivem apenas neste navegador. Limpar cache/cookies do site apaga tudo — mantenha backups.</p>
-    </div></div>`, { wide: true });
-
+    </div>
+  `, { wide: true });
 
   return `
   ${pageHead({
@@ -5325,8 +5666,7 @@ function pageAjustes() {
     ${aparencia}
     ${celular}
     ${nuvem}
-    ${dados}
-    ${armazenamento}
+    ${dev}
   </div>
   <div class="card card--paper" style="display:flex;gap:20px;align-items:center;flex-wrap:wrap;margin-top:16px">
     <span class="brand-seal" style="width:46px;height:46px;font-size:24px">道</span>
@@ -5337,7 +5677,95 @@ function pageAjustes() {
     <div class="small dim" style="text-align:right">${db.students.length} alunos · ${db.payments.length} mensalidades · ${Object.keys(db.attendance).length} dias de chamada</div>
   </div>`;
 }
-const PAGES = { hoje: pageHoje, alunos: pageAlunos, frequencia: pageFrequencia, treinos: pageTreinos, financeiro: pageFinanceiro, ajustes: pageAjustes };
+/* ============================================================
+   PÁGINA DO LOG — rota própria (#log), fora das abas normais
+   ============================================================ */
+const LOG_ROTULOS = {
+  aluno: 'Aluno', pagamento: 'Mensalidade', despesa: 'Despesa',
+  presenca: 'Chamada', treino: 'Treino', visita: 'Visita',
+  sistema: 'Sistema', proteção: 'Proteção'
+};
+const LOG_TONS = {
+  aluno: 'var(--vermilion)', pagamento: 'var(--moss)', despesa: 'var(--danger)',
+  presenca: 'var(--indigo)', treino: 'var(--amber-ink)', visita: 'var(--ink-2)',
+  sistema: 'var(--ink-3)', proteção: 'var(--danger)'
+};
+
+function logFiltrado() {
+  const busca = (view.logBusca || '').toLowerCase().trim();
+  const tipo = view.logTipo || 'todos';
+  return (db.log || []).slice().reverse().filter(r => {
+    if (tipo !== 'todos' && r.t !== tipo) return false;
+    if (!busca) return true;
+    return (r.txt + ' ' + (r.quem || '')).toLowerCase().includes(busca);
+  });
+}
+
+function pageLog() {
+  const todos = (db.log || []).slice().reverse();
+  const linhas = logFiltrado();
+  const tipos = ['todos', ...new Set(todos.map(r => r.t))];
+
+  /* agrupa por dia para dar ritmo de leitura */
+  const grupos = [];
+  linhas.forEach(r => {
+    const d = r.ts ? new Date(r.ts) : null;
+    const chave = d ? `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}` : 'sem-data';
+    const ult = grupos[grupos.length - 1];
+    if (ult && ult.chave === chave) ult.itens.push(r);
+    else grupos.push({ chave, itens: [r] });
+  });
+  const rotuloDia = chave => {
+    if (chave === 'sem-data') return 'Sem data';
+    if (chave === TODAY_ISO) return 'Hoje · ' + dateBR(chave);
+    const ontem = addDays(TODAY_ISO, -1);
+    if (chave === ontem) return 'Ontem · ' + dateBR(chave);
+    return dateBR(chave);
+  };
+
+  const chips = tipos.map(t => `<button class="chip" data-act="log-tipo" data-id="${t}" aria-pressed="${(view.logTipo || 'todos') === t}">
+      ${t === 'todos' ? 'Tudo' : (LOG_ROTULOS[t] || t)}${t === 'todos' ? ` · ${todos.length}` : ''}
+    </button>`).join('');
+
+  const corpo = linhas.length ? grupos.map(g => `
+    <div class="log-dia">
+      <div class="log-dia-lbl">${esc(rotuloDia(g.chave))}</div>
+      ${g.itens.map(r => `<div class="log-linha${r.forte ? ' log-linha--forte' : ''}">
+        <span class="log-hora num">[${esc(r.hora || '--:--:--')}]</span>
+        <span class="log-ponto" style="background:${LOG_TONS[r.t] || 'var(--ink-3)'}"></span>
+        <span class="log-txt"><b>${esc(r.quem || 'Neste aparelho')}</b> — ${esc(r.txt)}</span>
+        <span class="log-tag" style="color:${LOG_TONS[r.t] || 'var(--ink-3)'}">${esc(LOG_ROTULOS[r.t] || r.t)}</span>
+      </div>`).join('')}
+    </div>`).join('') : `<div class="log-vazio">
+      ${icon('list', 28)}
+      <b>${todos.length ? 'Nenhum registro com esse filtro.' : 'Ainda não há registros.'}</b>
+      <p>${todos.length ? 'Troque o filtro ou limpe a busca.' : 'A partir de agora, cada alteração na base aparece aqui com hora e autor.'}</p>
+    </div>`;
+
+  return `
+  ${pageHead({
+    crumb: 'Ajustes · Desenvolvedor',
+    title: `<h1 class="page-title">Log de alterações</h1>`,
+    sub: `${todos.length} registro(s) · cada mudança na base, com hora e autor.`,
+    actions: `<button class="btn" data-act="log-voltar">${icon('chevronLeft', 15)} Voltar</button>`
+  })}
+  <div class="card log-card">
+    <div class="log-bar">
+      <div class="log-busca">
+        ${icon('search', 15)}
+        <input type="search" id="logBusca" placeholder="Buscar aluno, ação ou pessoa…" value="${esc(view.logBusca || '')}" autocomplete="off">
+      </div>
+      <div class="log-chips">${chips}</div>
+    </div>
+    <div class="log-lista">${corpo}</div>
+    ${todos.length ? `<div class="log-foot">
+      <span class="small dim">Guardamos os ${LOG_MAX} registros mais recentes.</span>
+      <button class="btn btn--sm" data-act="log-baixar">${icon('download', 13)} Baixar log (.txt)</button>
+    </div>` : ''}
+  </div>`;
+}
+
+const PAGES = { hoje: pageHoje, alunos: pageAlunos, frequencia: pageFrequencia, treinos: pageTreinos, financeiro: pageFinanceiro, ajustes: pageAjustes, log: pageLog };
 
 /* fix da série semanal (escopo limpo) */
 function weekSeries(refDate) {
@@ -5372,9 +5800,21 @@ function studentForm(id, prefill = null, onSaved = null) {
     ${fieldHTML({ name: 'degrees', label: 'Graus', type: 'degrees', value: s?.degrees ?? 0 })}
     ${fieldHTML({ name: 'age', label: 'Idade', type: 'number', value: s?.age ?? '', min: 3, max: 99, placeholder: '28' })}
     ${fieldHTML({ name: 'phone', label: 'Telefone / WhatsApp', type: 'tel', value: s?.phone || '', placeholder: '(88) 99999-9999' })}
-    ${fieldHTML({ name: 'locality', label: 'Localidade / bairro', value: s?.locality || '', placeholder: 'Ex.: Centro' })}
-    ${fieldHTML({ name: 'guardian', label: 'Responsável legal', value: s?.guardian || '', placeholder: 'Para menores de 18 anos' })}
+    ${fieldAutocompleteHTML({ name: 'locality', label: 'Localidade', value: s?.locality || '', placeholder: 'Comece a digitar… Ex.: Tre', hint: 'Sugere as localidades de Icapuí — pode escrever outra.' })}
     ${fieldHTML({ name: 'plan', label: 'Plano', type: 'select', value: s?.plan || 'Mensal', options: PLANS })}
+    <div class="form-field full resp-block" id="respBlock" hidden>
+      <div class="resp-head">
+        <span class="resp-ico">${icon('users', 14)}</span>
+        <div>
+          <b>Aluno menor de idade</b>
+          <small>O lembrete de mensalidade vai para o WhatsApp do responsável, com o nome dele e o do aluno.</small>
+        </div>
+      </div>
+      <div class="form-grid" style="gap:12px;margin-top:12px">
+        ${fieldHTML({ name: 'guardian', label: 'Responsável legal', value: s?.guardian || '', placeholder: 'Nome do pai, mãe ou tutor' })}
+        ${fieldHTML({ name: 'guardianPhone', label: 'Telefone do responsável', type: 'tel', value: s?.guardianPhone || '', placeholder: '(88) 99999-9999' })}
+      </div>
+    </div>
     <div class="form-field full" id="feeField">
       <label class="lbl">Mensalidade</label>
       <input type="hidden" name="feeMode" id="f_feeMode" value="${Number(s?.fee ?? FEE_DEFAULT) === FEE_DEFAULT ? 'padrao' : 'outro'}">
@@ -5403,6 +5843,8 @@ function studentForm(id, prefill = null, onSaved = null) {
       mountBeltPicker(root);
       mountClassBeltGroup(root);
       mountFeeMode(root);
+      mountAutocomplete(root, 'locality');
+      mountResponsavel(root);
     },
     onSubmit: data => {
       if (!data.name || !data.name.trim()) { toast('Informe o nome do aluno.'); return false; }
@@ -5410,7 +5852,8 @@ function studentForm(id, prefill = null, onSaved = null) {
       const obj = {
         name: data.name.trim(), classGroup: data.classGroup, status: data.status, belt: data.belt,
         degrees: Number(data.degrees) || 0, age: data.age ? Number(data.age) : '', phone: data.phone.trim(),
-        locality: data.locality.trim(), guardian: data.guardian?.trim() || '', plan: data.plan,
+        locality: data.locality.trim(), guardian: (data.guardian || '').trim(),
+        guardianPhone: (data.guardianPhone || '').trim(), plan: data.plan,
         fee: data.feeMode === 'outro' ? (Number(data.fee) || 0) : FEE_DEFAULT,
         dueDay: Number(data.dueDay) || 10, joinDate: data.joinDate || TODAY_ISO
       };
@@ -6590,7 +7033,8 @@ function profileHTML(s) {
     <div class="eyebrow" style="margin-bottom:10px">Dados</div>
     <div class="rows" style="margin-bottom:20px">
       ${[['Idade', s.age ? s.age + ' anos' : '—'], ['Telefone', s.phone || '—'], ['Localidade', s.locality || '—'],
-        ['Responsável', s.guardian || '—'], ['Matrícula', s.joinDate ? dateBR(s.joinDate) : '—'],
+        ...(precisaResponsavel(s) ? [['Responsável', s.guardian || '—'], ['Telefone do responsável', s.guardianPhone || '—']] : []),
+        ['Matrícula', s.joinDate ? dateBR(s.joinDate) : '—'],
         ['Vencimento', `${(s.dueDay || 10)}º dia`]].map(([k, v]) => `<div class="row" style="padding:9px 0">
         <span class="small dim">${k}</span><span class="tail small" style="font-weight:550">${esc(v)}</span></div>`).join('')}
     </div>
@@ -6675,6 +7119,208 @@ function trainingDrawer(t) {
 /* ============================================================
    17. AÇÕES
    ============================================================ */
+/* ============================================================
+   LOG DE ALTERAÇÕES
+   Cada gravação compara a base anterior com a nova e anota, em
+   português, o que mudou — quem mudou e a que horas. O log fica
+   no próprio banco (db.log), então também viaja entre aparelhos.
+   ============================================================ */
+const LOG_MAX = 600;
+const LOG_MESES = { jan: 0, fev: 1, mar: 2, abr: 3, mai: 4, jun: 5, jul: 6, ago: 7, set: 8, out: 9, nov: 10, dez: 11 };
+
+function logQuem() {
+  const u = CLOUD.user;
+  if (u && u.nome) return u.nome;
+  if (u && u.email) return u.email;
+  return 'Neste aparelho';
+}
+function logHora(d = new Date()) {
+  const p = n => String(n).padStart(2, '0');
+  return `${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`;
+}
+function logDataCurta(iso) {
+  const [a, m, d] = String(iso || TODAY_ISO).split('-');
+  return `${d}/${m}/${a.slice(2)}`;
+}
+/* rótulo curto de um mês "2026-11" */
+function logMes(m) {
+  const [a, mm] = String(m || '').split('-');
+  const nome = MONTHS_SHORT[Number(mm) - 1] || mm;
+  return `${nome}/${String(a || '').slice(2)}`;
+}
+function logFaixa(b) { return b ? `${String(b).replace('Faixa ', '')}` : '—'; }
+function logGraus(n) { return Number(n) ? ` ${n}º grau` : ''; }
+
+/* resumo curto de um aluno no formato do pedido do Steven */
+function logAlunoResumo(s) {
+  const bits = [];
+  if (s.age) bits.push(s.age + ' anos');
+  if (s.belt) bits.push(String(s.belt).replace('Faixa ', '').toLowerCase());
+  if (s.classGroup) bits.push(s.classGroup.toLowerCase());
+  if (s.phone) bits.push(s.phone);
+  return bits.join(', ');
+}
+
+let LOG_ANTES = null;   /* foto da base antes da próxima gravação */
+
+function logSnapshot(d) {
+  return JSON.stringify({
+    students: d.students || [], payments: d.payments || [], expenses: d.expenses || [],
+    trainings: d.trainings || [], visitors: d.visitors || [], customPositions: d.customPositions || [],
+    attendance: d.attendance || {}, attendanceOpen: d.attendanceOpen || {}
+  });
+}
+function logPreparar() { if (LOG_ANTES === null) LOG_ANTES = logSnapshot(db); }
+
+/* compara duas listas por id e devolve { entrou, saiu, mudou } */
+function logDiffLista(antes, depois) {
+  const A = new Map((antes || []).map(x => [x.id, x]));
+  const D = new Map((depois || []).map(x => [x.id, x]));
+  const entrou = [...D.values()].filter(x => !A.has(x.id));
+  const saiu = [...A.values()].filter(x => !D.has(x.id));
+  const mudou = [...D.values()].filter(x => A.has(x.id) && JSON.stringify(A.get(x.id)) !== JSON.stringify(x))
+    .map(x => ({ de: A.get(x.id), para: x }));
+  return { entrou, saiu, mudou };
+}
+
+/* os campos que valem a pena narrar numa ficha de aluno */
+function logCamposAluno(de, para) {
+  const rot = { name: 'nome', belt: 'faixa', degrees: 'graus', age: 'idade', phone: 'telefone', locality: 'localidade', guardian: 'responsável', guardianPhone: 'telefone do responsável', plan: 'plano', fee: 'mensalidade', dueDay: 'vencimento', status: 'status', classGroup: 'turma', joinDate: 'entrada' };
+  const out = [];
+  Object.keys(rot).forEach(k => {
+    if (JSON.stringify(de[k]) === JSON.stringify(para[k])) return;
+    let a = de[k], b = para[k];
+    if (k === 'fee') { a = money(Number(a) || 0); b = money(Number(b) || 0); }
+    if (k === 'belt') { a = String(a || '—').replace('Faixa ', ''); b = String(b || '—').replace('Faixa ', ''); }
+    if (k === 'degrees') { a = (Number(a) || 0) + 'º'; b = (Number(b) || 0) + 'º'; }
+    if (a === '' || a === undefined || a === null) a = '—';
+    if (b === '' || b === undefined || b === null) b = '—';
+    out.push(`${rot[k]}: ${a} → ${b}`);
+  });
+  return out;
+}
+
+/* texto do log: junta tudo que mudou desde a última foto */
+function logAnotar(extra = '') {
+  if (LOG_ANTES === null) return;
+  const antes = JSON.parse(LOG_ANTES);
+  LOG_ANTES = null;
+  const depois = JSON.parse(logSnapshot(db));
+  /* a foto é refeita SEMPRE (mesmo quando nada mudou) para não acumular
+     diferenças antigas na próxima gravação */
+  const refazerFoto = () => { LOG_ANTES = logSnapshot(db); };
+  const itens = [];
+  const quem = logQuem();
+
+  /* ---- alunos ---- */
+  const a = logDiffLista(antes.students, depois.students);
+  a.entrou.forEach(s => itens.push({ t: 'aluno', txt: `Adicionou o aluno ${s.name}${logAlunoResumo(s) ? ' (' + logAlunoResumo(s) + ')' : ''}` }));
+  a.saiu.forEach(s => itens.push({ t: 'aluno', txt: `Excluiu o aluno ${s.name}${logAlunoResumo(s) ? ' (' + logAlunoResumo(s) + ')' : ''}`, forte: true }));
+  a.mudou.forEach(({ de, para }) => {
+    const campos = logCamposAluno(de, para);
+    if (campos.length) itens.push({ t: 'aluno', txt: `Editou a ficha de ${para.name}: ${campos.join('; ')}` });
+  });
+
+  /* ---- mensalidades ---- */
+  const nomes = id => {
+    const s = (depois.students || []).find(x => x.id === id) || (antes.students || []).find(x => x.id === id);
+    return s ? s.name : 'aluno removido';
+  };
+  const pg = logDiffLista(antes.payments, depois.payments);
+  pg.entrou.forEach(p => itens.push({
+    t: 'pagamento',
+    txt: `${p.status === 'Pago' ? 'Registrou pagamento' : 'Criou mensalidade'} de ${nomes(p.studentId)} ref. ${logMes(p.month)} — ${money(p.amount)}${p.status === 'Pago' ? ' · ' + (p.method || 'sem forma') : ' · em aberto'}`
+  }));
+  pg.saiu.forEach(p => itens.push({ t: 'pagamento', txt: `Excluiu a mensalidade de ${nomes(p.studentId)} ref. ${logMes(p.month)} (${money(p.amount)})`, forte: true }));
+  pg.mudou.forEach(({ de, para }) => {
+    if (de.status !== para.status) {
+      itens.push({ t: 'pagamento', txt: para.status === 'Pago'
+        ? `Confirmou pagamento de ${nomes(para.studentId)} referente a ${logMes(para.month).toUpperCase()} — ${money(para.amount)}${para.method ? ' · ' + para.method : ''}`
+        : `Reabriu a mensalidade de ${nomes(para.studentId)} referente a ${logMes(para.month)}` });
+      return;
+    }
+    const campos = [];
+    if (de.amount !== para.amount) campos.push(`valor: ${money(de.amount)} → ${money(para.amount)}`);
+    if (de.month !== para.month) campos.push(`mês: ${logMes(de.month)} → ${logMes(para.month)}`);
+    if (de.dueDate !== para.dueDate) campos.push(`vencimento: ${logDataCurta(de.dueDate)} → ${logDataCurta(para.dueDate)}`);
+    if (de.method !== para.method) campos.push(`forma: ${de.method || '—'} → ${para.method || '—'}`);
+    if (de.paidAt !== para.paidAt) campos.push(`pago em: ${de.paidAt ? logDataCurta(de.paidAt) : '—'} → ${para.paidAt ? logDataCurta(para.paidAt) : '—'}`);
+    if (campos.length) itens.push({ t: 'pagamento', txt: `Ajustou a mensalidade de ${nomes(para.studentId)} ref. ${logMes(para.month)}: ${campos.join('; ')}` });
+  });
+
+  /* ---- despesas ---- */
+  const dp = logDiffLista(antes.expenses, depois.expenses);
+  dp.entrou.forEach(e => itens.push({ t: 'despesa', txt: `Lançou a despesa ${e.description || e.name || 'sem descrição'} — ${money(e.amount)}${e.category ? ' (' + e.category + ')' : ''}` }));
+  dp.saiu.forEach(e => itens.push({ t: 'despesa', txt: `Excluiu a despesa ${e.description || e.name || 'sem descrição'} — ${money(e.amount)}`, forte: true }));
+  dp.mudou.forEach(({ de, para }) => {
+    const campos = [];
+    if (de.amount !== para.amount) campos.push(`valor: ${money(de.amount)} → ${money(para.amount)}`);
+    if ((de.description || de.name) !== (para.description || para.name)) campos.push(`descrição: ${de.description || de.name} → ${para.description || para.name}`);
+    if (de.category !== para.category) campos.push(`categoria: ${de.category || '—'} → ${para.category || '—'}`);
+    if (campos.length) itens.push({ t: 'despesa', txt: `Ajustou a despesa ${para.description || para.name || ''}: ${campos.join('; ')}` });
+  });
+
+  /* ---- presenças ---- */
+  const dias = new Set([...Object.keys(antes.attendance || {}), ...Object.keys(depois.attendance || {})]);
+  dias.forEach(dia => {
+    const A = new Set(antes.attendance[dia] || []);
+    const D = new Set(depois.attendance[dia] || []);
+    const add = [...D].filter(x => !A.has(x));
+    const rem = [...A].filter(x => !D.has(x));
+    if (add.length === 1) itens.push({ t: 'presenca', txt: `Marcou presença de ${nomes(add[0])} no treino de ${logDataCurta(dia)}` });
+    else if (add.length > 1) itens.push({ t: 'presenca', txt: `Marcou ${add.length} presenças no treino de ${logDataCurta(dia)}: ${add.map(nomes).join(', ')}` });
+    if (rem.length === 1) itens.push({ t: 'presenca', txt: `Desmarcou a presença de ${nomes(rem[0])} no treino de ${logDataCurta(dia)}` });
+    else if (rem.length > 1) itens.push({ t: 'presenca', txt: `Desmarcou ${rem.length} presenças no treino de ${logDataCurta(dia)}` });
+    /* turma aberta/fechada */
+    const oa = (antes.attendanceOpen || {})[dia] || {}, od = (depois.attendanceOpen || {})[dia] || {};
+    Object.keys({ ...oa, ...od }).forEach(g => {
+      if (!!oa[g] === !!od[g]) return;
+      itens.push({ t: 'presenca', txt: od[g] ? `Confirmou o treino da turma ${g} em ${logDataCurta(dia)}` : `Fechou o treino da turma ${g} em ${logDataCurta(dia)}` });
+    });
+  });
+
+  /* ---- treinos ---- */
+  const tr = logDiffLista(antes.trainings, depois.trainings);
+  tr.entrou.forEach(t => itens.push({ t: 'treino', txt: `Criou o treino ${t.title || t.name || '(sem título)'}${t.group ? ' · ' + t.group : ''}` }));
+  tr.saiu.forEach(t => itens.push({ t: 'treino', txt: `Excluiu o treino ${t.title || t.name || '(sem título)'}`, forte: true }));
+  tr.mudou.forEach(({ de, para }) => itens.push({ t: 'treino', txt: `Editou o treino ${para.title || para.name || ''}` }));
+
+  /* ---- visitantes ---- */
+  const vs = logDiffLista(antes.visitors, depois.visitors);
+  vs.entrou.forEach(v => itens.push({ t: 'visita', txt: `Cadastrou o visitante ${v.name}${v.phone ? ' (' + v.phone + ')' : ''}` }));
+  vs.saiu.forEach(v => itens.push({ t: 'visita', txt: `Removeu o visitante ${v.name}`, forte: true }));
+  vs.mudou.forEach(({ para }) => itens.push({ t: 'visita', txt: `Editou o visitante ${para.name}` }));
+
+  /* ---- posições personalizadas ---- */
+  const ps = logDiffLista(antes.customPositions, depois.customPositions);
+  ps.entrou.forEach(x => itens.push({ t: 'treino', txt: `Adicionou a posição ${x.name || x.nome || ''} ao mapa` }));
+  ps.saiu.forEach(x => itens.push({ t: 'treino', txt: `Removeu a posição ${x.name || x.nome || ''} do mapa` }));
+
+  if (extra) itens.push({ t: 'sistema', txt: extra });
+  if (!itens.length) { refazerFoto(); return; }
+
+  const agora = new Date();
+  const hora = logHora(agora);
+  const lote = Math.random().toString(36).slice(2, 7);
+  db.log ||= [];
+  itens.forEach((it, i) => {
+    db.log.push({ id: lote + '-' + i, t: it.t, txt: it.txt, quem, hora, ts: agora.getTime(), forte: !!it.forte });
+  });
+  if (db.log.length > LOG_MAX) db.log = db.log.slice(-LOG_MAX);
+  try { localStorage.setItem(LOG_KEY, JSON.stringify(db.log)); } catch (e) {}
+  refazerFoto();
+  return itens.length;
+}
+
+/* registro avulso (eventos que não vêm de uma edição da base) */
+function registrarLog(txt, tipo = 'sistema') {
+  db.log ||= [];
+  const agora = new Date();
+  db.log.push({ id: Math.random().toString(36).slice(2, 9), t: tipo, txt, quem: logQuem(), hora: logHora(agora), ts: agora.getTime() });
+  if (db.log.length > LOG_MAX) db.log = db.log.slice(-LOG_MAX);
+  try { localStorage.setItem(LOG_KEY, JSON.stringify(db.log)); } catch (e) {}
+}
+
 const ACTIONS = {
   nav: (id, el) => go(el.dataset.page),
   'go-att': () => go('frequencia', { state: { attDate: TODAY_ISO } }),
@@ -6952,6 +7598,19 @@ const ACTIONS = {
     CLOUD.pendente = true; await cloudPushAgora(); render();
     toast(CLOUD.erro ? 'Falha ao enviar: ' + CLOUD.erro : `Base enviada para o banco (${alunos} alunos).`, { icon: CLOUD.erro ? 'alert' : 'checkCircle' });
   },
+  'go-log': () => go('log'),
+  'log-voltar': () => go(view.logVoltaDe || 'ajustes'),
+  'log-tipo': id => { view.logTipo = id; view.logBusca = view.logBusca || ''; render(); },
+  'log-baixar': () => {
+    const linhas = (db.log || []).slice().reverse().map(r =>
+      `[${r.hora || '--:--:--'}] ${r.quem || 'Neste aparelho'} - ${r.txt}`);
+    const txt = 'Log de alterações · Arandu v' + APP_VERSION + '\n' + TODAY_ISO.split('-').reverse().join('/') + '\n\n' + linhas.join('\n');
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([txt], { type: 'text/plain;charset=utf-8' }));
+    a.download = `log-arandu-${TODAY_ISO}.txt`;
+    a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 4000);
+    toast('Log baixado.', { icon: 'download' });
+  },
   'install-app': () => installApp(),
   'copy-url': async () => {
     const url = location.href.split('#')[0];
@@ -7227,8 +7886,32 @@ async function cloudPull() {
   return { db: novo, vazio };
 }
 
-/* ---- escrita: quebra o db em documentos e envia só o que mudou ---- */
+/* ---- proteção da base na nuvem ----
+   Uma base local vazia NUNCA derruba a base do servidor: se os dados da
+   nuvem têm conteúdo e a base aberta aqui está sem alunos, o envio é
+   bloqueado e sobe um aviso. Sem isso, "Limpar base" feito offline
+   subiria um documento vazio por cima da base compartilhada.            */
+function baseDadosVazia(d) {
+  d = d || db;
+  const temAluno = (d.students || []).length > 0;
+  const temPag = (d.payments || []).length > 0;
+  const temPresenca = Object.values(d.attendance || {}).some(a => (a || []).length > 0);
+  return !temAluno && !temPag && !temPresenca;
+}
+
+/* última cópia local com conteúdo (gravada a cada base boa) */
+const BOA_KEY = KEY + '-boa';
+function guardarBoa(d) {
+  if (!d || baseDadosVazia(d)) return;
+  try { localStorage.setItem(BOA_KEY, JSON.stringify(d)); } catch (e) {}
+}
+function snapshotBoa() {
+  try { const d = JSON.parse(localStorage.getItem(BOA_KEY) || 'null'); return d && typeof d === 'object' ? d : null; }
+  catch (e) { return null; }
+}
+
 let cloudPushTimer = null;
+let cloudTravaAvisada = false;
 function cloudPush() {
   if (!CLOUD.ativo) return;
   CLOUD.pendente = true;
@@ -7253,10 +7936,21 @@ function cloudDocs() {
 
 async function cloudPushAgora() {
   if (!CLOUD.ativo || CLOUD.salvando) return;
+  /* trava de segurança: base vazia não sobrescreve a nuvem */
+  if (baseDadosVazia()) {
+    CLOUD.pendente = false;
+    if (!cloudTravaAvisada) {
+      cloudTravaAvisada = true;
+      toast('Envio bloqueado: a base aberta está vazia. A base do banco compartilhado não foi alterada.', { icon: 'shield', ms: 6000 });
+      registrarLog('Bloqueou envio de base vazia para a nuvem', 'proteção');
+    }
+    cloudPintar();
+    return;
+  }
   CLOUD.salvando = true; cloudPintar();
   try {
     const linhas = cloudDocs().map(([doc_id, data]) => ({
-      doc_id, data, atualizado_por: CLOUD.user.id,
+      doc_id, data, atualizado_por: (CLOUD.user && CLOUD.user.id) || null,
       atualizado_em: new Date().toISOString()
     }));
     await cloudFetch('/rest/v1/dojo_docs?on_conflict=doc_id', {
@@ -7278,6 +7972,25 @@ let cloudPollTimer = null;
 function cloudPoll() {
   clearInterval(cloudPollTimer);
   if (!CLOUD.ativo) return;
+  /* ---- rede de segurança: se a base da nuvem chegar vazia, restaura a última boa ---- */
+  (async () => {
+    try {
+      const linhas = await cloudFetch('/rest/v1/dojo_docs?select=doc_id,data');
+      const vals = (Array.isArray(linhas) ? linhas : [])
+        .filter(r => r.doc_id !== 'meta' && r.doc_id !== 'log')
+        .map(r => r.data || {});
+      const algumConteudo = vals.some(d => (d.lista || []).length > 0 || (d.presentes || []).length > 0);
+      if (vals.length && !algumConteudo) {
+        const boa = snapshotBoa();
+        if (boa && !baseDadosVazia(boa)) {
+          db = boa; save({ local: true });
+          toast('A base da nuvem chegou vazia. Restauramos a última cópia boa que estava aqui.', { icon: 'shield', ms: 7000 });
+          registrarLog('Restaurou base local: a nuvem chegou vazia', 'proteção');
+          scheduleRender();
+        }
+      }
+    } catch (e) { /* sem rede: segue o fluxo normal */ }
+  })();
   const sincronizar = async (forcar) => {
     if (!CLOUD.ativo || CLOUD.salvando || CLOUD.pendente) return;
     if (document.visibilityState === 'hidden' && !forcar) return;
@@ -7470,22 +8183,6 @@ function installStepsHTML() {
     : `${icon('arrowUpRight', 12)} <b>Android (Chrome):</b> menu <b>⋮</b> → <b>Instalar app</b>.`;
 }
 /* cartão de publicação: gera um QR da página atual para abrir no celular */
-function publishCardHTML() {
-  const file = isFile();
-  return `<div class="publish-card">
-    <div class="publish-txt">
-      <h4>Publicar para o celular</h4>
-      <p>${file
-        ? 'O atalho exige um endereço na web. Suba o arquivo <b>dojo-arandu-v2.html</b> (e o <b>sw.js</b>) em um serviço grátis — Netlify Drop, Vercel, GitHub Pages — e abra o link no celular. Aí o botão <b>Criar atalho</b> funciona.'
-        : 'Já está num endereço. Abra o QR no celular e use <b>Criar atalho</b> por lá.'}</p>
-      <div class="publish-url" id="publishUrl">${esc(location.href.split('#')[0])}</div>
-      <div class="acts">
-        <button class="btn btn--sm" data-act="copy-url">${icon('copy', 13)} Copiar endereço</button>
-        <span class="small dim" id="publishHint"></span>
-      </div>
-    </div>
-  </div>`;
-}
 function pwaIconData(size) {
   const c = document.createElement('canvas'); c.width = c.height = size;
   const x = c.getContext('2d');
@@ -7510,7 +8207,7 @@ function pwaSetup() {
     const url = URL.createObjectURL(new Blob([JSON.stringify({
       name: 'Arandu · Sistema do Dojo', short_name: 'Arandu', start_url: here,
       scope: here.replace(/[^/]*$/, ''), display: 'standalone',
-      background_color: '#0f1117', theme_color: '#c4432c', icons
+      background_color: '#0f1117', theme_color: '#0f1117', icons
     })], { type: 'application/manifest+json' }));
     head('link', { rel: 'manifest', href: url });
     head('link', { rel: 'apple-touch-icon', href: pwaIconData(180) });
@@ -7528,7 +8225,7 @@ function pwaSetup() {
         .then(j => { if (!Array.isArray(j.icons) || !j.icons.length) throw new Error('sem ícones'); })
         .catch(() => { link.remove(); useBlob(); });
     }
-    head('meta', { name: 'theme-color', content: '#c4432c' });
+    head('meta', { name: 'theme-color', content: '#0f1117' });
     head('meta', { name: 'apple-mobile-web-app-capable', content: 'yes' });
     head('meta', { name: 'apple-mobile-web-app-title', content: 'Arandu' });
     head('meta', { name: 'mobile-web-app-capable', content: 'yes' });
@@ -7636,8 +8333,8 @@ function exportCSV() {
       rows.push([s?.name || '', p.month, p.dueDate, String(p.amount).replace('.', ','), p.status, p.paidAt || '', p.method || '']);
     });
   } else {
-    rows.push(['Aluno', 'Turma', 'Faixa', 'Graus', 'Idade', 'Telefone', 'Localidade', 'Plano', 'Mensalidade', 'Status', 'Freq. semana', 'Freq. mês', 'Freq. ano']);
-    db.students.forEach(s => rows.push([s.name, groupOf(s), s.belt, degreeOf(s), s.age || '', s.phone || '', s.locality || '', s.plan || '', s.fee, s.status,
+    rows.push(['Aluno', 'Turma', 'Faixa', 'Graus', 'Idade', 'Telefone', 'Localidade', 'Responsável', 'Telefone do responsável', 'Plano', 'Mensalidade', 'Status', 'Freq. semana', 'Freq. mês', 'Freq. ano']);
+    db.students.forEach(s => rows.push([s.name, groupOf(s), s.belt, degreeOf(s), s.age || '', s.phone || '', s.locality || '', s.guardian || '', s.guardianPhone || '', s.plan || '', s.fee, s.status,
       freqCount(s.id, 'week'), freqCount(s.id, 'month'), freqCount(s.id, 'year')]));
   }
   const csv = '\ufeff' + rows.map(r => r.map(q).join(';')).join('\n');
@@ -7778,6 +8475,21 @@ document.addEventListener('keydown', e => {
   if (map[e.key.toLowerCase()]) { go(map[e.key.toLowerCase()]); return; }
   if (e.key.toLowerCase() === 'n') { e.preventDefault(); studentForm(); }
   if (e.key === '/') { e.preventDefault(); openCmdk(); }
+});
+
+/* o campo de busca do log é recriado a cada render: religa o listener */
+document.addEventListener('input', e => {
+  if (e.target && e.target.id === 'logBusca') {
+    view.logBusca = e.target.value;
+    clearTimeout(window.__logBuscaT);
+    window.__logBuscaT = setTimeout(() => {
+      const pos = e.target.selectionStart;
+      const id = 'logBusca';
+      render();
+      const el = document.getElementById(id);
+      if (el) { el.focus({ preventScroll: true }); try { el.setSelectionRange(pos, pos); } catch (err) {} }
+    }, 260);
+  }
 });
 
 window.addEventListener('hashchange', () => {

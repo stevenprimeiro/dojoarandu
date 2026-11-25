@@ -8,7 +8,7 @@
   "display": "standalone",
   "orientation": "portrait",
   "background_color": "#0f1117",
-  "theme_color": "#c4432c",
+  "theme_color": "#0f1117",
   "lang": "pt-BR",
   "icons": [
     {
@@ -31,7 +31,7 @@
     }
   ],
   "display_override": [
-    "standalone",
-    "minimal-ui"
+    "fullscreen",
+    "standalone"
   ]
 }
