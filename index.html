@@ -8,7 +8,7 @@
 <meta name="color-scheme" content="light dark">
 <style>
 /* ============================================================
-   ARANDU · v2.25 — design system
+   ARANDU · v2.26 — design system
    Papel & tinta: editorial, quente, tátil.
    ============================================================ */
 :root{
@@ -1809,7 +1809,7 @@ function hexA(hex, a) {
 }
 
 /* prefs de UI */
-const APP_VERSION = '2.25';
+const APP_VERSION = '2.26';
 /* assinatura do modelo de cobrança (fechamento novo + abertura com "outras pendências") */
 const WA_TPL_VER = 2;
 const WA_EMOJI_DEFAULT = '✅';
@@ -6574,20 +6574,39 @@ function pwaIconData(size) {
   return c.toDataURL('image/png');
 }
 function pwaSetup() {
-  /* manifest injetado (o app é um arquivo único) */
-  try {
-    const icons = [192, 512].map(sz => ({ src: pwaIconData(sz), sizes: sz + 'x' + sz, type: 'image/png', purpose: 'any maskable' }));
+  /* Preferência: manifest.webmanifest + ícones PNG reais, servidos ao lado do app.
+     O Chrome só empacota o app (WebAPK) com arquivos de verdade — manifest em blob
+     e ícone em data: URL concluem a instalação mas não criam ícone na tela inicial. */
+  const base = location.href.replace(/[^/]*$/, '');
+  const head = (tag, attrs) => { const el = document.createElement(tag); Object.entries(attrs).forEach(([k, v]) => el.setAttribute(k, v)); document.head.appendChild(el); return el; };
+  const useBlob = () => {
+    /* modo arquivo único: manifest em memória (serve para o iPhone, limita o Android) */
+    const icons = [192, 512].map(sz => ({ src: pwaIconData(sz), sizes: sz + 'x' + sz, type: 'image/png', purpose: 'any' }));
     const here = location.href.split('#')[0];
-    const manifest = { name: 'Arandu · Sistema do Dojo', short_name: 'Arandu', start_url: here, scope: here.replace(/[^/]*$/, ''), display: 'standalone', background_color: '#0f1117', theme_color: '#c4432c', icons };
-    const mf = document.createElement('link'); mf.rel = 'manifest';
-    mf.href = URL.createObjectURL(new Blob([JSON.stringify(manifest)], { type: 'application/manifest+json' }));
-    document.head.appendChild(mf);
-    const ai = document.createElement('link'); ai.rel = 'apple-touch-icon'; ai.href = icons[1].src;
-    document.head.appendChild(ai);
-    const tc = document.createElement('meta'); tc.name = 'theme-color'; tc.content = '#c4432c';
-    document.head.appendChild(tc);
-    const am = document.createElement('meta'); am.name = 'apple-mobile-web-app-capable'; am.content = 'yes';
-    document.head.appendChild(am);
+    const url = URL.createObjectURL(new Blob([JSON.stringify({
+      name: 'Arandu · Sistema do Dojo', short_name: 'Arandu', start_url: here,
+      scope: here.replace(/[^/]*$/, ''), display: 'standalone',
+      background_color: '#0f1117', theme_color: '#c4432c', icons
+    })], { type: 'application/manifest+json' }));
+    head('link', { rel: 'manifest', href: url });
+    head('link', { rel: 'apple-touch-icon', href: pwaIconData(180) });
+  };
+  try {
+    if (!/^https?:$/.test(location.protocol)) { useBlob(); }
+    else {
+      /* registra o manifest real; a checagem roda em segundo plano e só
+         cai no blob se o arquivo não existir (app de arquivo único) */
+      const link = head('link', { rel: 'manifest', href: base + 'manifest.webmanifest' });
+      head('link', { rel: 'apple-touch-icon', sizes: '180x180', href: base + 'apple-touch-icon.png' });
+      fetch(base + 'manifest.webmanifest', { cache: 'no-store' })
+        .then(r => { if (!r.ok) throw new Error('sem manifest'); return r.json(); })
+        .then(j => { if (!Array.isArray(j.icons) || !j.icons.length) throw new Error('sem ícones'); })
+        .catch(() => { link.remove(); useBlob(); });
+    }
+    head('meta', { name: 'theme-color', content: '#c4432c' });
+    head('meta', { name: 'apple-mobile-web-app-capable', content: 'yes' });
+    head('meta', { name: 'apple-mobile-web-app-title', content: 'Arandu' });
+    head('meta', { name: 'mobile-web-app-capable', content: 'yes' });
   } catch (e) {}
   /* service worker: só existe em http(s) — é o que libera o instalador do navegador.
      Em file:// o app continua funcionando, mas o atalho precisa de um endereço de verdade. */
@@ -6911,6 +6930,5 @@ boot();
 @keyframes dash{to{stroke-dashoffset:0}}
 @keyframes fadeIn{to{opacity:.85}}
 </style>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a5fc19c098fc4f82',t:'MTc5NTU2MTk2OA=='};var l=window.parent.location,o;try{o=new URL(l.origin).origin}catch(e){try{o=new URL(new URL(l.href).origin).origin}catch(e){o=''}}var u='/cdn-cgi/challenge-platform/scripts/jsd/main.js?ray=a5fc19c098fc4f82',a=document.createElement('script');a.src=o?new URL(u,o).href:u;document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script type="module" src="https://static.cloudflareinsights.com/beacon.min.js/vce701823e78c4301a35b7e07294d87301792088814092" integrity="sha512-UKNk8GbxkABxKcXYuLkO16EleLGUkcvJWtpSNmExE0Too3ZaFAxTscNWEc1OdAv5/BikHawapSCaiD2XCmp+Bw==" data-cf-beacon='{"version":"2024.11.0","token":"1954b47c125f43f8b4338b3c4f804e4f","spa":2}' crossorigin="anonymous"></script>
 </body>
 </html>

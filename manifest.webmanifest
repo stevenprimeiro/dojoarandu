@@ -1,0 +1,18 @@
+{
+  "name": "Arandu · Sistema do Dojo",
+  "short_name": "Arandu",
+  "description": "Sistema do Dojo Arandu — alunos, frequência e mensalidades.",
+  "start_url": "./",
+  "scope": "./",
+  "id": "/arandu",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f1117",
+  "theme_color": "#c4432c",
+  "lang": "pt-BR",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}
