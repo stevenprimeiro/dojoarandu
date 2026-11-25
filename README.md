@@ -4,12 +4,6 @@
 
 Criado por **Steven Primeiro** · versão **2.31**
 
-![Tela inicial no computador](assets/print-desktop.jpg)
-
-<p align="center">
-  <img src="assets/print-celular.jpg" width="300" alt="Tela inicial no celular">
-</p>
-
 ---
 
 ## O que ele faz
@@ -31,16 +25,6 @@ Criado por **Steven Primeiro** · versão **2.31**
 **No celular (recomendado):** abra o endereço publicado, use **Ajustes → Celular → Criar atalho** e o app fica na tela inicial, em tela cheia e com funcionamento offline.
 
 > O atalho só funciona quando o app está publicado num endereço web (`https://…`). Aberto direto do arquivo (`file://`), o navegador não libera a instalação — o próprio app avisa isso.
-
-## Como publicar (GitHub Pages)
-
-1. Baixe o pacote `DojoArandu vXp.zip` (ou use os arquivos desta pasta).
-2. Crie um repositório no GitHub e envie **só estes arquivos**:
-   `index.html`, `sw.js`, `manifest.webmanifest` e a pasta `assets/`
-   (com `icon-192.png`, `icon-512.png`, `icon-maskable-512.png` e `apple-touch-icon.png`).
-3. **Settings → Pages → Deploy from a branch → main / (root)** → Save.
-4. Em 1–2 minutos o app abre em `https://SEU-USUARIO.github.io/NOME-DO-REPO/`.
-5. No celular, abra o endereço e crie o atalho.
 
 ## Dados: onde ficam
 
