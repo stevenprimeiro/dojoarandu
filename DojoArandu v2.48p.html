@@ -2007,8 +2007,8 @@ const TODAY_ISO = iso(TODAY);
    Backup importado em 24/11/2026 — é a base que abre no primeiro acesso
    e o "restaurar base inicial" em Ajustes.
    ============================================================ */
-const SEED_BACKUP_NAME = 'base-exemplo.json';
-const SEED_BACKUP_LABEL = 'Base de exemplo (sem dados)';
+const SEED_BACKUP_NAME = 'arandu-backup-2026-11-25.json';
+const SEED_BACKUP_LABEL = 'Base inicial · 25/11/2026';
 const SEED_DATA = {"students":[{"id":"demo-a0","name":"Aluno Exemplo","age":30,"locality":"Centro","belt":"Branca","degrees":0,"plan":"Mensal","fee":70,"dueDay":10,"joinDate":"2026-01-10","status":"Ativo","classGroup":"Adulto","phone":"(00) 00000-0000","role":"","guardian":""},{"id":"demo-k0","name":"Criança Exemplo","age":9,"locality":"Centro","belt":"Branca","degrees":0,"plan":"Mensal","fee":70,"dueDay":10,"joinDate":"2026-02-01","status":"Ativo","classGroup":"Kids","phone":"(00) 00000-0000","guardian":"Responsável Exemplo","role":""}],"payments":[{"id":"demo-p1","studentId":"demo-a0","month":"2026-11","dueDate":"2026-11-10","amount":70,"status":"Pendente","paidAt":"","method":""},{"id":"demo-p2","studentId":"demo-k0","month":"2026-11","dueDate":"2026-11-10","amount":70,"status":"Pago","paidAt":"2026-11-08","method":"Pix"}],"expenses":[],"attendance":{},"attendanceOpen":{},"trainings":[],"visitors":[],"customPositions":[]}
 const seedData = () => JSON.parse(JSON.stringify(SEED_DATA));
 
@@ -5541,10 +5541,14 @@ function pageAjustes() {
       </div>
     </div>`);
 
+  const quemTela = ehMobile()
+    ? (CLOUD.user ? esc(CLOUD.user.nome || CLOUD.user.email) : esc(perfilDoAparelho().nome))
+    : esc(perfilDoAparelho().nome);
+  const papelTela = papelEfetivo();
   const nuvemTxt = !cloudConfigurado()
     ? 'Não configurada — a base fica só neste aparelho.'
     : CLOUD.ativo
-      ? `Conectado como ${esc(CLOUD.user.nome || CLOUD.user.email)} (${CLOUD.user.papel}).`
+      ? `Conectado como ${quemTela} (${papelTela}).`
       : 'Configurada — entre para compartilhar a base.';
   const nuvem = sec('nuvem', 'Conta e sincronização', nuvemTxt, `<div class="set-pad">
       <div class="settings-row" style="padding-top:0">
@@ -5552,7 +5556,7 @@ function pageAjustes() {
           <h4>${CLOUD.ativo ? 'Conectado ao banco compartilhado' : 'Banco compartilhado (Supabase)'}</h4>
           ${CLOUD.ativo ? `
           <div class="sec-facts" style="margin-top:10px">
-            <div><b>${esc(CLOUD.user.nome || CLOUD.user.email)}</b><span>${esc(CLOUD.user.email)} · perfil: ${esc(CLOUD.user.papel)}</span></div>
+            <div><b>${quemTela}</b><span>${ehMobile() ? esc(CLOUD.user.email) : ''} · perfil: ${papelTela}</span></div>
             ${CLOUD.user.perfilErro ? `<div><b style="color:var(--vermilion)">Perfil não confirmado</b><span>${esc(CLOUD.user.perfilErro)} O papel mostrado acima é só um palpite do app; quem manda é a tabela <b>perfis</b>.<button class="link small" data-act="cloud-relerm-perfil" style="display:block;margin-top:8px;font-weight:700">Tentar ler o perfil de novo</button></span></div>` : ''}
             <div><b>Estado do envio</b><span>${CLOUD.erro ? `<span style="color:var(--vermilion)">${esc(CLOUD.erro)}</span>` : CLOUD.salvando ? 'enviando…' : CLOUD.pendente ? 'na fila' : CLOUD.ultimo ? 'tudo salvo na nuvem' : 'aguardando'}</span></div>
             <div><b>Atualização</b><span>A tela busca o banco a cada 20 segundos e ao voltar para o app.</span></div>
@@ -7128,11 +7132,28 @@ function trainingDrawer(t) {
 const LOG_MAX = 600;
 const LOG_MESES = { jan: 0, fev: 1, mar: 2, abr: 3, mai: 4, jun: 5, jul: 6, ago: 7, set: 8, out: 9, nov: 10, dez: 11 };
 
+function ehMobile() {
+  return window.matchMedia && window.matchMedia('(max-width: 767px)').matches;
+}
+/* perfil que o aparelho assume: celular = professor (Steven), computador = admin (PCadmin) */
+function perfilDoAparelho() {
+  return ehMobile() ? { nome: 'Steven', papel: 'professor' }
+                    : { nome: 'PCadmin', papel: 'admin' };
+}
 function logQuem() {
   const u = CLOUD.user;
+  /* no computador a assinatura é sempre a do admin geral */
+  if (!ehMobile()) return perfilDoAparelho().nome;
   if (u && u.nome) return u.nome;
   if (u && u.email) return u.email;
-  return 'Neste aparelho';
+  const p = perfilDoAparelho();
+  return p.nome;
+}
+/* papel efetivo para exibição e decisões de tela */
+function papelEfetivo() {
+  if (!ehMobile()) return perfilDoAparelho().papel;
+  const u = CLOUD.user;
+  return u && u.papel ? u.papel : perfilDoAparelho().papel;
 }
 function logHora(d = new Date()) {
   const p = n => String(n).padStart(2, '0');
@@ -7877,6 +7898,15 @@ async function cloudPull() {
   novo.attendance = etapa;
   novo.attendanceOpen = aberto;
   const vazio = !linhas.length;
+  /* ---- log: nunca apaga. Mescla o que veio do banco com o que já está aqui ---- */
+  const logLocal = (db && db.log) || [];
+  const logDoc = linhas.find(l => l.doc_id === 'log');
+  const logNuvem = logDoc && Array.isArray(logDoc.data.lista) ? logDoc.data.lista : [];
+  const idsLog = new Set(logLocal.map(x => x.id));
+  logNuvem.forEach(x => { if (x && x.id && !idsLog.has(x.id)) { logLocal.push(x); idsLog.add(x.id); } });
+  if (logLocal.length > LOG_MAX) logLocal = logLocal.slice(-LOG_MAX);
+  novo.log = logLocal;
+
   db = novo;
   /* o que veio do banco é a base do dojo: tira a faixa de demonstração */
   view.baseModo = 'real';
@@ -7926,7 +7956,8 @@ function cloudDocs() {
     ['despesas', { lista: db.expenses || [] }],
     ['treinos', { lista: db.trainings || [] }],
     ['visitas', { lista: db.visitors || [] }],
-    ['posicoes', { lista: db.customPositions || [] }]
+    ['posicoes', { lista: db.customPositions || [] }],
+    ['log', { lista: (db.log || []).slice(-LOG_MAX) }]
   ];
   Object.keys(db.attendance || {}).forEach(dia => {
     docs.push(['chamada:' + dia, { presentes: db.attendance[dia] || [], aberto: (db.attendanceOpen || {})[dia] || null }]);
