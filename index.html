@@ -8,7 +8,7 @@
 <meta name="color-scheme" content="light dark">
 <style>
 /* ============================================================
-   ARANDU · v2.31 — design system
+   ARANDU · v2.32 — design system
    Papel & tinta: editorial, quente, tátil.
    ============================================================ */
 :root{
@@ -1890,7 +1890,7 @@ function hexA(hex, a) {
 }
 
 /* prefs de UI */
-const APP_VERSION = '2.31';
+const APP_VERSION = '2.32';
 /* assinatura do modelo de cobrança (fechamento novo + abertura com "outras pendências") */
 const WA_TPL_VER = 2;
 const WA_EMOJI_DEFAULT = '✅';
@@ -6883,7 +6883,7 @@ function pwaSetup() {
       /* registra o manifest real; a checagem roda em segundo plano e só
          cai no blob se o arquivo não existir (app de arquivo único) */
       const link = head('link', { rel: 'manifest', href: base + 'manifest.webmanifest' });
-      head('link', { rel: 'apple-touch-icon', sizes: '180x180', href: base + 'apple-touch-icon.png' });
+      head('link', { rel: 'apple-touch-icon', sizes: '180x180', href: base + 'assets/apple-touch-icon.png' });
       fetch(base + 'manifest.webmanifest', { cache: 'no-store' })
         .then(r => { if (!r.ok) throw new Error('sem manifest'); return r.json(); })
         .then(j => { if (!Array.isArray(j.icons) || !j.icons.length) throw new Error('sem ícones'); })

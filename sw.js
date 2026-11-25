@@ -1,15 +1,19 @@
 /* Arandu — service worker.
    Guarda o app em cache para abrir pelo atalho e funcionar offline.
-   Funciona com qualquer nome de arquivo (index.html, dojo-arandu-v2.html…). */
+   Funciona com qualquer nome de arquivo (index.html, DojoArandu vXp.html…). */
 const CACHE = 'arandu-v2';
+/* arquivos fixos do atalho (as imagens ficam em assets/) */
+const ASSETS = ['manifest.webmanifest', 'assets/icon-192.png', 'assets/icon-512.png'];
 
 self.addEventListener('install', e => {
-  e.waitUntil(
-    caches.open(CACHE)
-      /* guarda a página que registrou o service worker (sem depender do nome do arquivo) */
-      .then(c => c.add(new Request('./', { cache: 'reload' })).catch(() => {}))
-      .then(() => self.skipWaiting())
-  );
+  e.waitUntil((async () => {
+    const c = await caches.open(CACHE);
+    /* a página que registrou o service worker, sem depender do nome do arquivo */
+    await c.add(new Request('./', { cache: 'reload' })).catch(() => {});
+    /* ícones e manifest: se algum faltar, o app instala do mesmo jeito */
+    await Promise.all(ASSETS.map(u => c.add(new Request(u, { cache: 'reload' })).catch(() => {})));
+    await self.skipWaiting();
+  })());
 });
 
 self.addEventListener('activate', e => {
@@ -29,13 +33,13 @@ self.addEventListener('fetch', e => {
   e.respondWith(
     fetch(e.request)
       .then(res => {
-        if (res && res.status === 200) {
+        /* guarda uma cópia do que foi baixado com sucesso */
+        if (res && res.ok) {
           const copy = res.clone();
           caches.open(CACHE).then(c => c.put(e.request, copy)).catch(() => {});
         }
         return res;
       })
-      .catch(() => caches.match(e.request, { ignoreSearch: true })
-        .then(hit => hit || caches.match('./')))
+      .catch(() => caches.match(e.request).then(hit => hit || caches.match('./')))
   );
 });
