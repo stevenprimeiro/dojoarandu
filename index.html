@@ -21,7 +21,7 @@
 <meta name="application-name" content="Arandu">
 <style>
 /* ============================================================
-   ARANDU · v2.43 — design system
+   ARANDU · v2.45 — design system
    Papel & tinta: editorial, quente, tátil.
    ============================================================ */
 :root{
@@ -178,10 +178,12 @@ img,svg{display:block;max-width:100%}
 .topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px}
 .kbd-btn{
   display:flex;align-items:center;gap:9px;padding:8px 10px 8px 12px;border-radius:999px;
-  border:1px solid var(--line);background:var(--card);color:var(--ink-3);font-size:12.5px;
-  transition:border-color .2s,color .2s,box-shadow .2s
+  /* sem círculo por padrão (pedido do Steven, v2.45): o contorno só aparece ao focar/passar o mouse */
+  border:1px solid transparent;background:transparent;color:var(--ink-3);font-size:12.5px;
+  transition:border-color .2s,background .2s,color .2s,box-shadow .2s
 }
-.kbd-btn:hover{border-color:var(--ink-3);color:var(--ink-2);box-shadow:var(--shadow-s)}
+.kbd-btn:hover,.kbd-btn:focus-visible{border-color:var(--line);background:var(--card);color:var(--ink-2);box-shadow:var(--shadow-s)}
+.kbd-btn:active{background:var(--card-2)}
 .kbd-btn kbd{font:500 10px/1 var(--mono);border:1px solid var(--line);border-radius:5px;padding:3px 5px;background:var(--card-2)}
 .icon-btn{
   width:calc(var(--topbar-icon) * 1px);height:calc(var(--topbar-icon) * 1px);display:grid;place-items:center;border-radius:999px;
@@ -1475,6 +1477,8 @@ body.has-demo-banner .main{padding-bottom:74px}
 .sec-facts{display:grid;gap:9px;margin-top:10px}
 .sec-facts>div{border:1px solid var(--line-2);border-radius:12px;padding:10px 12px;background:color-mix(in srgb,var(--ink) 3%,transparent)}
 .sec-facts b{display:block;font-size:12.5px;margin-bottom:2px}
+/* negrito dentro do texto (ex.: nome da tabela) fica na mesma linha */
+.sec-facts span b{display:inline;font-size:inherit;margin:0;color:var(--ink-2)}
 .sec-facts span{font-size:11.5px;color:var(--ink-3);line-height:1.55}
 
 /* ---------- ajustes: seções recolhíveis ---------- */
@@ -1986,9 +1990,12 @@ function load() {
   let data = null;
   try { data = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { data = null; }
   if (!data || typeof data !== 'object') {
-    /* primeiro acesso num aparelho com banco: NÃO mostra a base de exemplo
-       (a do dojo vem do login). Sem banco configurado, segue a base da máquina. */
-    data = cloudTemConfig() ? BLANK() : seedData();
+    /* O arquivo PÚBLICO carrega só dados de exemplo: num aparelho com banco, ele
+       não deve mostrar nem esses por um instante — a base do dojo vem do login.
+       Já o arquivo de desenvolvimento traz a base real embutida e segue abrindo
+       com ela (é a cópia de trabalho do Steven). */
+    const seedEhExemplo = SEED_BACKUP_NAME === 'base-exemplo.json';
+    data = (seedEhExemplo && cloudTemConfig()) ? BLANK() : seedData();
     BASE.origin = 'seed';
   }
   const base = BLANK();
@@ -2047,7 +2054,7 @@ function hexA(hex, a) {
 }
 
 /* prefs de UI */
-const APP_VERSION = '2.43';
+const APP_VERSION = '2.45';
 /* assinatura do modelo de cobrança (fechamento novo + abertura com "outras pendências") */
 const WA_TPL_VER = 2;
 const WA_EMOJI_DEFAULT = '✅';
@@ -2485,7 +2492,20 @@ function openModal({ title, eyebrow = 'Dojo Arandu', body, onSubmit, submitText 
     if (result !== false) close();
   };
   if (onMount) onMount(wrap);
+  /* no celular, focar um campo ao abrir o modal convoca o teclado na hora
+     (caso clássico: editar mensalidade). Ali o foco vai para o próprio modal,
+     que continua navegável pelo teclado e pelo leitor de tela. */
   setTimeout(() => {
+    const soToque = window.matchMedia && window.matchMedia('(max-width:900px), (pointer:coarse)').matches;
+    if (soToque) {
+      const caixa = wrap.querySelector('.modal');
+      if (caixa) {
+        caixa.setAttribute('tabindex', '-1');
+        caixa.style.outline = 'none';          /* foco para leitor de tela, sem anel visual */
+        caixa.focus({ preventScroll: true });
+      }
+      return;
+    }
     const first = wrap.querySelector('input:not([type=hidden]),select,textarea');
     if (first) first.focus();
   }, 80);
@@ -2558,7 +2578,11 @@ function mountFeeMode(root) {
     hidden.value = btn.dataset.feeMode;
     $$('[data-fee-mode]', root).forEach(b => b.setAttribute('aria-pressed', String(b === btn)));
     wrap.style.display = btn.dataset.feeMode === 'outro' ? 'flex' : 'none';
-    if (btn.dataset.feeMode === 'outro') { if (!input.value) input.value = ''; input.focus(); }
+    if (btn.dataset.feeMode === 'outro') {
+      if (!input.value) input.value = '';
+      /* no celular não foca: abrir o teclado só quando a pessoa tocar no campo */
+      if (!(window.matchMedia && window.matchMedia('(max-width:900px), (pointer:coarse)').matches)) input.focus();
+    }
     else input.removeAttribute('required');
     syncPreview();
   });
@@ -3714,11 +3738,14 @@ function pageHoje() {
 
   /* agenda */
   const wd = TODAY.getDay();
+  const faseAdulto = sessionPhase(TODAY, 'Adulto');
   const nextDay = (() => {
+    /* primeira tentativa: o treino de HOJE, se ele ainda não terminou.
+       Antes o cálculo começava amanhã e anunciava quinta num dia de quarta. */
+    if (faseAdulto.fase === 'antes' || faseAdulto.fase === 'durante') return TODAY;
     for (let i = 1; i <= 7; i++) { const d = new Date(TODAY); d.setDate(d.getDate() + i); if (GROUPS.Adulto.days.includes(d.getDay())) return d; }
     return TODAY;
   })();
-  const faseAdulto = sessionPhase(TODAY, 'Adulto');
   const encerrado = faseAdulto.fase === 'encerrado';
   const durante = faseAdulto.fase === 'durante';
   const agenda = Object.keys(GROUPS).map(g => {
@@ -3796,12 +3823,12 @@ function pageHoje() {
             ? 'Treino <em>encerrado</em>.'
             : gruposHojeTexto(groupsToday.length, durante)}</h2>
           <p style="margin-top:10px">${encerrado
-            ? `O treino adulto de hoje foi das ${GROUPS.Adulto.start} às ${GROUPS.Adulto.end}. ${todayIds.length ? `Ficaram <b>${present} presenças</b> registradas no tatame.` : 'Ninguém foi marcado na chamada — se o treino aconteceu, registre agora.'} Próximo treino: ${WEEKDAYS_LONG[nextDay.getDay()]}, ${GROUPS.Adulto.start}.`
+            ? `O treino adulto de hoje foi das ${GROUPS.Adulto.start} às ${GROUPS.Adulto.end}. ${todayIds.length ? `Ficaram <b>${present} presenças</b> registradas no tatame.` : 'Ninguém foi marcado na chamada — se o treino aconteceu, registre agora.'} Próximo treino: ${nextDay.getTime() === TODAY.getTime() ? 'hoje' : WEEKDAYS_LONG[nextDay.getDay()]}, ${GROUPS.Adulto.start}.`
             : groupsToday.length
               ? `${groupsToday.length} turma${groupsToday.length > 1 ? 's' : ''} confirmada${groupsToday.length > 1 ? 's' : ''} hoje. Registre as presenças enquanto a memória do treino está fresca.`
               : (durante
                   ? `O treino adulto está rolando agora — ${GROUPS.Adulto.start} às ${GROUPS.Adulto.end}. Abra a chamada e marque quem está no tatame.`
-                  : `Nenhuma turma confirmada hoje. Próximo treino adulto: ${WEEKDAYS_LONG[nextDay.getDay()]}, ${GROUPS.Adulto.start}.`)}</p>
+                  : `Nenhuma turma confirmada hoje. Próximo treino adulto: ${nextDay.getTime() === TODAY.getTime() ? 'hoje' : WEEKDAYS_LONG[nextDay.getDay()]}, ${GROUPS.Adulto.start}.`)}</p>
           <div class="hero-actions">
             <button class="btn btn--seal" data-act="go-att">${icon('check', 15)} ${groupsToday.length ? 'Abrir chamada' : 'Confirmar treino'}</button>
             <button class="btn btn--ghost" data-act="new-training">${icon('layers', 15)} Planejar treino</button>
@@ -5183,25 +5210,6 @@ function pageAjustes() {
       </div>
     </div>`);
 
-  const seguranca = sec('seguranca', 'Acesso', 'Quem entra é quem abre a base — não existe mais PIN.', `<div class="set-pad">
-      <div class="settings-row" style="padding-top:0">
-        <div class="txt" style="width:100%">
-          <h4>Entrada pelo login do professor</h4>
-          <p>O app pede o <b>nome</b> e a <b>senha</b> de quem está entrando. Sem login não há acesso à base do dojo — não existe PIN separado.</p>
-          <div class="sec-facts" style="margin-top:10px">
-            <div><b>Nesta sessão</b><span>${CLOUD.ativo ? (esc(CLOUD.user.nome || CLOUD.user.email) + ' (' + esc(CLOUD.user.papel) + ') — sessão na nuvem.') : 'Sem conta na nuvem: ou você escolheu "só neste aparelho", ou a nuvem não está configurada.'}</span></div>
-            <div><b>Quem pode entrar</b><span>Só os três nomes do dojo. Ninguém se cadastra sozinho; a conta é criada no Supabase.</span></div>
-          </div>
-          <div class="acts" style="margin-top:12px">
-            ${CLOUD.ativo
-              ? `<button class="btn btn--sm btn--danger" data-act="cloud-sair">${icon('x', 14)} Sair da conta</button>`
-              : `<button class="btn btn--sm btn--primary" data-act="entrar-nuvem">${icon('userPlus', 14)} Entrar com a minha conta</button>`}
-            ${view.baseModo === 'demo' ? `<button class="btn btn--sm" data-act="descartar-demo">${icon('x', 14)} Sair do modo demonstração</button>` : ''}
-          </div>
-        </div>
-      </div>
-    </div>`, { wide: true });
-
   const nuvemTxt = !cloudConfigurado()
     ? 'Não configurada — a base fica só neste aparelho.'
     : CLOUD.ativo
@@ -5214,7 +5222,7 @@ function pageAjustes() {
           ${CLOUD.ativo ? `
           <div class="sec-facts" style="margin-top:10px">
             <div><b>${esc(CLOUD.user.nome || CLOUD.user.email)}</b><span>${esc(CLOUD.user.email)} · perfil: ${esc(CLOUD.user.papel)}</span></div>
-            ${CLOUD.user.perfilErro ? `<div><b style="color:var(--vermilion)">Perfil não confirmado</b><span>${esc(CLOUD.user.perfilErro)} O papel mostrado acima é só um palpite do app.</span></div>` : ''}
+            ${CLOUD.user.perfilErro ? `<div><b style="color:var(--vermilion)">Perfil não confirmado</b><span>${esc(CLOUD.user.perfilErro)} O papel mostrado acima é só um palpite do app; quem manda é a tabela <b>perfis</b>.<button class="link small" data-act="cloud-relerm-perfil" style="display:block;margin-top:8px;font-weight:700">Tentar ler o perfil de novo</button></span></div>` : ''}
             <div><b>Estado do envio</b><span>${CLOUD.erro ? `<span style="color:var(--vermilion)">${esc(CLOUD.erro)}</span>` : CLOUD.salvando ? 'enviando…' : CLOUD.pendente ? 'na fila' : CLOUD.ultimo ? 'tudo salvo na nuvem' : 'aguardando'}</span></div>
             <div><b>Atualização</b><span>A tela busca o banco a cada 20 segundos e ao voltar para o app.</span></div>
           </div>
@@ -5317,7 +5325,6 @@ function pageAjustes() {
     ${aparencia}
     ${celular}
     ${nuvem}
-    ${seguranca}
     ${dados}
     ${armazenamento}
   </div>
@@ -6277,7 +6284,9 @@ function mapEdgeForm() {
     mapRefresh();
     toast('Conexão criada.', { icon: 'checkCircle' });
   };
-  setTimeout(() => { const f = $('#edgeTo', host); if (f) f.focus(); }, 60);
+  if (!(window.matchMedia && window.matchMedia('(max-width:900px), (pointer:coarse)').matches)) {
+    setTimeout(() => { const f = $('#edgeTo', host); if (f) f.focus(); }, 60);
+  }
 }
 
 
@@ -6845,7 +6854,8 @@ const ACTIONS = {
     const box = $('#cloudSenhaBox');
     if (box) box.hidden = false;
     const erro = $('#cloudErro'); if (erro) erro.textContent = '';
-    setTimeout(() => $('#cloudSenha')?.focus(), 60);
+    /* sem .focus(): no celular isso abria o teclado sozinho ao escolher o nome.
+       Quem quer digitar toca no campo (pedido do Steven, v2.45). */
   },
   'cloud-entrar': async () => {
     const pessoa = acharEquipe(CLOUD.entrando);
@@ -6889,6 +6899,17 @@ const ACTIONS = {
     render();
   },
   'cloud-sair': () => cloudSair(),
+  'cloud-relerm-perfil': async () => {
+    if (!CLOUD.user) return;
+    try {
+      await cloudCarregarPerfil();
+      render();
+      toast(CLOUD.user.perfilErro
+        ? 'Ainda não foi possível ler o perfil: ' + (CLOUD.user.perfilDetalhe || 'sem resposta')
+        : 'Perfil confirmado: ' + CLOUD.user.nome + ' (' + CLOUD.user.papel + ')',
+        { icon: CLOUD.user.perfilErro ? 'alert' : 'checkCircle' });
+    } catch (e) { toast('Não foi possível reler: ' + e.message, { icon: 'alert' }); }
+  },
   'cloud-sync': async () => {
     if (!CLOUD.ativo) return;
     try { await cloudPull(); render(); toast('Base atualizada a partir do banco.', { icon: 'checkCircle' }); }
@@ -6903,7 +6924,7 @@ const ACTIONS = {
           ${fieldHTML({ name: 'cloudKey', label: 'Chave publishable / anon', value: CLOUD.key, placeholder: 'sb_publishable_… ou eyJ…', full: true })}
         </div>`,
       onSubmit: data => {
-        const url = String(data.cloudUrl || '').trim().replace(/\/$/, '');
+        const url = cloudLimparUrl(data.cloudUrl);
         const key = String(data.cloudKey || '').trim();
         const okUrl = /^https:\/\/[^\s]+\.supabase\.co$/.test(url)
           || /^http:\/\/localhost(:\d+)?$/.test(url);   /* só para testes locais */
@@ -6989,9 +7010,15 @@ function applyTheme() {
      são as políticas de RLS no banco, não o segredo da chave.
    • NUNCA coloque a chave service_role/secret neste arquivo.
    ============================================================ */
+/* projeto do dojo: já vem preenchido para o professor não digitar nada.
+   A chave publishable é pública por desenho — quem protege os dados é a RLS. */
+const CLOUD_PADRAO = {
+  url: 'https://wjgiqvyiuluihneqouhm.supabase.co',
+  key: 'sb_publishable_TSLEDQ1SAiTx5lIuGBeSLA_0mJFFYEv'
+};
 const CLOUD = {
-  url: '',          /* ex.: https://abcd1234.supabase.co  */
-  key: '',          /* chave publishable/anon             */
+  url: CLOUD_PADRAO.url,
+  key: CLOUD_PADRAO.key,
   user: null,       /* { id, email, nome, papel }         */
   ativo: false,
   erro: '',
@@ -7012,6 +7039,10 @@ const acharEquipe = (loginOuEmail) => {
   if (!t) return null;
   return EQUIPE.find(p => p.login === t) || EQUIPE.find(p => p.email === t) || null;
 };
+/* aceita a URL do jeito que o painel do Supabase mostra (com /rest/v1/ no fim)
+   e também com barra sobrando — o resto do app sempre trabalha com a raiz */
+const cloudLimparUrl = (u) => String(u || '').trim()
+  .replace(/\/(rest|auth)\/v1\/?$/i, '').replace(/\/+$/, '');
 const cloudConfigurado = () => !!(CLOUD.url && CLOUD.key);
 /* a config vive no localStorage; o load() roda antes do cloudInit(), então
    precisa desta leitura direta para não abrir a base de exemplo por engano */
@@ -7067,24 +7098,48 @@ async function cloudCarregarPerfil() {
     });
     return Array.isArray(linhas) ? linhas[0] : null;
   };
-  let perfil = null, falhou = false;
-  try { perfil = await buscar(); } catch (e) { falhou = true; }
-  if (!perfil && !falhou) {
+  let perfil = null, motivo = '';
+  try { perfil = await buscar(); } catch (e) { motivo = String((e && e.message) || e); }
+  if (!perfil && !motivo) {
     /* banco respondendo mas sem a linha: pode ser cache da resposta — tenta uma vez mais */
-    try { perfil = await buscar(); } catch (e) { falhou = true; }
+    try { perfil = await buscar(); } catch (e) { motivo = String((e && e.message) || e); }
   }
   if (perfil) {
     CLOUD.user.nome = perfil.nome || CLOUD.user.email;
     CLOUD.user.papel = perfil.papel || 'professor';
     CLOUD.user.perfilErro = '';
+    CLOUD.user.perfilDetalhe = '';
     return;
   }
-  /* não achou: deixa claro que o papel mostrado é um palpite, não o do banco */
+  /* não achou a linha: antes de desistir, tenta criar o próprio perfil.
+     Assim quem entra não fica com "papel de palpite" e, se a conta for admin
+     e a linha desaparecer, ela se recompõe sozinha (nunca como admin). */
+  const modo = motivo;                     /* o que a leitura disse, antes de tentar criar */
+  if (!modo) {
+    const daEquipe = acharEquipe(CLOUD.user.email);
+    try {
+      await cloudFetch('/rest/v1/perfis', {
+        method: 'POST', prefer: 'return=representation,resolution=merge-duplicates',
+        body: JSON.stringify([{ id: CLOUD.user.id, nome: daEquipe ? daEquipe.nome : CLOUD.user.email, papel: 'professor' }])
+      });
+      perfil = await buscar().catch(() => null);
+      if (perfil) {
+        CLOUD.user.nome = perfil.nome || CLOUD.user.email;
+        CLOUD.user.papel = perfil.papel || 'professor';
+        CLOUD.user.perfilErro = '';
+        CLOUD.user.perfilDetalhe = '';
+        return;
+      }
+    } catch (e) { motivo = String((e && e.message) || e); }
+  }
+  /* não achou e não deu para criar: deixa claro que o papel é um palpite e
+     guarda o motivo técnico, para dar um diagnóstico útil em vez de "falhou" */
   CLOUD.user.nome = CLOUD.user.email;
   CLOUD.user.papel = 'professor';
-  CLOUD.user.perfilErro = falhou
-    ? 'Não foi possível ler seu perfil agora.'
-    : 'Seu perfil ainda não existe na tabela perfis — rode o SQL de perfis com o seu e-mail.';
+  CLOUD.user.perfilDetalhe = motivo;
+  CLOUD.user.perfilErro = modo
+    ? 'A consulta ao perfil falhou (' + modo + ').'
+    : 'Não consegui ler nem criar o seu perfil' + (motivo ? ' (' + motivo + ')' : '') + ' — a linha da tabela perfis não existe e o banco não deixou criar.';
 }
 
 async function cloudSessaoSalva() {
@@ -7373,7 +7428,7 @@ window.addEventListener('offline', cloudPintar);
 async function cloudInit() {
   try {
     const cfg = JSON.parse(localStorage.getItem('arandu-cloud-cfg') || 'null');
-    if (cfg && cfg.url && cfg.key) { CLOUD.url = cfg.url; CLOUD.key = cfg.key; }
+    if (cfg && cfg.url && cfg.key) { CLOUD.url = cloudLimparUrl(cfg.url); CLOUD.key = cfg.key; }
   } catch (e) {}
   if (!cloudConfigurado()) return;          /* sem configuração: tudo local, como sempre */
   if (cloudSessaoTentada) return;           /* a renovação da sessão acontece uma vez só */
