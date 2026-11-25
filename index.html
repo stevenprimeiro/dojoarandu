@@ -6,9 +6,22 @@
 <title>Arandu · Sistema do Dojo</title>
 <meta name="description" content="Arandu — gestão de dojo de Jiu-Jitsu: alunos, frequência, treinos e financeiro em um só lugar.">
 <meta name="color-scheme" content="light dark">
+<meta name="theme-color" content="#c4432c">
+<!-- atalho na tela inicial: declarado no HTML (não só via JS) para o
+     navegador achar o ícone mesmo antes do script rodar -->
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="assets/icon-192.png">
+<link rel="icon" type="image/png" sizes="512x512" href="assets/icon-512.png">
+<link rel="apple-touch-icon" sizes="180x180" href="assets/apple-touch-icon.png">
+<link rel="apple-touch-icon" sizes="192x192" href="assets/icon-192.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Arandu">
+<meta name="application-name" content="Arandu">
 <style>
 /* ============================================================
-   ARANDU · v2.32 — design system
+   ARANDU · v2.34 — design system
    Papel & tinta: editorial, quente, tátil.
    ============================================================ */
 :root{
@@ -799,7 +812,7 @@ html[data-theme="dark"] .chart-tip{background:#f3ede3;color:#151311}
 .cmdk-foot{display:flex;gap:14px;padding:9px 16px;border-top:1px solid var(--line-2);font-size:11px;color:var(--ink-3);background:var(--card)}
 
 /* ---------- toast ---------- */
-.toasts{position:fixed;z-index:130;left:50%;bottom:26px;transform:translateX(-50%);display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none;width:min(460px,calc(100% - 24px))}
+.toasts{position:fixed;z-index:130;left:50%;bottom:26px;transition:bottom .25s var(--ease);transform:translateX(-50%);display:flex;flex-direction:column;gap:8px;align-items:center;pointer-events:none;width:min(460px,calc(100% - 24px))}
 .toast{
   display:flex;align-items:center;gap:11px;width:100%;
   background:var(--ink);color:var(--paper);padding:11px 12px 11px 15px;border-radius:12px;
@@ -982,10 +995,14 @@ html.lowfx .dock-fab::after{display:none}
   .main{padding-bottom:96px}
 }
 
+/* o menu de páginas só existe no celular */
+@media(min-width:901px){#menuBtn{display:none !important}}
+
 @media(max-width:900px){
   .td-actions{flex-wrap:wrap}
   .training-card{gap:12px;padding:14px}
   .nav{display:none}
+  .topbar .menu-btn{display:grid;place-items:center}
   .kbd-btn span,.kbd-btn kbd{display:none}
   .kbd-btn{padding:8px;width:38px;height:38px;justify-content:center}
   /* v2.23 · barra de topo 15% mais baixa no celular (escala todo o conteúdo) */
@@ -1305,6 +1322,33 @@ html.lowfx .map-page-head{backdrop-filter:none;background:var(--paper)}
 .badge--role{background:color-mix(in srgb,var(--gold) 22%,transparent);color:var(--gold);border:1px solid color-mix(in srgb,var(--gold) 38%,transparent);font-size:9px;letter-spacing:.05em;text-transform:uppercase;padding:2px 6px;border-radius:6px;vertical-align:middle;font-weight:700}
 
 /* ---------- segurança: tela de PIN ---------- */
+/* ---------- menu de páginas na barra superior ---------- */
+.menu-pop{
+  position:fixed;z-index:95;min-width:214px;padding:7px;
+  background:var(--card);border:1px solid var(--line);border-radius:16px;
+  box-shadow:var(--shadow-l);backdrop-filter:blur(20px) saturate(1.4);
+  animation:menuIn .16s var(--ease)
+}
+.menu-pop[hidden]{display:none}
+@keyframes menuIn{from{opacity:0;transform:translateY(-6px) scale(.98)}to{opacity:1;transform:none}}
+.menu-pop a{
+  display:flex;align-items:center;gap:11px;padding:10px 11px;border-radius:11px;
+  font-size:13.5px;font-weight:600;color:var(--ink-2);transition:background .15s,color .15s
+}
+.menu-pop a:hover{background:color-mix(in srgb,var(--ink) 7%,transparent);color:var(--ink)}
+.menu-pop a[aria-current="page"]{color:var(--vermilion);background:color-mix(in srgb,var(--vermilion) 10%,transparent)}
+.menu-pop a svg{opacity:.85;flex:none}
+.menu-pop .menu-sep{height:1px;background:var(--line-2);margin:6px 4px}
+.demo-banner{position:fixed;left:0;right:0;bottom:0;z-index:80;display:flex;align-items:center;gap:12px;
+  justify-content:space-between;padding:10px 14px calc(10px + env(safe-area-inset-bottom));
+  background:color-mix(in srgb,var(--gold) 16%,var(--paper-deep));border-top:1px solid color-mix(in srgb,var(--gold) 34%,var(--line));
+  font-size:11.5px;font-weight:600;color:var(--ink-2);backdrop-filter:blur(14px)}
+.demo-banner[hidden]{display:none}
+body.has-demo-banner .toasts{bottom:78px}
+.demo-banner span{display:flex;align-items:center;gap:7px}
+.demo-banner span::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--gold);flex:none}
+body.has-demo-banner .main{padding-bottom:74px}
+.lock-wrap{display:contents}
 .lock-screen{position:fixed;inset:0;z-index:200;display:grid;place-items:center;padding:20px;
   background:radial-gradient(120% 100% at 50% 0%,color-mix(in srgb,var(--accent) 18%,var(--paper)),var(--paper) 70%);
   backdrop-filter:blur(6px)}
@@ -1710,19 +1754,21 @@ html.lowfx .view-anim>*{animation:none !important}
       <button class="icon-btn" id="settingsBtn" aria-label="Ajustes" title="Ajustes">
         <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .34 1.87l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.7 1.7 0 0 0-1.87-.34 1.7 1.7 0 0 0-1.03 1.56V21a2 2 0 1 1-4 0v-.09A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.87.34l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06A1.7 1.7 0 0 0 4.6 15a1.7 1.7 0 0 0-1.56-1.03H3a2 2 0 1 1 0-4h.09A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.34-1.87l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.7 1.7 0 0 0 9 4.6h.09A1.7 1.7 0 0 0 10.11 3V3a2 2 0 1 1 4 0v.09A1.7 1.7 0 0 0 15.14 4.6a1.7 1.7 0 0 0 1.87-.34l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06A1.7 1.7 0 0 0 19.4 9v.09a1.7 1.7 0 0 0 1.56 1.03H21a2 2 0 1 1 0 4h-.09a1.7 1.7 0 0 0-1.51 1.03Z"/></svg>
       </button>
+      <button class="icon-btn menu-btn" id="menuBtn" aria-label="Menu de páginas" aria-expanded="false" aria-controls="pageMenu"></button>
     </div>
     <nav class="mobile-nav" id="mobileNav" aria-label="Navegação no celular"></nav>
   </header>
 
   <main class="main" id="view" tabindex="-1"></main>
 
-  <nav class="dock" id="dock" aria-label="Navegação móvel">
-    <div class="dock-nav" id="dockNav"></div>
-    <button class="dock-fab" type="button" id="dockFab" aria-label="Abrir menu" aria-expanded="false"></button>
-  </nav>
 </div>
 
+<div class="menu-pop" id="pageMenu" role="menu" aria-label="Páginas do app" hidden></div>
 <div class="scrim" id="scrim"></div>
+<div class="demo-banner" id="demoBanner" hidden>
+  <span>Base de demonstração — dados fictícios</span>
+  <button class="btn btn--sm" data-act="gate-abrir-pin">Digitar PIN</button>
+</div>
 <aside class="drawer" id="drawer" role="dialog" aria-modal="true" aria-labelledby="drawerTitle" aria-hidden="true"></aside>
 <div class="modal-wrap" id="modalWrap" aria-hidden="true"></div>
 <div class="map-page" id="mapPage" aria-hidden="true">
@@ -1771,7 +1817,8 @@ const TODAY_ISO = iso(TODAY);
    ============================================================ */
 const SEED_BACKUP_NAME = 'base-exemplo.json';
 const SEED_BACKUP_LABEL = 'Base de exemplo (sem dados)';
-const SEED_DATA = {"students":[{"id":"demo-a0","name":"Aluno Exemplo","age":30,"locality":"Centro","belt":"Branca","degrees":0,"plan":"Mensal","fee":70,"dueDay":10,"joinDate":"2026-01-10","status":"Ativo","classGroup":"Adulto","phone":"(00) 00000-0000","role":"","guardian":""},{"id":"demo-k0","name":"Criança Exemplo","age":9,"locality":"Centro","belt":"Branca","degrees":0,"plan":"Mensal","fee":70,"dueDay":10,"joinDate":"2026-02-01","status":"Ativo","classGroup":"Kids","phone":"(00) 00000-0000","guardian":"Responsável Exemplo","role":""}],"payments":[{"id":"demo-p1","studentId":"demo-a0","month":"2026-11","dueDate":"2026-11-10","amount":70,"status":"Pendente","paidAt":"","method":""},{"id":"demo-p2","studentId":"demo-k0","month":"2026-11","dueDate":"2026-11-10","amount":70,"status":"Pago","paidAt":"2026-11-08","method":"Pix"}],"expenses":[],"attendance":{},"attendanceOpen":{},"trainings":[],"visitors":[],"customPositions":[]};
+const COFRE = {"real": {"v": 1, "iter": 250000, "salt": "QXJhbmR1LWRvam8tcmVhbC12MQ==", "iv": "wg0SjiUzr+B+MNVG", "ct": "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"}, "demo": {"v": 1, "iter": 250000, "salt": "QXJhbmR1LWRvam8tZGVtby12MQ==", "iv": "HbRIIkWilZfaSgZd", "ct": "IJDIUb+uEn4fjCwBn7cEkEJ7soVCzO+0stFsk1612ehE1XOpCkzfbWJKJxVY7h4TVM2HSVvgRsv6w94rUXhfXIQOPP3y4PmCOal12svhEE3nWqUWtiGtaXPgtjSrMfPObYoBzqlh5arsAK1t27RYzxi544qWI8+fiEd/HrQterK9midxCdSuRuOFH88vL3fsF0gBsg4BjKQyiZfSxNqEo8/FEhife4ZpOsoFdx8X/b8rtr1qqlppJ8C3synAza9n1/2WQre/nav4rsLy8ekrrfEL113PEA835eC67kr2pygkNwYruRFYXg5Unwyj6KB/6KeyJveUQLZDg+eYvR7C7QqSw/vJv/x+Tl4cN6SIDWVOuqoRGoQvZAq3+F8G19BI/tAfBdHkf6f5UWasUOddnV3VnQRDhzaqktEh8on+zzJMPfg3MqdATBP+Pz/zqOP7HlvGfJDLvc1HGdMDXrtBGvrE8xsocgV/+u7N6Qn3/O5wfcBWapsg70HkMbyceuANHiZbH9V5tduOF0K+kAE4gVPhmvZ5PTA/qU10eaQE1TQ/6/9aOLWgpEAbxJeD5mvXPpaJZQHkzWySZrIWlrsaMi5/XGnggVqycwcnIjmESToVFPuys4s5EApJNsMz/dqa/o6wJnxzIvzKlFAOXetxsj0L4I22suCIdg1aum1G1P6GOMKuI1U7bJq3JCc2Ui4KjkOjchpfhvgR0DWOPJfm7uFnBzNyei+f/2Y12OuJuxeHecfN/Vh7re9+3ZJY47U3BVdS1dFkWO/LUFGMkOmnW6tJzVBiUKIiRNx3SPYRVPZCfB2yUv7RvxJxVygSbeOdZNIJUPeA8wz0YFyfHs4h21AvZk3CdQBEAI8jSggrGVKU7kzAic7+YZvd7iqPGxvTMZR2kbeWGYsnXCyJy04D6JYSw4SSaafXCXiar8b/jqiYoQ3xjbNxJ+sHlt7ussPNhITEJY68ZyfAzPvPp+Z/fahvV+CLmpe9k/dUxRG+lpPjKYkKdoABP40tk2HHgVq6VG+Q4XwGV7GeUtEcJOWV1Gt95TDutVW4EPP03jdOJPQvpYrTVmDDprBibumtH3f/37eHfBtNdA7WP561orOOxEZtxRXsWLDhpt7MlEg6Q2pmp1p1pIyYCRiHQgF1oyzWpLAYaSoH0Drz7MYphx4fbppu7p35ATqXvIyO4CniCvOfcEwKFoqTyZZoTRP8FjAK6ZBDHHKS8OohV5SNBibsbFuLfOZ4xVbc3lc="}};
+const SEED_DATA = {"students":[{"id":"demo-a0","name":"Aluno Exemplo","age":30,"locality":"Centro","belt":"Branca","degrees":0,"plan":"Mensal","fee":70,"dueDay":10,"joinDate":"2026-01-10","status":"Ativo","classGroup":"Adulto","phone":"(00) 00000-0000","role":"","guardian":""},{"id":"demo-k0","name":"Criança Exemplo","age":9,"locality":"Centro","belt":"Branca","degrees":0,"plan":"Mensal","fee":70,"dueDay":10,"joinDate":"2026-02-01","status":"Ativo","classGroup":"Kids","phone":"(00) 00000-0000","guardian":"Responsável Exemplo","role":""}],"payments":[{"id":"demo-p1","studentId":"demo-a0","month":"2026-11","dueDate":"2026-11-10","amount":70,"status":"Pendente","paidAt":"","method":""},{"id":"demo-p2","studentId":"demo-k0","month":"2026-11","dueDate":"2026-11-10","amount":70,"status":"Pago","paidAt":"2026-11-08","method":"Pix"}],"expenses":[],"attendance":{},"attendanceOpen":{},"trainings":[],"visitors":[],"customPositions":[]}
 const seedData = () => JSON.parse(JSON.stringify(SEED_DATA));
 
 const MONTH = TODAY_ISO.slice(0, 7);
@@ -1845,9 +1892,11 @@ function load() {
   try { meta = JSON.parse(localStorage.getItem(BASE_KEY) || 'null'); } catch (e) { meta = null; }
   if (meta && meta.origin) Object.assign(BASE, meta);
 }
-function save() {
+function save(opts = {}) {
   try { localStorage.setItem(KEY, JSON.stringify(db)); }
   catch (e) { toast('Não foi possível salvar: o armazenamento está cheio.'); }
+  /* nuvem: cada gravação local também vai para o banco compartilhado */
+  if (CLOUD.ativo && !opts.local) cloudPush();
 }
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
 
@@ -1890,14 +1939,13 @@ function hexA(hex, a) {
 }
 
 /* prefs de UI */
-const APP_VERSION = '2.32';
+const APP_VERSION = '2.34';
 /* assinatura do modelo de cobrança (fechamento novo + abertura com "outras pendências") */
 const WA_TPL_VER = 2;
 const WA_EMOJI_DEFAULT = '✅';
 let prefs = { theme: 'dark', view: 'table', beltCompact: true, pv: 3, palette: 'violet',
   waNumber: '', waTime: '09:00', waTemplate: '', waLate: true, waPix: 'dojoarandu@gmail.com', waTplVer: WA_TPL_VER, waEmoji: WA_EMOJI_DEFAULT,
-  fabPos: 'br', hideTopbar: true,
-  pinHash: '', pinHint: '', lockOnBlur: true, wipeOnExit: false };
+  hideTopbar: true };
 function savePrefs() { try { localStorage.setItem(COL_KEY, JSON.stringify(prefs)); } catch (e) {} }
 (() => {
   let stored = null;
@@ -2690,7 +2738,7 @@ function ringSVG(percent, { size = 118, label = '', value = '' } = {}) {
 /* ============================================================
    8. ESTADO DA INTERFACE + ROTEADOR
    ============================================================ */
-const view = {
+const view = { baseModo: '',
   page: 'hoje',
   tab: 'mensalidades',
   attDate: TODAY_ISO,
@@ -2728,14 +2776,51 @@ function renderNav() {
   const mob = $('#mobileNav');
   if (mob) mob.innerHTML = NAV.map(n =>
     `<a href="#${n.page}" data-act="nav" data-page="${n.page}" ${view.page === n.page ? 'aria-current="page"' : ''}>${icon(n.icon, 13)}<span>${n.label}</span></a>`).join('');
-  $('#dockNav').innerHTML = NAV.map(n =>
-    `<a href="#${n.page}" data-act="nav" data-page="${n.page}" ${view.page === n.page ? 'aria-current="page"' : ''}>
-      ${icon(n.icon, 19)}<span>${n.label}</span></a>`).join('');
-  const fab = $('#dockFab');
-  if (fab) {
-    fab.innerHTML = `<span class="dock-fab-ico"><span class="dock-kanji" aria-hidden="true">柔</span></span>`;
-    fab.style.animation = 'none'; fab.offsetHeight; fab.style.animation = '';
+}
+
+/* menu de páginas: botão na barra → lista suspensa */
+function menuBuild() {
+  const pop = $('#pageMenu');
+  if (!pop) return;
+  const atual = view.page;
+  pop.innerHTML = NAV.map(n =>
+    `<a href="#${n.page}" role="menuitem" data-act="nav" data-page="${n.page}" ${atual === n.page ? 'aria-current="page"' : ''}>
+      ${icon(n.icon, 16)}<span>${n.label}</span></a>`).join('') +
+    `<div class="menu-sep"></div>
+     <a href="#ajustes" role="menuitem" data-act="nav" data-page="ajustes" ${atual === 'ajustes' ? 'aria-current="page"' : ''}>
+       ${icon('settings', 16)}<span>Ajustes</span></a>`;
+}
+function menuToggle(abrir) {
+  const pop = $('#pageMenu'), btn = $('#menuBtn');
+  if (!pop || !btn) return;
+  const jaAberto = !pop.hidden;
+  const abrirAgora = abrir === undefined ? !jaAberto : abrir;
+  if (abrirAgora) menuBuild();
+  pop.hidden = !abrirAgora;
+  btn.setAttribute('aria-expanded', String(abrirAgora));
+  if (abrirAgora) {
+    /* posiciona logo abaixo do botão, alinhado à direita */
+    const r = btn.getBoundingClientRect();
+    pop.style.top = Math.round(r.bottom + 8) + 'px';
+    pop.style.right = Math.max(10, Math.round(window.innerWidth - r.right)) + 'px';
+    pop.style.left = 'auto';
   }
+}
+function menuInit() {
+  const btn = $('#menuBtn'), pop = $('#pageMenu');
+  if (!btn || !pop) return;
+  btn.innerHTML = `<svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg>`;
+  btn.onclick = e => { e.stopPropagation(); menuToggle(); };
+  pop.addEventListener('click', e => {
+    const a = e.target.closest('[data-page]');
+    if (a) menuToggle(false);
+  });
+  document.addEventListener('click', e => {
+    if (!pop.hidden && !pop.contains(e.target) && e.target !== btn && !btn.contains(e.target)) menuToggle(false);
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') menuToggle(false); });
+  window.addEventListener('resize', () => menuToggle(false), { passive: true });
+  window.addEventListener('scroll', () => { if (!pop.hidden) menuToggle(false); }, { passive: true });
 }
 
 /* topbar do celular: esconde ao descer, volta ao subir um pouco */
@@ -2759,20 +2844,20 @@ function topbarInit() {
       return;
     }
     bar.classList.toggle('is-scrolled', y > 6);
-    /* no topo da página a barra está sempre à vista */
-    if (y <= 24) {
+    /* A barra só reaparece no topo absoluto: qualquer rolagem para baixo,
+       a partir daí, esconde de novo. Assim, no meio da página ela nunca
+       volta a ocupar a tela enquanto se rola para cima. */
+    if (y <= 8) {
       bar.classList.remove('is-tucked');
       dirAcc = 0;
       return;
     }
+    if (bar.classList.contains('is-tucked')) return;   /* já escondida: fica escondida */
     /* trocou de sentido? zera o acumulador para não misturar os dois */
     if ((delta > 0 && dirAcc < 0) || (delta < 0 && dirAcc > 0)) dirAcc = 0;
     dirAcc += delta;
     if (dirAcc >= DOWN_AT) {        /* desceu o bastante → some */
       bar.classList.add('is-tucked');
-      dirAcc = 0;
-    } else if (dirAcc <= -UP_AT) {  /* subiu o bastante → volta */
-      bar.classList.remove('is-tucked');
       dirAcc = 0;
     }
   };
@@ -2791,42 +2876,6 @@ function topbarInit() {
 
 /* dock: retrai para um botão flutuante */
 let dockCollapseTimer = null;
-function dockSetCollapsed(open) {
-  const dock = $('#dock');
-  if (!dock) return;
-  const collapsed = !open;
-  dock.classList.toggle('is-collapsed', collapsed);
-  dock.dataset.pos = prefs.fabPos || 'br';
-  const fab = $('#dockFab');
-  if (fab) fab.setAttribute('aria-expanded', String(open));
-  if (open) {
-    clearTimeout(dockCollapseTimer);
-    dockCollapseTimer = setTimeout(() => dockSetCollapsed(false), 6000);
-  }
-}
-function dockInit() {
-  const dock = $('#dock'), fab = $('#dockFab');
-  if (!dock || !fab) return;
-  /* mede a altura do menu aberto para centralizar o botão recolhido */
-  /* o dock agora é só o botão flutuante: nada de medir altura de menu */
-  const syncDockH = () => { dock.classList.add('is-collapsed'); };
-  syncDockH();
-  dock.dataset.pos = prefs.fabPos || 'br';
-  window.addEventListener('resize', () => { if (window.innerWidth <= 900) syncDockH(); }, { passive: true });
-  dock.classList.add('is-collapsed');
-  fab.onclick = () => {
-    const isCollapsed = dock.classList.contains('is-collapsed');
-    dockSetCollapsed(isCollapsed);
-  };
-  /* toque em qualquer link do dock volta a retrair depois da navegação */
-  $('#dockNav').addEventListener('click', () => { clearTimeout(dockCollapseTimer); setTimeout(() => dockSetCollapsed(false), 380); });
-  /* rolar a página retrai imediatamente */
-  window.addEventListener('scroll', () => {
-    if (!dock.classList.contains('is-collapsed') && Math.abs(window.scrollY - (dockInit._y || 0)) > 40) {
-      dockInit._y = window.scrollY; dockSetCollapsed(false);
-    } else dockInit._y = window.scrollY;
-  }, { passive: true });
-}
 
 let renderQueued = false;
 function scheduleRender() {
@@ -2846,7 +2895,16 @@ function go(page, opts = {}) {
   $('#view').focus({ preventScroll: true });
 }
 
+function renderBaseBanner() {
+  const el = $('#demoBanner');
+  if (!el) return;
+  const demo = view.baseModo === 'demo' || BASE.label === 'Base de exemplo (sem dados)' && view.baseModo !== 'real';
+  el.hidden = !demo;
+  document.body.classList.toggle('has-demo-banner', demo);
+}
+
 function render() {
+  renderBaseBanner();
   renderNav();
   applyPalette();
   const root = $('#view');
@@ -4963,14 +5021,92 @@ function pageAjustes() {
         <div class="txt"><h4>Faixa compacta</h4><p>Na lista de alunos, mostrar apenas a barra colorida e os graus, sem o nome da cor. Padrão do sistema.</p></div>
         <label class="switch"><input type="checkbox" data-on="toggle-belt-compact" ${prefs.beltCompact ? 'checked' : ''}><span class="track"></span></label>
       </div>
+      
+      </div>
       <div class="settings-row">
-        <div class="txt"><h4>Visitas no gráfico mensal</h4><p>Exibe a linha de visitantes junto à frequência por turma.</p></div>
-        <label class="switch"><input type="checkbox" data-on="toggle-visits" ${view.showVisits ? 'checked' : ''}><span class="track"></span></label>
+        <div class="txt"><h4>Esconder a barra ao rolar</h4><p>No celular, a barra do app sai de cena quando você desce e volta ao chegar no topo.</p></div>
+        <label class="switch"><input type="checkbox" data-on="toggle-hide-topbar" ${prefs.hideTopbar !== false ? 'checked' : ''}><span class="track"></span></label>
+      </div>
+      <div class="settings-row" style="border-bottom:0">
+        <div class="txt" style="width:100%">${publishCardHTML()}</div>
       </div>
     </div>`);
 
+  const celular = sec('celular', 'Celular', 'Atalho na tela inicial e barra do navegador', `<div class="set-pad">
+      <div class="settings-row" style="padding-top:0">
+        <div class="txt" style="width:100%">
+          <h4>Atalho na tela inicial</h4>
+          <p>Instala o Arandu como app: ícone na tela inicial, tela cheia e acesso em um toque.</p>
+          <div class="acts">
+            <button class="btn btn--sm btn--primary" data-act="install-app">${icon('download', 14)} Criar atalho</button>
+            <span class="small dim" id="installHint">${installHintText()}</span>
+          </div>
+          <div class="install-steps">${installStepsHTML()}</div>
+        </div>
+      </div>
+      <div class="settings-row">
+        <div class="txt"><h4>Esconder a barra ao rolar</h4><p>No celular, a barra do app sai de cena quando você desce e volta ao chegar no topo.</p></div>
+        <label class="switch"><input type="checkbox" data-on="toggle-hide-topbar" ${prefs.hideTopbar !== false ? 'checked' : ''}><span class="track"></span></label>
+      </div>
+      <div class="settings-row" style="border-bottom:0">
+        <div class="txt" style="width:100%">${publishCardHTML()}</div>
+      </div>
+    </div>`);
+
+  const seguranca = sec('seguranca', 'Segurança', 'A base real é aberta com o PIN do dojo.', `<div class="set-pad">
+      <div class="settings-row" style="padding-top:0">
+        <div class="txt" style="width:100%">
+          <h4>Cofre da base real</h4>
+          <p>Os dados dos alunos vão <b>cifrados</b> dentro do app (AES-GCM, chave derivada do PIN). Quem abrir o link sem o PIN vê apenas a base de demonstração — nomes e telefones reais não ficam legíveis em nenhum lugar do arquivo.</p>
+          <div class="sec-facts" style="margin-top:10px">
+            <div><b>Nesta sessão</b><span>${view.baseModo === 'real' ? 'Base real aberta — o PIN fica guardado só nesta aba.' : 'Base de demonstração: os dados são fictícios e não vão para a base real.'}</span></div>
+            <div><b>Trocar o PIN</b><span>O PIN é definido no gerador de publicação; para mudar, gere a versão de novo com outro PIN.</span></div>
+          </div>
+          <div class="acts" style="margin-top:12px">
+            <button class="btn btn--sm btn--primary" data-act="gate-abrir-pin">${icon('shield', 14)} Digitar o PIN</button>
+            ${view.baseModo === 'demo' ? `<button class="btn btn--sm" data-act="gate-sair-demo">${icon('x', 14)} Sair do modo demonstração</button>` : ''}
+          </div>
+        </div>
+      </div>
+    </div>`);
+
+  const nuvemTxt = !cloudConfigurado()
+    ? 'Não configurada — a base fica só neste aparelho.'
+    : CLOUD.ativo
+      ? `Conectado como ${esc(CLOUD.user.nome || CLOUD.user.email)} (${CLOUD.user.papel}).`
+      : 'Configurada — entre para compartilhar a base.';
+  const nuvem = sec('nuvem', 'Conta e sincronização', nuvemTxt, `<div class="set-pad">
+      <div class="settings-row" style="padding-top:0">
+        <div class="txt" style="width:100%">
+          <h4>${CLOUD.ativo ? 'Conectado ao banco compartilhado' : 'Banco compartilhado (Supabase)'}</h4>
+          ${CLOUD.ativo ? `
+          <div class="sec-facts" style="margin-top:10px">
+            <div><b>${esc(CLOUD.user.nome || CLOUD.user.email)}</b><span>${esc(CLOUD.user.email)} · perfil: ${esc(CLOUD.user.papel)}</span></div>
+            <div><b>Estado do envio</b><span>${CLOUD.erro ? `<span style="color:var(--vermilion)">${esc(CLOUD.erro)}</span>` : CLOUD.salvando ? 'enviando…' : CLOUD.pendente ? 'na fila' : CLOUD.ultimo ? 'tudo salvo na nuvem' : 'aguardando'}</span></div>
+            <div><b>Atualização</b><span>A tela busca o banco a cada 20 segundos e ao voltar para o app.</span></div>
+          </div>
+          <div class="acts" style="margin-top:12px">
+            <button class="btn btn--sm" data-act="cloud-sync">${icon('download', 14)} Buscar do banco</button>
+            <button class="btn btn--sm" data-act="cloud-enviar-tudo">${icon('arrowUpRight', 14)} Enviar esta base</button>
+            <button class="btn btn--sm btn--danger" data-act="cloud-sair">${icon('x', 14)} Sair da conta</button>
+          </div>` : `
+          <p>Com o banco compartilhado, você e os professores usam a <b>mesma base</b>: o que um marca aparece nos outros. Cada pessoa entra com a própria conta e as regras ficam no banco (RLS), não nesta página.</p>
+          <div class="sec-facts" style="margin-top:10px">
+            <div><b>Sem configurar</b><span>O app continua funcionando só neste aparelho, como sempre.</span></div>
+            <div><b>Configurar</b><span>Cole a URL do projeto e a chave <b>publishable/anon</b> do Supabase. Nunca a chave <b>service_role</b>.</span></div>
+          </div>
+          <div class="acts" style="margin-top:12px">
+            <button class="btn btn--sm btn--primary" data-act="cloud-config">${icon('settings', 14)} Configurar banco</button>
+            <button class="btn btn--sm" data-act="cloud-entrar-agora">${icon('userPlus', 14)} Já configurado: entrar</button>
+          </div>
+          <div class="field-note" style="margin-top:10px">Arquivo de apoio com o SQL e o passo a passo: <b>SUPABASE.md</b>.</div>`}
+        </div>
+      </div>
+    </div>`);
+
+
   const seedCor = BASE.origin === 'seed' ? 'badge--ok' : BASE.origin === 'empty' ? 'badge--late' : 'badge--warn';
-  const seedNome = BASE.origin === 'seed' ? 'Base inicial do dojo' : BASE.origin === 'import' ? 'Backup importado' : BASE.origin === 'demo' ? 'Demonstração' : 'Base vazia';
+  const seedNome = BASE.origin === 'seed' ? 'Base inicial do dojo' : BASE.origin === 'empty' ? 'Base vazia' : 'Backup importado';
   const baseAtiva = `<div class="base-active">
       <div class="base-active-head">
         <span class="base-ico">${icon('download', 16)}</span>
@@ -4991,43 +5127,6 @@ function pageAjustes() {
         <span class="small dim">${BASE.origin === 'seed' ? 'Você está na base oficial.' : 'A base oficial é a ' + esc(SEED_BACKUP_NAME) + '.'}</span>
       </div>
     </div>`;
-
-  const posBtn = (id, label, hint) => `<button type="button" class="fab-pos" data-act="set-fab-pos" data-id="${id}" aria-pressed="${(prefs.fabPos || 'br') === id}" title="${hint}">
-      <span class="fab-pos-box"><i style="--x:${id[1] === 'l' ? 'left' : 'right'};--y:${id[0] === 't' ? 'top' : 'bottom'}"></i></span>
-      <span class="fab-pos-lbl">${label}</span></button>`;
-
-  const celular = sec('celular', 'Celular', 'Só aparece no aparelho — no computador nada muda', `<div class="set-pad">
-      <div class="settings-row" style="padding-top:0">
-        <div class="txt" style="width:100%">
-          <h4>Posição do botão flutuante</h4>
-          <p>Onde fica o botão do menu (柔) quando está recolhido no celular.</p>
-          <div class="fab-pos-grid">
-            ${posBtn('tl', 'Topo esquerdo', 'Botão no canto superior esquerdo')}
-            ${posBtn('tr', 'Topo direito', 'Botão no canto superior direito')}
-            ${posBtn('bl', 'Base esquerda', 'Botão no canto inferior esquerdo')}
-            ${posBtn('br', 'Base direita', 'Botão no canto inferior direito')}
-          </div>
-        </div>
-      </div>
-      <div class="settings-row">
-        <div class="txt"><h4>Esconder a barra do topo ao rolar</h4><p>Ao descer a página a barra sai de cena e volta quando você rola um pouco para cima.</p></div>
-        <label class="switch"><input type="checkbox" data-on="toggle-hide-topbar" ${prefs.hideTopbar !== false ? 'checked' : ''}><span class="track"></span></label>
-      </div>
-      <div class="settings-row" style="border-bottom:0">
-        <div class="txt" style="width:100%">
-          <h4>Atalho na home do celular</h4>
-          <p>Instala o Arandu como app: ícone na tela inicial, tela cheia e acesso em um toque — sem passar pelo navegador.</p>
-          <div class="acts">
-            <button class="btn btn--sm btn--primary" data-act="install-app">${icon('download', 14)} Criar atalho</button>
-            <span class="small dim" id="installHint">${installHintText()}</span>
-          </div>
-          <div class="install-steps">${installStepsHTML()}</div>
-        </div>
-      </div>
-      <div class="settings-row" style="border-bottom:0">
-        <div class="txt" style="width:100%">${publishCardHTML()}</div>
-      </div>
-    </div>`);
 
   const dados = sec('dados', 'Dados', 'Tudo salvo neste navegador', `<div class="set-pad">
       <div class="settings-row" style="padding-top:0;border-bottom:0">
@@ -5064,42 +5163,6 @@ function pageAjustes() {
       </div>
     </div></div>`);
 
-  const pinTxt = pinSet() ? 'PIN ativo neste aparelho.' : 'Sem PIN — quem abrir o app vê a base inteira.';
-  const seguranca = sec('seguranca', 'Segurança', pinTxt, `<div class="set-pad">
-      <div class="settings-row" style="padding-top:0">
-        <div class="txt" style="width:100%">
-          <h4>Trava de acesso (PIN)</h4>
-          <p>Protege a base real: ao abrir o app, ele pede um PIN de 4 a 8 dígitos. O PIN é guardado como código de embaralhamento (SHA-256) neste navegador — ninguém consegue ler a senha, nem eu.</p>
-          <div class="acts">
-            <button class="btn btn--sm btn--primary" data-act="pin-set">${icon('shield', 14)} ${pinSet() ? 'Trocar PIN' : 'Criar PIN'}</button>
-            ${pinSet() ? `<button class="btn btn--sm" data-act="pin-lock-now">${icon('x', 14)} Trancar agora</button>
-            <button class="btn btn--sm btn--danger" data-act="pin-remove">${icon('trash', 14)} Remover PIN</button>` : ''}
-          </div>
-          ${pinSet() ? `<div class="field-note">${icon('shield', 12)} Dica cadastrada: “${esc(prefs.pinHint || 'sem dica')}”</div>` : ''}
-          <div class="field-note" style="margin-top:10px">${icon('bell', 12)} <b>Se esquecer o PIN</b> não há como recuperar — por segurança. A saída é apagar os dados do site (Ajustes do navegador → Dados do site) e importar um backup. Por isso: baixe backups e guarde o PIN junto.</div>
-        </div>
-      </div>
-      <div class="settings-row">
-        <div class="txt"><h4>Trancar ao sair do app</h4><p>Pede o PIN de novo assim que você troca de aba ou deixa o celular parado.</p></div>
-        <label class="switch"><input type="checkbox" data-on="toggle-lock-on-blur" ${prefs.lockOnBlur !== false ? 'checked' : ''}><span class="track"></span></label>
-      </div>
-      <div class="settings-row">
-        <div class="txt"><h4>Limpar dados ao sair</h4><p>Apaga a base deste navegador quando você fecha a aba. Use só em aparelho emprestado — e tenha backup.</p></div>
-        <label class="switch"><input type="checkbox" data-on="toggle-wipe-on-exit" ${prefs.wipeOnExit ? 'checked' : ''}><span class="track"></span></label>
-      </div>
-      <div class="settings-row" style="border-bottom:0">
-        <div class="txt" style="width:100%">
-          <h4>Onde os dados ficam</h4>
-          <div class="sec-facts">
-            <div><b>Neste aparelho</b><span>Só no navegador (localStorage). Nada de alunos, telefones ou mensalidades vai para o GitHub.</span></div>
-            <div><b>Página no GitHub Pages</b><span>Só o app vazio: HTML, ícones e manifest. Quem abrir o link vê um sistema sem dados.</span></div>
-            <div><b>Sem nuvem</b><span>Não existe servidor, login ou sincronização. Backup é o JSON que você baixa.</span></div>
-            <div><b>Dispositivo emprestado</b><span>Use PIN + “Limpar dados ao sair” e importe o backup quando devolver.</span></div>
-          </div>
-          <div class="field-note" style="margin-top:10px">${icon('alert', 12)} O link do GitHub Pages é público. Se você publicar <b>um HTML com dados de teste dentro</b>, esses dados ficam públicos. Publique sempre a versão limpa — a pasta <b>publicar-github/</b> já vem assim.</div>
-        </div>
-      </div>
-    </div>`);
 
   const armazenamento = sec('armazenamento', 'Armazenamento', `localStorage · ${kb} KB em uso`, `<div class="set-pad">
       <div style="height:8px;border-radius:99px;background:var(--line-2);overflow:hidden">
@@ -5120,6 +5183,7 @@ function pageAjustes() {
   <div class="cols-2">
     ${aparencia}
     ${celular}
+    ${nuvem}
     ${seguranca}
     ${dados}
     ${armazenamento}
@@ -6616,62 +6680,106 @@ const ACTIONS = {
     if (!ok) return;
     db = demoData(); baseSnapshotMeta('demo', 'demonstração fictícia', db); save(); render(); toast('Demonstração carregada.', { icon: 'spark' });
   },
-  'pin-set': () => {
-    const body = `<div class="form-grid">
-      ${fieldHTML({ name: 'pin', label: pinSet() ? 'Novo PIN (4 a 8 dígitos)' : 'PIN (4 a 8 dígitos)', type: 'password', value: '', required: true, placeholder: '••••', inputmode: 'numeric' })}
-      ${fieldHTML({ name: 'pin2', label: 'Repita o PIN', type: 'password', value: '', required: true, placeholder: '••••', inputmode: 'numeric' })}
-      ${fieldHTML({ name: 'hint', label: 'Dica (opcional, aparece no Ajustes)', value: prefs.pinHint || '', placeholder: 'Ex.: aniversário do dojo', full: true })}
-      ${pinSet() ? fieldHTML({ name: 'atual', label: 'PIN atual', type: 'password', value: '', required: true, full: true }) : ''}
-    </div>`;
-    openModal({
-      title: pinSet() ? 'Trocar o PIN' : 'Criar PIN', eyebrow: 'Segurança', body, submitText: 'Salvar',
-      onSubmit: async data => {
-        const pin = String(data.pin || '').trim();
-        if (!/^\d{4,8}$/.test(pin)) { toast('O PIN precisa ter de 4 a 8 números.', { icon: 'alert' }); return false; }
-        if (pin !== String(data.pin2 || '').trim()) { toast('Os dois PINs não conferem.', { icon: 'alert' }); return false; }
-        if (pinSet() && (await sha256(String(data.atual || '').trim())) !== prefs.pinHash) { toast('PIN atual incorreto.', { icon: 'x' }); return false; }
-        prefs.pinHash = await sha256(pin);
-        prefs.pinHint = String(data.hint || '').trim();
-        savePrefs(); render();
-        toast('PIN salvo. Ele será pedido na próxima abertura.', { icon: 'shield' });
-      }
-    });
-  },
-  'pin-remove': async () => {
-    const ok = await confirmDialog({ title: 'Remover o PIN', danger: true, confirmText: 'Remover', message: 'Sem PIN, qualquer pessoa que abrir este navegador vê a base do dojo.' });
-    if (!ok) return;
-    prefs.pinHash = ''; prefs.pinHint = ''; savePrefs(); render();
-    toast('PIN removido.', { icon: 'checkCircle' });
-  },
-  'pin-lock-now': () => { showLock(); },
-  unlock: async () => {
-    const v = String($('#lockPin')?.value || '').trim();
-    if ((await sha256(v)) === prefs.pinHash) { hideLock(); toast('Bem-vindo de volta.', { icon: 'checkCircle' }); }
-    else {
-      const er = $('#lockErro'); if (er) { er.textContent = 'PIN incorreto.'; }
-      const inp = $('#lockPin'); if (inp) { inp.value = ''; inp.focus(); }
-    }
-  },
-  'forgot-pin': async () => {
-    await confirmDialog({
-      title: 'Esqueci o PIN', confirmText: 'Entendi', cancelText: 'Fechar',
-      message: 'O PIN não tem recuperação — é o que garante que ninguém entre sem ele.\n\nPara voltar a usar: apague os dados do site nas configurações do navegador e importe seu último backup (Ajustes → Dados → Importar).'
-    });
-  },
   'toggle-sec': id => {
     const card = document.querySelector(`.set-sec[data-sec="${id}"]`);
     if (!card) return;
     const head = card.querySelector('.set-head');
     const body = card.querySelector('.set-body');
-    const open = head.getAttribute('aria-expanded') !== 'true';
-    head.setAttribute('aria-expanded', String(open));
-    card.classList.toggle('is-open', open);
-    body.hidden = !open;
-    if (open) view.openSec = id;
+    const abrir = head.getAttribute('aria-expanded') !== 'true';
+    head.setAttribute('aria-expanded', String(abrir));
+    card.classList.toggle('is-open', abrir);
+    body.hidden = !abrir;
   },
-  'set-fab-pos': id => {
-    prefs.fabPos = id; savePrefs(); applyFabPos(); render();
-    toast(`Botão do menu no ${({ tl: 'topo esquerdo', tr: 'topo direito', bl: 'base esquerda', br: 'base direita' })[id]}.`, { icon: 'grid' });
+  'gate-entrar': async () => {
+    const pin = String($('#gatePin')?.value || '').trim();
+    const erro = $('#gateErro');
+    const btn = document.querySelector('[data-act="gate-entrar"]');
+    if (!/^\d{4,8}$/.test(pin)) { if (erro) erro.textContent = 'Digite os números do PIN.'; return; }
+    if (btn) { btn.disabled = true; btn.textContent = 'Abrindo…'; }
+    try {
+      const dados = await cofreAbrir(pin);
+      if (!dados) throw new Error('sem cofre');
+      aplicarBase(dados, 'seed', 'Base real · protegida por PIN', SEED_BACKUP_NAME);
+      sessionStorage.setItem(COFRE_KEY, pin);          /* lembra só nesta aba */
+      view.baseModo = 'real';
+      hideGate();
+      render();
+      toast('Base do dojo aberta.', { icon: 'checkCircle' });
+    } catch (e) {
+      if (erro) erro.textContent = 'PIN incorreto. Tente de novo ou use a base de teste.';
+      const inp = $('#gatePin'); if (inp) { inp.value = ''; inp.focus(); }
+      if (btn) { btn.disabled = false; btn.textContent = 'Abrir a base'; }
+    }
+  },
+  'gate-abrir-pin': () => showGate(),
+  'gate-sair-demo': () => { view.baseModo = ''; showGate(); render(); },
+  'gate-demo': () => {
+    hideGate();
+    view.baseModo = 'demo';
+    toast('Modo de demonstração: dados fictícios.', { icon: 'alert' });
+    render();
+  },
+  'cloud-entrar': async () => {
+    const email = String($('#cloudEmail')?.value || '').trim().toLowerCase();
+    const senha = String($('#cloudSenha')?.value || '');
+    const erro = $('#cloudErro');
+    if (!email || !senha) { if (erro) erro.textContent = 'Preencha e-mail e senha.'; return; }
+    const btn = document.querySelector('[data-act="cloud-entrar"]');
+    if (btn) { btn.disabled = true; btn.textContent = 'Entrando…'; }
+    try {
+      await cloudLogin(email, senha);
+      hideCloudLogin();
+      await cloudPull();
+      cloudPoll();
+      render();
+      toast('Bem-vindo, ' + (CLOUD.user.nome || 'professor') + '.', { icon: 'checkCircle' });
+    } catch (e) {
+      if (erro) erro.textContent = 'Não foi possível entrar: ' + e.message;
+      if (btn) { btn.disabled = false; btn.textContent = 'Entrar'; }
+    }
+  },
+  'cloud-modo-local': () => {
+    hideCloudLogin();
+    toast('Modo local: a base fica só neste aparelho.', { icon: 'checkCircle' });
+    render();
+  },
+  'cloud-sair': () => cloudSair(),
+  'cloud-sync': async () => {
+    if (!CLOUD.ativo) return;
+    try { await cloudPull(); render(); toast('Base atualizada a partir do banco.', { icon: 'checkCircle' }); }
+    catch (e) { toast('Não foi possível buscar: ' + e.message, { icon: 'alert' }); }
+  },
+  'cloud-config': () => {
+    openModal({
+      title: 'Configurar banco', eyebrow: 'Supabase', submitText: 'Salvar',
+      body: `<p class="small dim" style="margin-bottom:14px">Em supabase.com → Project Settings → API, copie a <b>Project URL</b> e a chave <b>publishable (anon)</b>. A chave <b>service_role/secret</b> nunca entra aqui.</p>
+        <div class="form-grid">
+          ${fieldHTML({ name: 'cloudUrl', label: 'URL do projeto', value: CLOUD.url, placeholder: 'https://abcd1234.supabase.co', full: true })}
+          ${fieldHTML({ name: 'cloudKey', label: 'Chave publishable / anon', value: CLOUD.key, placeholder: 'sb_publishable_… ou eyJ…', full: true })}
+        </div>`,
+      onSubmit: data => {
+        const url = String(data.cloudUrl || '').trim().replace(/\/$/, '');
+        const key = String(data.cloudKey || '').trim();
+        const okUrl = /^https:\/\/[^\s]+\.supabase\.co$/.test(url)
+          || /^http:\/\/localhost(:\d+)?$/.test(url);   /* só para testes locais */
+        if (!okUrl) { toast('URL inválida: use https://SEU-PROJETO.supabase.co', { icon: 'alert' }); return false; }
+        if (key.length < 30) { toast('Chave inválida.', { icon: 'alert' }); return false; }
+        if (/service_role/i.test(key) || key.startsWith('sb_secret')) {
+          toast('Essa é a chave service_role/secret — ela nunca pode ficar na página. Use a publishable/anon.', { icon: 'alert' });
+          return false;
+        }
+        CLOUD.url = url; CLOUD.key = key;
+        try { localStorage.setItem('arandu-cloud-cfg', JSON.stringify({ url, key })); } catch (e) {}
+        showCloudLogin();
+        toast('Endereço salvo. Entre com a sua conta.', { icon: 'checkCircle' });
+      }
+    });
+  },
+  'cloud-entrar-agora': () => { if (cloudConfigurado()) showCloudLogin(); else toast('Configure o banco primeiro.', { icon: 'alert' }); },
+  'cloud-enviar-tudo': async () => {
+    if (!CLOUD.ativo) return;
+    CLOUD.pendente = true; await cloudPushAgora(); render();
+    toast(CLOUD.erro ? 'Falha ao enviar: ' + CLOUD.erro : 'Base enviada para o banco.', { icon: CLOUD.erro ? 'alert' : 'checkCircle' });
   },
   'install-app': () => installApp(),
   'copy-url': async () => {
@@ -6699,18 +6807,7 @@ const ACTIONS = {
 };
 
 const INPUTS = {
-  'toggle-hide-topbar': el => { prefs.hideTopbar = el.checked; savePrefs(); applyFabPos(); },
-  'toggle-lock-on-blur': el => { prefs.lockOnBlur = el.checked; savePrefs(); },
-  'toggle-wipe-on-exit': el => {
-    prefs.wipeOnExit = el.checked; savePrefs();
-    if (!el.checked) { try { sessionStorage.removeItem('arandu-armed'); } catch (e) {} }
-    else toast('A base será apagada quando você fechar a aba.', { icon: 'alert' });
-  }, 
-  'student-search': el => {
-    view.q = el.value;
-    const body = $('#studentsBody');
-    if (body) body.innerHTML = studentRowsHTML();
-  },
+  'toggle-hide-topbar': el => { prefs.hideTopbar = el.checked; savePrefs(); },
   'att-date': el => { view.attDate = el.value || TODAY_ISO; render(); },
   'cal-month': el => { view.calCursor = el.value || MONTH; render(); },
   'pay-month': el => { view.payMonth = el.value || MONTH; render(); },
@@ -6730,83 +6827,288 @@ function applyTheme() {
   document.documentElement.style.colorScheme = dark ? 'dark' : 'light';
   applyPalette();
   updateThemeButton();
-  applyFabPos();
 }
+/* ============================================================
+   NUVEM (Supabase) — banco compartilhado entre os professores
+   ------------------------------------------------------------
+   • Sem configuração, o app roda 100% local (como sempre).
+   • Configurado, a base vive no Supabase e a sessão é por pessoa.
+   • A chave publishable/anon pode ficar aqui: quem protege os dados
+     são as políticas de RLS no banco, não o segredo da chave.
+   • NUNCA coloque a chave service_role/secret neste arquivo.
+   ============================================================ */
+const CLOUD = {
+  url: '',          /* ex.: https://abcd1234.supabase.co  */
+  key: '',          /* chave publishable/anon             */
+  user: null,       /* { id, email, nome, papel }         */
+  ativo: false,
+  erro: '',
+  salvando: false,
+  pendente: false,
+  ultimo: 0,
+  canal: null
+};
+const cloudConfigurado = () => !!(CLOUD.url && CLOUD.key);
+const cloudSessionKey = 'arandu-cloud-session';
+
+/* chamada simples à API REST do Supabase */
+async function cloudFetch(path, opts = {}) {
+  const resp = await fetch(CLOUD.url.replace(/\/$/, '') + path, {
+    ...opts,
+    headers: {
+      'apikey': CLOUD.key,
+      'Authorization': 'Bearer ' + ((CLOUD.user && CLOUD.user.token) || CLOUD.key),
+      'Content-Type': 'application/json',
+      'Prefer': opts.prefer || 'return=representation',
+      ...(opts.headers || {})
+    }
+  });
+  const txt = await resp.text();
+  const body = txt ? (() => { try { return JSON.parse(txt); } catch (e) { return txt; } })() : null;
+  if (!resp.ok) {
+    const msg = (body && (body.msg || body.message || body.error_description || body.error)) || ('HTTP ' + resp.status);
+    throw new Error(msg);
+  }
+  return body;
+}
+
+async function cloudLogin(email, senha) {
+  const r = await cloudFetch('/auth/v1/token?grant_type=password', {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + CLOUD.key },
+    prefer: '',
+    body: JSON.stringify({ email, password: senha })
+  });
+  CLOUD.user = {
+    id: r.user.id, email: r.user.email, token: r.access_token,
+    refresh: r.refresh_token, expira: Date.now() + (r.expires_in || 3600) * 1000
+  };
+  await cloudCarregarPerfil();
+  try { localStorage.setItem(cloudSessionKey, JSON.stringify(CLOUD.user)); } catch (e) {}
+  CLOUD.ativo = true;
+  return CLOUD.user;
+}
+
+async function cloudCarregarPerfil() {
+  try {
+    const linhas = await cloudFetch(`/rest/v1/perfis?id=eq.${CLOUD.user.id}&select=nome,papel`);
+    if (linhas && linhas[0]) { CLOUD.user.nome = linhas[0].nome; CLOUD.user.papel = linhas[0].papel; }
+    else { CLOUD.user.nome = CLOUD.user.email; CLOUD.user.papel = 'professor'; }
+  } catch (e) { CLOUD.user.nome = CLOUD.user.email; CLOUD.user.papel = 'professor'; }
+}
+
+async function cloudSessaoSalva() {
+  if (!cloudConfigurado()) return false;
+  let salvo = null;
+  try { salvo = JSON.parse(localStorage.getItem(cloudSessionKey) || 'null'); } catch (e) {}
+  if (!salvo || !salvo.refresh) return false;
+  try {
+    const r = await cloudFetch('/auth/v1/token?grant_type=refresh_token', {
+      method: 'POST', headers: { 'Authorization': 'Bearer ' + CLOUD.key }, prefer: '',
+      body: JSON.stringify({ refresh_token: salvo.refresh })
+    });
+    CLOUD.user = { ...salvo, token: r.access_token, refresh: r.refresh_token, expira: Date.now() + (r.expires_in || 3600) * 1000 };
+    await cloudCarregarPerfil();
+    CLOUD.ativo = true;
+    try { localStorage.setItem(cloudSessionKey, JSON.stringify(CLOUD.user)); } catch (e) {}
+    return true;
+  } catch (e) { return false; }
+}
+
+/* ---- leitura: junta os documentos do banco num único objeto db ---- */
+async function cloudPull() {
+  const linhas = await cloudFetch('/rest/v1/dojo_docs?select=doc_id,data,versao,atualizado_em');
+  if (!Array.isArray(linhas)) throw new Error('resposta inesperada do banco');
+  const novo = BLANK();
+  const etapa = {};      /* memória da chamada por dia */
+  const aberto = {};
+  linhas.forEach(l => {
+    const d = l.data || {};
+    if (l.doc_id === 'alunos') novo.students = d.lista || [];
+    else if (l.doc_id === 'pagamentos') novo.payments = d.lista || [];
+    else if (l.doc_id === 'despesas') novo.expenses = d.lista || [];
+    else if (l.doc_id === 'treinos') novo.trainings = d.lista || [];
+    else if (l.doc_id === 'visitas') novo.visitors = d.lista || [];
+    else if (l.doc_id === 'posicoes') novo.customPositions = d.lista || [];
+    else if (l.doc_id.startsWith('chamada:')) {
+      const dia = l.doc_id.slice(8);
+      etapa[dia] = d.presentes || [];
+      if (d.aberto) aberto[dia] = d.aberto;
+    }
+  });
+  novo.attendance = etapa;
+  novo.attendanceOpen = aberto;
+  db = novo;
+  /* guarda local como cópia de segurança (e para abrir offline) */
+  save({ local: true });
+  return novo;
+}
+
+/* ---- escrita: quebra o db em documentos e envia só o que mudou ---- */
+let cloudPushTimer = null;
+function cloudPush() {
+  if (!CLOUD.ativo) return;
+  CLOUD.pendente = true;
+  clearTimeout(cloudPushTimer);
+  cloudPushTimer = setTimeout(cloudPushAgora, 900);   /* agrupa várias edições seguidas */
+}
+
+function cloudDocs() {
+  const docs = [
+    ['alunos', { lista: db.students || [] }],
+    ['pagamentos', { lista: db.payments || [] }],
+    ['despesas', { lista: db.expenses || [] }],
+    ['treinos', { lista: db.trainings || [] }],
+    ['visitas', { lista: db.visitors || [] }],
+    ['posicoes', { lista: db.customPositions || [] }]
+  ];
+  Object.keys(db.attendance || {}).forEach(dia => {
+    docs.push(['chamada:' + dia, { presentes: db.attendance[dia] || [], aberto: (db.attendanceOpen || {})[dia] || null }]);
+  });
+  return docs;
+}
+
+async function cloudPushAgora() {
+  if (!CLOUD.ativo || CLOUD.salvando) return;
+  CLOUD.salvando = true;
+  try {
+    const linhas = cloudDocs().map(([doc_id, data]) => ({
+      doc_id, data, atualizado_por: CLOUD.user.id,
+      atualizado_em: new Date().toISOString()
+    }));
+    await cloudFetch('/rest/v1/dojo_docs?on_conflict=doc_id', {
+      method: 'POST',
+      prefer: 'resolution=merge-duplicates,return=minimal',
+      body: JSON.stringify(linhas)
+    });
+    CLOUD.pendente = false; CLOUD.erro = ''; CLOUD.ultimo = Date.now();
+  } catch (e) {
+    CLOUD.erro = e.message || 'falha ao enviar';
+  } finally {
+    CLOUD.salvando = false;
+  }
+}
+
+/* ---- atualização entre aparelhos: busca o banco a cada 20 s e ao voltar para a aba ---- */
+let cloudPollTimer = null;
+function cloudPoll() {
+  clearInterval(cloudPollTimer);
+  if (!CLOUD.ativo) return;
+  const sincronizar = async (forcar) => {
+    if (!CLOUD.ativo || CLOUD.salvando || CLOUD.pendente) return;
+    if (document.visibilityState === 'hidden' && !forcar) return;
+    try {
+      const antes = JSON.stringify(db);
+      await cloudPull();
+      if (JSON.stringify(db) !== antes) { scheduleRender(); }
+      CLOUD.erro = '';
+    } catch (e) { CLOUD.erro = e.message || 'sem conexão'; }
+  };
+  cloudPollTimer = setInterval(() => sincronizar(false), 20000);
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') sincronizar(true); });
+  window.addEventListener('online', () => sincronizar(true));
+}
+
+async function cloudSair() {
+  clearTimeout(cloudPushTimer);
+  try { await cloudPushAgora(); } catch (e) {}
+  CLOUD.ativo = false; CLOUD.user = null;
+  try { localStorage.removeItem(cloudSessionKey); } catch (e) {}
+  toast('Sessão encerrada. O app voltou ao modo local.', { icon: 'checkCircle' });
+  render();
+}
+
+/* ============================================================
+   COFRE — a base real vem cifrada no arquivo e só abre com o PIN
+   ------------------------------------------------------------
+   O arquivo público não tem nomes nem telefones legíveis: os dados
+   reais estão em AES-GCM (chave derivada do PIN por PBKDF2). Quem
+   abre sem o PIN usa a base de demonstração.
+   ============================================================ */
+const COFRE_KEY = 'arandu-cofre-sessao';
+
+async function cofreAbrir(entrada) {
+  const cfg = typeof COFRE !== 'undefined' && COFRE && COFRE.real;
+  if (!cfg) return null;                       /* app de desenvolvimento: sem cofre */
+  const b64 = t => Uint8Array.from(atob(t), c => c.charCodeAt(0));
+  const salt = b64(cfg.salt);
+  const base = await crypto.subtle.importKey('raw', new TextEncoder().encode(entrada), 'PBKDF2', false, ['deriveBits']);
+  const bits = await crypto.subtle.deriveBits({ name: 'PBKDF2', salt, iterations: cfg.iter, hash: 'SHA-256' }, base, 256);
+  const chave = await crypto.subtle.importKey('raw', bits, 'AES-GCM', false, ['decrypt']);
+  const claro = await crypto.subtle.decrypt({ name: 'AES-GCM', iv: b64(cfg.iv) }, chave, b64(cfg.ct));
+  return JSON.parse(new TextDecoder().decode(claro));
+}
+
+/* aplica uma base recém-importada (real ou de demonstração) */
+function aplicarBase(dados, origem, rotulo, arquivo) {
+  db = dados;
+  /* garante as chaves que o app espera */
+  ['students','payments','expenses','attendance','attendanceOpen','trainings','visitors','customPositions']
+    .forEach(k => { if (!db[k]) db[k] = (k === 'attendance' || k === 'attendanceOpen') ? {} : []; });
+  baseSnapshotMeta(origem, arquivo, db);
+  BASE.label = rotulo;
+  save({ local: true });
+  view.baseModo = origem;
+}
+
+function gateHTML() {
+  return `<div class="lock-wrap">
+    <div class="lock-card">
+      <span class="brand-seal" style="width:54px;height:54px;margin:0 auto 14px">道</span>
+      <div class="eyebrow" style="text-align:center">Arandu · Sistema do Dojo</div>
+      <h2 class="lock-title">Digite o PIN do dojo</h2>
+      <p class="small dim" style="text-align:center;margin-bottom:16px">A base dos alunos está protegida. Sem o PIN, o app abre em modo de demonstração.</p>
+      <input class="field lock-input" id="gatePin" type="password" inputmode="numeric" maxlength="8"
+        placeholder="••••" autocomplete="off" aria-label="PIN do dojo">
+      <div class="lock-erro" id="gateErro"></div>
+      <button class="btn btn--primary" style="width:100%;margin-top:10px" data-act="gate-entrar">Abrir a base</button>
+      <button class="link small" style="display:block;margin:16px auto 0" data-act="gate-demo">Entrar só com a base de teste</button>
+    </div>
+  </div>`;
+}
+function showGate() {
+  if ($('#gateScreen')) return;
+  const el = document.createElement('div');
+  el.id = 'gateScreen'; el.className = 'lock-screen';
+  el.innerHTML = gateHTML();
+  document.body.appendChild(el);
+  setTimeout(() => $('#gatePin')?.focus(), 90);
+  $('#gatePin')?.addEventListener('keydown', e => { if (e.key === 'Enter') ACTIONS['gate-entrar'](); });
+}
+function hideGate() { $('#gateScreen')?.remove(); }
+
 /* ============================================================
    SEGURANÇA — trava local por PIN + limpeza automática
    Os dados nunca saem deste navegador; a trava impede que alguém
    que pegue o celular abra a lista de alunos.
    ============================================================ */
-const sha256 = async (txt) => {
-  try {
-    const buf = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(txt + '::arandu'));
-    return [...new Uint8Array(buf)].map(b => b.toString(16).padStart(2, '0')).join('');
-  } catch (e) {
-    /* file:// em navegador antigo: hash simples de emergência */
-    let h = 5381;
-    for (const ch of txt) h = ((h << 5) + h + ch.charCodeAt(0)) >>> 0;
-    return 'x' + h.toString(16);
+/* ao abrir: pede o PIN do dojo (ou libera direto se já foi digitado nesta aba) */
+async function abrirGate() {
+  const cfg = typeof COFRE !== 'undefined' && COFRE && COFRE.real;
+  if (!cfg) { view.baseModo = 'real'; return; }   /* desenvolvimento: sem cofre, sem gate */
+  let guardado = null;
+  try { guardado = sessionStorage.getItem(COFRE_KEY); } catch (e) {}
+  if (guardado) {
+    try {
+      const dados = await cofreAbrir(guardado);
+      if (dados) { aplicarBase(dados, 'seed', 'Base real · protegida por PIN', SEED_BACKUP_NAME); view.baseModo = 'real'; render(); return; }
+    } catch (e) { try { sessionStorage.removeItem(COFRE_KEY); } catch (e2) {} }
   }
-};
-const pinSet = () => !!(prefs.pinHash && prefs.pinHash.length > 10);
-let locked = false;
-
-function lockScreenHTML() {
-  return `<div class="lock-wrap">
-    <div class="lock-card">
-      <span class="brand-seal" style="width:54px;height:54px;font-size:27px;margin:0 auto 14px">道</span>
-      <div class="eyebrow" style="text-align:center">Arandu · Sistema do Dojo</div>
-      <h2 class="lock-title">Digite seu PIN</h2>
-      <p class="small dim" style="text-align:center;margin-bottom:16px">A base tem dados reais do dojo. O PIN fica só neste aparelho.</p>
-      <input class="field lock-input" id="lockPin" type="password" inputmode="numeric" maxlength="8"
-        placeholder="••••" autocomplete="off" aria-label="PIN">
-      <div class="lock-erro" id="lockErro"></div>
-      <button class="btn btn--primary" style="width:100%;margin-top:10px" data-act="unlock">Entrar</button>
-      <button class="link small" style="display:block;margin:14px auto 0" data-act="forgot-pin">Esqueci o PIN</button>
-    </div>
-  </div>`;
-}
-function showLock() {
-  if (!pinSet()) return;
-  locked = true;
-  const el = document.createElement('div');
-  el.id = 'lockScreen'; el.className = 'lock-screen';
-  el.innerHTML = lockScreenHTML();
-  document.body.appendChild(el);
-  setTimeout(() => $('#lockPin')?.focus(), 80);
-  $('#lockPin')?.addEventListener('keydown', e => { if (e.key === 'Enter') ACTIONS.unlock(); });
-}
-function hideLock() {
-  locked = false;
-  $('#lockScreen')?.remove();
+  showGate();
 }
 
-function securityInit() {
-  /* 1) pede o PIN ao abrir */
-  if (pinSet()) showLock();
-
-  /* 2) tranca ao sair do app (troca de aba/janela) */
-  document.addEventListener('visibilitychange', () => {
-    if (!pinSet() || prefs.lockOnBlur === false) return;
-    if (document.visibilityState === 'hidden') locked = true;
-    else if (locked) showLock();
-  });
-
-  /* 3) limpa a base ao fechar, se o usuário escolheu isso */
-  if (prefs.wipeOnExit) {
-    try { sessionStorage.setItem('arandu-armed', '1'); } catch (e) {}
-  }
-  window.addEventListener('pagehide', () => {
-    if (!prefs.wipeOnExit) return;
-    try { localStorage.removeItem(KEY); localStorage.removeItem(BASE_KEY); } catch (e) {}
-  });
-  /* se o app foi reaberto depois de uma limpeza, avisa */
+async function cloudInit() {
   try {
-    if (prefs.wipeOnExit && !sessionStorage.getItem('arandu-armed') && !db.students.length) {
-      toast('Base apagada ao sair. Importe um backup para continuar.', { icon: 'alert' });
-    }
-    sessionStorage.setItem('arandu-armed', '1');
+    const cfg = JSON.parse(localStorage.getItem('arandu-cloud-cfg') || 'null');
+    if (cfg && cfg.url && cfg.key) { CLOUD.url = cfg.url; CLOUD.key = cfg.key; }
   } catch (e) {}
+  if (!cloudConfigurado()) return;          /* sem configuração: tudo local, como sempre */
+  const voltou = await cloudSessaoSalva();
+  if (voltou) {
+    try { await cloudPull(); cloudPoll(); render(); } catch (e) { CLOUD.erro = e.message; }
+  } else {
+    showCloudLogin();                       /* primeira vez neste aparelho */
+  }
 }
 
 /* ---------- atalho na home do celular (PWA) ---------- */
@@ -6882,8 +7184,9 @@ function pwaSetup() {
     else {
       /* registra o manifest real; a checagem roda em segundo plano e só
          cai no blob se o arquivo não existir (app de arquivo único) */
-      const link = head('link', { rel: 'manifest', href: base + 'manifest.webmanifest' });
-      head('link', { rel: 'apple-touch-icon', sizes: '180x180', href: base + 'assets/apple-touch-icon.png' });
+      /* manifest e apple-touch-icon já vêm declarados no <head>; aqui só
+         conferimos se o arquivo existe e, se não, caímos no modo blob */
+      const link = document.querySelector('link[rel="manifest"]') || head('link', { rel: 'manifest', href: base + 'manifest.webmanifest' });
       fetch(base + 'manifest.webmanifest', { cache: 'no-store' })
         .then(r => { if (!r.ok) throw new Error('sem manifest'); return r.json(); })
         .then(j => { if (!Array.isArray(j.icons) || !j.icons.length) throw new Error('sem ícones'); })
@@ -6914,12 +7217,6 @@ function installApp() {
   });
 }
 
-/* posição do botão flutuante do menu (vale no celular) */
-function applyFabPos() {
-  const dock = $('#dock');
-  if (dock) dock.dataset.pos = prefs.fabPos || 'br';
-  document.documentElement.dataset.hideTopbar = prefs.hideTopbar === false ? 'off' : 'on';
-}
 function updateThemeButton() {
   const btn = $('#themeToggle');
   if (!btn) return;
@@ -7201,10 +7498,11 @@ function boot() {
   if (PAGES[hash]) view.page = hash;
   applyTheme();
   render();
-  dockInit();
+  menuInit();
   topbarInit();
   pwaSetup();
-  securityInit();
+  cloudInit();
+  abrirGate();
   /* lembrete automático: varre os vencimentos do dia ao abrir o app */
   try { waAutoRun(); render(); } catch (e) {}
 }
