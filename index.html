@@ -21,7 +21,7 @@
 <meta name="application-name" content="Arandu">
 <style>
 /* ============================================================
-   ARANDU · v2.56 — design system
+   ARANDU · v2.73 — design system
    Papel & tinta: editorial, quente, tátil.
    ============================================================ */
 :root{
@@ -46,6 +46,9 @@
   --vermilion:#5b3ef0;
   --vermilion-ink:#452ecb;
   --vermilion-soft:rgba(91,62,240,.12);
+  --pal-2:#1668b8;
+  --pal-3:#9a6206;
+
   --moss:#0f7a45;
   --moss-soft:rgba(15,122,69,.12);
   --indigo:#1668b8;
@@ -56,6 +59,9 @@
   --volt-ink:#4e7600;
   --volt-soft:color-mix(in srgb,var(--volt) 32%,var(--card));
   --danger:#c22a4b;
+  /* dinheiro: sempre verde (positivo) / vermelho (negativo), independente da paleta */
+  --money-pos:#0f7a45;
+  --money-neg:#c22a4b;
 
   --shadow-s:0 1px 2px rgba(0,0,0,.35);
   --shadow-m:0 1px 0 rgba(255,255,255,.05) inset,0 24px 60px -34px rgba(0,0,0,.85);
@@ -79,6 +85,8 @@ html[data-theme="dark"]{
   --vermilion:#7b5cff;
   --vermilion-ink:#a78bfa;
   --vermilion-soft:rgba(123,92,255,.16);
+  --pal-2:#6fb9ff;
+  --pal-3:#ffc46b;
   --moss:#8ef0a8;
   --moss-soft:rgba(142,240,168,.14);
   --indigo:#6fb9ff;
@@ -86,6 +94,8 @@ html[data-theme="dark"]{
   --gold:#ffc46b;
   --gold-soft:rgba(255,196,107,.16);
   --danger:#ff7a90;
+  --money-pos:#8ef0a8;
+  --money-neg:#ff7a90;
   --shadow-s:0 1px 2px rgba(0,0,0,.5);
   --shadow-m:0 1px 2px rgba(0,0,0,.4),0 18px 40px -30px rgba(0,0,0,.9);
   --shadow-l:0 2px 6px rgba(0,0,0,.5),0 40px 80px -40px #000;
@@ -98,8 +108,8 @@ body{
   margin:0;color:var(--ink);
   background:
     radial-gradient(1200px 640px at 92% -12%, color-mix(in srgb,var(--vermilion) 30%,transparent), transparent 68%),
-    radial-gradient(980px 560px at -12% 4%, color-mix(in srgb,var(--indigo) 22%,transparent), transparent 66%),
-    radial-gradient(900px 620px at 50% 118%, color-mix(in srgb,var(--gold) 14%,transparent), transparent 70%),
+    radial-gradient(980px 560px at -12% 4%, color-mix(in srgb,var(--pal-2) 22%,transparent), transparent 66%),
+    radial-gradient(900px 620px at 50% 118%, color-mix(in srgb,var(--pal-3) 14%,transparent), transparent 70%),
     var(--paper);
   background-attachment:fixed;
   font:15px/1.55 var(--sans);
@@ -113,8 +123,8 @@ body::before{
 html[data-theme="dark"] body::before{opacity:.06}
 html[data-theme="dark"] body{background:
   radial-gradient(1100px 600px at 88% -10%, color-mix(in srgb,var(--vermilion) 34%,transparent), transparent 66%),
-  radial-gradient(900px 520px at -8% 6%, color-mix(in srgb,var(--indigo) 26%,transparent), transparent 64%),
-  radial-gradient(820px 560px at 46% 114%, color-mix(in srgb,var(--gold) 12%,transparent), transparent 68%),
+  radial-gradient(900px 520px at -8% 6%, color-mix(in srgb,var(--pal-2) 26%,transparent), transparent 64%),
+  radial-gradient(820px 560px at 46% 114%, color-mix(in srgb,var(--pal-3) 12%,transparent), transparent 68%),
   var(--paper)}
 ::selection{background:var(--vermilion);color:#fff}
 a{color:inherit;text-decoration:none}
@@ -131,6 +141,9 @@ img,svg{display:block;max-width:100%}
   color:var(--ink-3)
 }
 .num{font-family:var(--mono);font-variant-numeric:tabular-nums;letter-spacing:-.02em}
+.money-pos{color:var(--money-pos)}
+.money-neg{color:var(--money-neg)}
+.money-warn{color:var(--gold)}
 .serif{font-family:var(--serif)}
 .muted{color:var(--ink-2)}
 .dim{color:var(--ink-3)}
@@ -235,9 +248,9 @@ img,svg{display:block;max-width:100%}
   box-shadow:inset 0 1px 0 rgba(255,255,255,.24),0 10px 22px -16px rgba(0,0,0,.7)
 }
 html[data-theme="dark"] .btn--primary{background:var(--ink);color:#151311}
-.btn--primary:hover{background:color-mix(in srgb,var(--ink) 88%,var(--vermilion));border-color:transparent}
-.btn--seal{background:linear-gradient(160deg,color-mix(in srgb,#fff 16%,var(--vermilion)),var(--vermilion));border-color:transparent;color:#fff;box-shadow:0 10px 26px -14px color-mix(in srgb,var(--vermilion) 90%,transparent),inset 0 1px 0 rgba(255,255,255,.28)}
-.btn--seal:hover{background:var(--vermilion-ink);border-color:var(--vermilion-ink)}
+.btn--primary:hover{background:color-mix(in srgb,var(--ink) 88%,var(--accent-button,var(--vermilion)));border-color:transparent}
+.btn--seal{background:linear-gradient(160deg,color-mix(in srgb,#fff 16%,var(--accent-button,var(--vermilion))),var(--accent-button,var(--vermilion)));border-color:transparent;color:#fff;box-shadow:0 10px 26px -14px color-mix(in srgb,var(--accent-button,var(--vermilion)) 90%,transparent),inset 0 1px 0 rgba(255,255,255,.28)}
+.btn--seal:hover{background:var(--accent-button-ink,var(--vermilion-ink));border-color:var(--accent-button-ink,var(--vermilion-ink))}
 .btn--quiet{background:transparent;border-color:transparent;color:var(--ink-2);padding:9px 11px}
 .btn--quiet:hover{background:color-mix(in srgb,var(--ink) 6%,transparent);color:var(--ink);box-shadow:none}
 .btn--ghost{background:transparent}
@@ -420,12 +433,12 @@ html[data-theme="dark"] .card--ink{background:#232019;color:var(--ink);border-co
 .dot{width:7px;height:7px;border-radius:50%;background:var(--ink-3);flex:none}
 .dot--seal{background:var(--vermilion)}.dot--moss{background:var(--moss)}.dot--indigo{background:var(--indigo)}.dot--gold{background:var(--gold)}
 .trend{display:inline-flex;align-items:center;gap:4px;font:750 9.5px/1 var(--cond);letter-spacing:.08em;text-transform:uppercase;padding:3px 6px;border-radius:4px;background:var(--moss-soft);color:var(--moss)}
-.trend--down{background:var(--vermilion-soft);color:var(--vermilion-ink)}
+.trend--down{background:color-mix(in srgb,var(--money-neg) 14%,transparent);color:var(--money-neg)}
 
 /* ---------- hero ---------- */
 .hero{
   position:relative;overflow:hidden;
-  background:linear-gradient(115deg,color-mix(in srgb,var(--vermilion) 16%,var(--card)) 0%,var(--card) 46%,color-mix(in srgb,var(--indigo) 14%,var(--card)) 100%);
+  background:linear-gradient(115deg,color-mix(in srgb,var(--vermilion) 16%,var(--card)) 0%,var(--card) 46%,color-mix(in srgb,var(--pal-2) 14%,var(--card)) 100%);
 }
 .hero::before{
   content:"";position:absolute;inset:auto -10% -60% 30%;height:80%;pointer-events:none;
@@ -530,7 +543,7 @@ html[data-theme="dark"] .hero{background:linear-gradient(115deg,var(--card) 0%,v
 }
 .badge--ok{background:var(--moss-soft);color:var(--moss)}
 .badge--warn{background:var(--gold-soft);color:var(--gold)}
-.badge--late{background:var(--vermilion-soft);color:var(--vermilion-ink)}
+.badge--late{background:color-mix(in srgb,var(--money-neg) 14%,transparent);color:var(--money-neg)}
 .badge--info{background:var(--indigo-soft);color:var(--indigo)}
 .badge--outline{background:transparent;border:1px solid var(--line);color:var(--ink-3)}
 .chip{
@@ -625,7 +638,7 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
   padding:7px 11px;border-radius:6px;font:750 10.5px/1 var(--cond);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);
   transition:.22s var(--ease)
 }
-.seg button[aria-pressed="true"]{background:linear-gradient(160deg,color-mix(in srgb,#fff 14%,var(--vermilion)),var(--vermilion));color:#fff;box-shadow:0 8px 20px -12px color-mix(in srgb,var(--vermilion) 80%,transparent)}
+.seg button[aria-pressed="true"]{background:linear-gradient(160deg,color-mix(in srgb,#fff 14%,var(--accent-button,var(--vermilion))),var(--accent-button,var(--vermilion)));color:#fff;box-shadow:0 8px 20px -12px color-mix(in srgb,var(--accent-button,var(--vermilion)) 80%,transparent)}
 .seg button:hover{color:var(--ink)}
 
 /* toggle switches */
@@ -639,7 +652,7 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
   content:"";position:absolute;top:3px;left:3px;width:16px;height:16px;border-radius:50%;
   background:var(--card);box-shadow:0 1px 3px rgba(0,0,0,.25);transition:transform .3s var(--spring)
 }
-.switch input:checked + .track{background:var(--vermilion)}
+.switch input:checked + .track{background:var(--accent-button,var(--vermilion))}
 .switch input:checked + .track::after{transform:translateX(16px)}
 
 /* ---------- tabela ---------- */
@@ -835,7 +848,7 @@ tr:hover .td-actions{opacity:1}
   border-color:color-mix(in srgb,var(--vermilion) 55%,transparent);background:color-mix(in srgb,var(--vermilion) 10%,transparent);
   transform:translateY(-2px);box-shadow:0 16px 32px -22px color-mix(in srgb,var(--vermilion) 80%,transparent)
 }
-.quick:hover .ico{background:var(--vermilion);color:#fff}
+.quick:hover .ico{background:var(--accent-button,var(--vermilion));color:#fff}
 .quick .ico{
   width:32px;height:32px;border-radius:10px;display:grid;place-items:center;
   background:color-mix(in srgb,var(--vermilion) 10%,transparent);color:var(--vermilion)
@@ -1081,28 +1094,61 @@ html[data-theme="dark"] .toast .act{color:var(--vermilion-ink)}
 .settings-row h4{font-size:14px;font-weight:650}
 .settings-row p{font-size:12.5px;color:var(--ink-2);margin-top:4px;max-width:60ch}
 .settings-row .acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
-.theme-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
-@media(max-width:520px){.theme-grid{grid-template-columns:1fr}}
+.theme-grid{display:flex;justify-content:center;gap:14px;flex-wrap:wrap}
+.group-tone--adult{color:var(--adult-class,var(--vermilion))!important}
+.group-tone--kids{color:var(--kids-class,var(--accent-button,var(--vermilion)))!important}
+.badge--outline.group-tone--adult{border-color:color-mix(in srgb,var(--adult-class,var(--vermilion)) 48%,var(--line));background:color-mix(in srgb,var(--adult-class,var(--vermilion)) 9%,transparent)}
+.badge--outline.group-tone--kids{border-color:color-mix(in srgb,var(--kids-class,var(--accent-button,var(--vermilion))) 48%,var(--line));background:color-mix(in srgb,var(--kids-class,var(--accent-button,var(--vermilion))) 9%,transparent)}
 .theme-opt{
-  border:1px solid var(--line);border-radius:12px;padding:10px;background:var(--card);
-  text-align:left;transition:.22s var(--ease)
+  border:2px solid var(--line);border-radius:16px;padding:20px 18px 16px;background:var(--card);
+  text-align:center;transition:.22s var(--ease);display:flex;flex-direction:column;align-items:center;gap:10px;
+  min-width:150px;flex:1;max-width:220px;
 }
-.theme-opt:hover{border-color:var(--ink-3)}
-.theme-opt[aria-pressed="true"]{border-color:var(--vermilion);box-shadow:0 0 0 3px color-mix(in srgb,var(--vermilion) 12%,transparent)}
-.theme-prev{height:52px;border-radius:9px;border:1px solid var(--line-2);margin-bottom:9px;position:relative;overflow:hidden;display:flex}
-.tp-half{flex:1;display:flex;gap:3px;padding:6px;position:relative}
-.tp-half span{display:block;border-radius:2px}
-.tp-half .rail{width:22%;height:100%}
-.tp-half .body{flex:1;display:flex;flex-direction:column;gap:3px}
-.tp-half .body i{display:block;border-radius:2px;flex:1}
-.tp-half .body i:first-child{flex:.6}
-.theme-opt .theme-prev{border:1px solid var(--line-2);border-radius:9px;overflow:hidden;background:transparent}
-.tp-half.bevel::after,.tp-half.bevel::before{display:none !important}
-.tp-half.bevel .body i{opacity:.9}
-.theme-opt b{font-size:12.5px}
-.theme-opt small{display:block;font-size:11px;color:var(--ink-3)}
-.t-icon{font-size:14px;opacity:.9}
-.t-icon svg{width:14px;height:14px;display:block}
+.theme-opt:hover{border-color:var(--ink-3);transform:translateY(-1px)}
+.theme-opt[aria-pressed="true"]{border-color:var(--vermilion);box-shadow:0 0 0 3px color-mix(in srgb,var(--vermilion) 18%,transparent),0 10px 28px -18px color-mix(in srgb,var(--vermilion) 70%,transparent)}
+.theme-opt b{font-size:15px;font-weight:700;text-transform:none}
+.t-icon{display:grid;place-items:center;color:var(--ink)}
+.t-icon svg{width:32px;height:32px;display:block}
+
+/* sliders de cor: carrossel infinito, 7 cores visíveis, selecionada ao meio */
+.color-slider-wrap{position:relative;max-width:360px;margin:6px auto 0}
+.color-slider{
+  display:flex;gap:8px;overflow-x:auto;overflow-y:hidden;
+  padding:14px calc(50% - 20px);
+  scroll-snap-type:x mandatory;scrollbar-width:none;
+  -webkit-overflow-scrolling:touch;touch-action:pan-x pan-y;
+}
+.color-slider::-webkit-scrollbar{display:none}
+.color-arrow{
+  position:absolute;top:50%;transform:translateY(-50%);z-index:3;
+  width:34px;height:34px;border-radius:50%;display:grid;place-items:center;
+  background:var(--card);border:1px solid var(--line);color:var(--ink-2);
+  box-shadow:0 4px 14px rgba(0,0,0,.28);transition:.18s var(--ease);padding:0;
+}
+.color-arrow:hover{color:var(--ink);border-color:var(--vermilion);transform:translateY(-50%) scale(1.08)}
+.color-arrow svg{width:18px;height:18px;display:block}
+.color-arrow--l{left:-42px}
+.color-arrow--r{right:-42px}
+.color-dot{
+  flex:none;width:40px;height:40px;border-radius:9px;scroll-snap-align:center;
+  border:2px solid rgba(255,255,255,.35);box-shadow:0 2px 8px rgba(0,0,0,.25),inset 0 0 0 1px rgba(0,0,0,.12);
+  transition:transform .18s var(--ease),box-shadow .18s;cursor:pointer;padding:0;position:relative;
+}
+.color-dot:hover{transform:translateY(-2px)}
+.color-dot.is-on{transform:translateY(-2px);border-color:#fff;box-shadow:0 0 0 3px var(--vermilion),0 4px 14px rgba(0,0,0,.35)}
+html[data-theme="light"] .color-dot{border-color:rgba(0,0,0,.18)}
+html[data-theme="light"] .color-dot.is-on{border-color:#fff;box-shadow:0 0 0 3px var(--vermilion),0 4px 14px rgba(0,0,0,.25)}
+@media(max-width:480px){.color-slider-wrap{width:calc(100% - 40px);max-width:360px}.color-dot{width:32px;height:32px;border-radius:7px}.color-slider{gap:6px}.color-arrow--l{left:-38px}.color-arrow--r{right:-38px}}
+.color-custom{
+  background:conic-gradient(#f00,#ff0,#0f0,#0ff,#00f,#f0f,#f00);
+  display:grid;place-items:center;overflow:hidden;
+}
+.color-custom input{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%}
+.color-custom::after{content:"";width:18px;height:18px;border-radius:5px;background:#fff;box-shadow:0 1px 4px rgba(0,0,0,.4);pointer-events:none}
+.color-slider-wrap::before,.color-slider-wrap::after{display:none}
+.color-current{display:flex;align-items:center;gap:8px;margin-top:8px;font-size:12px;color:var(--ink-2)}
+.color-current i{width:16px;height:16px;border-radius:50%;border:1px solid var(--line);flex:none}
+.color-reset{margin-top:10px}
 
 /* ---------- mobile dock ---------- */
 .dock{
@@ -1124,9 +1170,9 @@ html[data-theme="dark"] .toast .act{color:var(--vermilion-ink)}
   bottom:calc(14px + env(safe-area-inset-bottom));
   width:40px;height:40px;padding:0;border-radius:50%;
   display:grid;place-items:center;
-  background:linear-gradient(160deg,color-mix(in srgb,var(--vermilion) 88%,var(--ink)) 0%,var(--vermilion) 58%,color-mix(in srgb,var(--vermilion) 62%,var(--indigo)) 100%);
-  border-color:color-mix(in srgb,var(--vermilion) 55%,#fff);
-  box-shadow:0 4px 10px -4px color-mix(in srgb,var(--vermilion) 70%,transparent),0 14px 30px -14px rgba(0,0,0,.85);
+  background:linear-gradient(160deg,color-mix(in srgb,var(--accent-button,var(--vermilion)) 88%,var(--ink)) 0%,var(--accent-button,var(--vermilion)) 58%,color-mix(in srgb,var(--accent-button,var(--vermilion)) 62%,var(--indigo)) 100%);
+  border-color:color-mix(in srgb,var(--accent-button,var(--vermilion)) 55%,#fff);
+  box-shadow:0 4px 10px -4px color-mix(in srgb,var(--accent-button,var(--vermilion)) 70%,transparent),0 14px 30px -14px rgba(0,0,0,.85);
   transition:width .34s var(--ease),height .34s var(--ease),bottom .34s var(--ease),border-radius .3s var(--ease),transform .38s var(--ease),opacity .3s var(--ease),box-shadow .3s;
 }
 .dock.is-collapsed .dock-nav{display:none}
@@ -1491,10 +1537,10 @@ html.lowfx .map-page-head{backdrop-filter:none;background:var(--paper)}
 .pal-opt:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--vermilion) 40%,var(--line))}
 .pal-opt[aria-pressed="true"]{border-color:var(--vermilion);box-shadow:0 0 0 3px color-mix(in srgb,var(--vermilion) 14%,transparent)}
 .pal-opt b{font-size:11.5px}
-.pal-opt-small{padding:5px;border-radius:8px;gap:2px}
-.pal-opt-small b{font-size:7px}
-.pal-opt-small .pal-glass{height:30px;border-radius:6px}
-.pal-opt-small .pal-on{right:5px;bottom:34px;width:14px;height:14px}
+.pal-opt-small{padding:8px 6px;border-radius:10px;gap:6px;align-items:center;text-align:center;min-width:80px}
+.pal-opt-small b{font-size:11px}
+.pal-opt-small .pal-glass{height:34px;border-radius:8px;width:100%}
+.pal-opt-small .pal-on{right:8px;bottom:8px;width:16px;height:16px}
 
 .badge--role{background:color-mix(in srgb,var(--gold) 22%,transparent);color:var(--gold);border:1px solid color-mix(in srgb,var(--gold) 38%,transparent);font-size:9px;letter-spacing:.05em;text-transform:uppercase;padding:2px 6px;border-radius:6px;vertical-align:middle;font-weight:700}
 
@@ -1665,12 +1711,12 @@ body.has-demo-banner .main{padding-bottom:74px}
 .fh-kpi b{font-family:var(--serif);font-size:20px;letter-spacing:-.02em}
 .fh-kpi small{font-size:10.5px;color:var(--ink-3)}
 .fh-kpi.ok b{color:var(--moss)}
-.fh-kpi.warn b{color:var(--vermilion-ink)}
+.fh-kpi.warn b{color:var(--gold)}
 .fh-alert{display:flex;align-items:center;gap:9px;padding:11px 12px;border-radius:12px;font-size:12px;
   background:color-mix(in srgb,var(--gold) 12%,transparent);color:var(--ink);
   border:1px solid color-mix(in srgb,var(--gold) 30%,transparent);margin-bottom:14px}
-.fh-alert--late{background:color-mix(in srgb,var(--vermilion) 12%,transparent);
-  border-color:color-mix(in srgb,var(--vermilion) 32%,transparent)}
+.fh-alert--late{background:color-mix(in srgb,var(--money-neg) 12%,transparent);
+  border-color:color-mix(in srgb,var(--money-neg) 32%,transparent)}
 .fh-alert--ok{background:color-mix(in srgb,var(--moss) 12%,transparent);
   border-color:color-mix(in srgb,var(--moss) 30%,transparent)}
 .fh-alert .btn{margin-left:auto;flex:none}
@@ -1678,6 +1724,7 @@ body.has-demo-banner .main{padding-bottom:74px}
 .fh-year-row{display:flex;align-items:center;gap:10px;font-size:11.5px;color:var(--ink-3)}
 .fh-year-row span{width:34px;font-variant-numeric:tabular-nums}
 .fh-year-row b{width:74px;text-align:right;color:var(--ink);font-variant-numeric:tabular-nums}
+.fh-year-row b.money-pos{color:var(--money-pos)}
 .fh-track{flex:1;height:7px;border-radius:99px;background:var(--line-2);overflow:hidden}
 .fh-track i{display:block;height:100%;border-radius:99px;
   background:linear-gradient(90deg,color-mix(in srgb,var(--vermilion) 70%,transparent),color-mix(in srgb,var(--indigo) 65%,transparent))}
@@ -1691,7 +1738,7 @@ body.has-demo-banner .main{padding-bottom:74px}
 .fh-dot{width:7px;height:7px;border-radius:50%;flex:none;background:var(--ink-3)}
 .fh-dot.ok{background:var(--moss)}
 .fh-dot.warn{background:var(--gold)}
-.fh-dot.late{background:var(--vermilion)}
+.fh-dot.late{background:var(--money-neg)}
 .fh-month{display:flex;flex-direction:column;min-width:0;flex:1}
 .fh-month b{font-size:12.5px;font-weight:650}
 .fh-month small{font-size:10px;color:var(--ink-3)}
@@ -1771,7 +1818,7 @@ body.has-demo-banner .main{padding-bottom:74px}
 .rd-grid-1{margin-bottom:6px}
 .rd-trend{font:700 11px var(--sans);padding:3px 8px;border-radius:999px}
 .rd-trend.up{color:var(--moss);background:var(--moss-soft)}
-.rd-trend.down{color:var(--vermilion-ink);background:var(--vermilion-soft)}
+.rd-trend.down{color:var(--money-neg);background:color-mix(in srgb,var(--money-neg) 14%,transparent)}
 
 /* caixa */
 .rd-cash{display:flex;align-items:flex-end;gap:10px;height:148px;padding-top:6px}
@@ -1779,15 +1826,15 @@ body.has-demo-banner .main{padding-bottom:74px}
 .rd-cash-bars{display:flex;align-items:flex-end;gap:3px;height:104px;width:100%;justify-content:center}
 .rd-cash-bars i{width:12px;border-radius:4px 4px 2px 2px;min-height:3px;transition:height .4s var(--ease)}
 .rd-cash-bars i.rev{background:linear-gradient(180deg,color-mix(in srgb,var(--moss) 80%,transparent),color-mix(in srgb,var(--moss) 40%,transparent))}
-.rd-cash-bars i.exp{background:linear-gradient(180deg,color-mix(in srgb,var(--vermilion) 72%,transparent),color-mix(in srgb,var(--vermilion) 32%,transparent))}
+.rd-cash-bars i.exp{background:linear-gradient(180deg,color-mix(in srgb,var(--money-neg) 80%,transparent),color-mix(in srgb,var(--money-neg) 40%,transparent))}
 .rd-cash-col b{font-size:10px;color:var(--ink-2);text-transform:capitalize}
 .rd-cash-col small{font-size:9px;font-weight:700}
 .rd-cash-col small.pos{color:var(--moss)}
-.rd-cash-col small.neg{color:var(--vermilion-ink)}
+.rd-cash-col small.neg{color:var(--money-neg)}
 .rd-legend{display:flex;align-items:center;gap:12px;font-size:10px;color:var(--ink-3);margin-top:6px}
 .rd-legend i{display:inline-block;width:8px;height:8px;border-radius:2px;margin-right:4px}
 .rd-legend i.rev{background:var(--moss)}
-.rd-legend i.exp{background:var(--vermilion)}
+.rd-legend i.exp{background:var(--money-neg)}
 .rd-legend-tip{margin-left:auto}
 .rd-note{display:flex;align-items:center;gap:7px;flex-wrap:wrap;font-size:11px;color:var(--ink-3);margin-top:10px;padding-top:10px;border-top:1px solid var(--line-2)}
 .rd-note b{color:var(--ink)}
@@ -1862,10 +1909,8 @@ body.has-demo-banner .main{padding-bottom:74px}
 @media(max-width:420px){.rd-kpis{grid-template-columns:1fr}}
 
 .pal-opt small{font-size:10px;color:var(--ink-3)}
-.pal-glass{position:relative;width:100%;height:42px;border-radius:10px;overflow:hidden;display:flex;align-items:flex-end;gap:3px;padding:6px;background:linear-gradient(140deg,var(--p1),color-mix(in srgb,var(--p2) 65%,transparent))}
-.pal-glass i{flex:1;border-radius:4px;background:color-mix(in srgb,#fff 55%,var(--p2))}
-.pal-glass i:nth-child(2){flex:1.6;background:color-mix(in srgb,#fff 78%,transparent);height:60%}
-.pal-glass i:nth-child(3){background:var(--p3);height:34%}
+.pal-glass{position:relative;width:100%;height:42px;border-radius:10px;overflow:hidden;display:flex;gap:2px;padding:0;background:var(--line-2)}
+.pal-glass i{flex:1;height:100%;display:block}
 .pal-on{position:absolute;right:7px;bottom:44px;width:18px;height:18px;border-radius:50%;background:var(--vermilion);color:#fff;display:grid;place-items:center}
 
   .map-mobile-list{display:flex;flex-direction:column;gap:7px}
@@ -2123,34 +2168,140 @@ function uid() { return Date.now().toString(36) + Math.random().toString(36).sli
    PALETAS DE COR (padrão de cores escolhido em Ajustes)
    ============================================================ */
 const PALETTES = [
-  { id: 'sangue', name: 'Vermelho Sangue', from: '#b22222', fromL: '#d32f2f', inkL: '#8b1a1a', inkD: '#ff6b6b',
-    swatches: ['#b22222', '#d32f2f', '#ff6b6b'] },
-  { id: 'profundo', name: 'Azul Profundo', from: '#0d47a1', fromL: '#1565c0', inkL: '#0a3d91', inkD: '#64b5f6',
-    swatches: ['#0d47a1', '#1565c0', '#64b5f6'] },
-  { id: 'veneno', name: 'Verde Veneno', from: '#006400', fromL: '#2e7d32', inkL: '#1b5e20', inkD: '#69f0ae',
-    swatches: ['#006400', '#2e7d32', '#69f0ae'] },
-  { id: 'fantasma', name: 'Violeta Fantasma', from: '#7b2cbf', fromL: '#9d4edd', inkL: '#5b21b6', inkD: '#afa8ff',
-    swatches: ['#7b2cbf', '#9d4edd', '#afa8ff'] },
-  { id: 'sombrio', name: 'Cinza Sombrio', from: '#37474f', fromL: '#546e7a', inkL: '#263238', inkD: '#cfd8dc',
-    swatches: ['#37474f', '#546e7a', '#cfd8dc'] },
-  { id: 'analoga', name: 'Análogas', from: '#0d47a1', fromL: '#1e90ff', inkL: '#0a3d91', inkD: '#64b5f6',
-    swatches: ['#0d47a1', '#1e90ff', '#00bcd4'] },
-  { id: 'complementar', name: 'Complementar', from: '#0d47a1', fromL: '#1565c0', inkL: '#0a3d91', inkD: '#ff9d00',
-    swatches: ['#0d47a1', '#ff9d00', '#f57c00'] },
-  { id: 'triadica', name: 'Triádica', from: '#d32f2f', fromL: '#ff5252', inkL: '#8b1a1a', inkD: '#ffcdd2',
-    swatches: ['#d32f2f', '#ffc107', '#3f51b5'] },
-  { id: 'tetradica', name: 'Tetrádica', from: '#d32f2f', fromL: '#ff5252', inkL: '#8b1a1a', inkD: '#ffcdd2',
-    swatches: ['#d32f2f', '#4caf50', '#2196f3', '#ffc107'] }
+  { id: 'sangue', name: 'Guerreiro Vermelho', accent1: '#ef5350', background: '#f2e6d8' },
+  { id: 'profundo', name: 'Oceano Profundo', accent1: '#42a5f5', background: '#e8f2fb' },
+  { id: 'veneno', name: 'Selva Tóxica', accent1: '#66bb6a', background: '#edf5e8' },
+  { id: 'fantasma', name: 'Névoa Roxa', accent1: '#ab47bc', background: '#f4eaf7' },
+  { id: 'sombrio', name: 'Cinza Urbano', accent1: '#78909c', background: '#f0f2f3' },
+  { id: 'triada-quente', name: 'Brasa do Sol', accent1: '#d32f2f', background: '#fff3d6' },
+  { id: 'triada-fria', name: 'Gelo do Mar', accent1: '#2196f3', background: '#e8f7f7' },
+  { id: 'triada-neutra', name: 'Terra Crua', accent1: '#a1887f', background: '#f4ede4' },
+  { id: 'triada-viva', name: 'Neon Tropical', accent1: '#e91e63', background: '#fff0f5' },
+  { id: 'terra-sertao', name: 'Caatinga Seca', accent1: '#BF9B7A', background: '#F2E6D8' },
+  { id: 'fogo-mata', name: 'Fogo da Serra', accent1: '#F26716', background: '#F2EDD5' },
+  { id: 'barro-vermelho', name: 'Barro do Rio', accent1: '#D97B66', background: '#F2E9D8' },
+  { id: 'lavanda-mar', name: 'Lavanda do Céu', accent1: '#AC8DDD', background: '#AFF9F8' },
+  { id: 'por-sol', name: 'Entardecer', accent1: '#F29441', background: '#F0C739' },
+  { id: 'selva-viva', name: 'Selva Neon', accent1: '#A325D9', background: '#BEE00A' },
+  { id: 'pedra-serra', name: 'Pedra Bruta', accent1: '#5c7a9e', background: '#A4A680' },
+  { id: 'mar-areia', name: 'Maré Alta', accent1: '#4ABBC7', background: '#FCD89D' }
 ];
 function currentPalette() { return PALETTES.find(p => p.id === prefs.palette) || PALETTES[0]; }
+function mixHex(a, b, t) {
+  const pa = (h => { const x = h.replace('#', ''); const n = parseInt(x.length === 3 ? x.split('').map(c => c + c).join('') : x, 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; })(a);
+  const pb = (h => { const x = h.replace('#', ''); const n = parseInt(x.length === 3 ? x.split('').map(c => c + c).join('') : x, 16); return [(n >> 16) & 255, (n >> 8) & 255, n & 255]; })(b);
+  const r = Math.round(pa[0] * (1 - t) + pb[0] * t), g = Math.round(pa[1] * (1 - t) + pb[1] * t), bl = Math.round(pa[2] * (1 - t) + pb[2] * t);
+  return `rgb(${r},${g},${bl})`;
+}
+function hexHSL(hex) {
+  const x = hex.replace('#', ''); const n = parseInt(x.length === 3 ? x.split('').map(c => c + c).join('') : x, 16);
+  const r = ((n >> 16) & 255) / 255, g = ((n >> 8) & 255) / 255, b = (n & 255) / 255;
+  const mx = Math.max(r, g, b), mn = Math.min(r, g, b), d = mx - mn;
+  const l = (mx + mn) / 2;
+  const s = d === 0 ? 0 : d / (1 - Math.abs(2 * l - 1));
+  let h = 0;
+  if (d !== 0) {
+    if (mx === r) h = ((g - b) / d) % 6;
+    else if (mx === g) h = (b - r) / d + 2;
+    else h = (r - g) / d + 4;
+    h *= 60; if (h < 0) h += 360;
+  }
+  return { h, s, l };
+}
+function complementaryHex(hex) {
+  const hsl = hexHSL(hex), h = (hsl.h + 180) % 360, s = hsl.s, l = hsl.l;
+  const c = (1 - Math.abs(2 * l - 1)) * s, x = c * (1 - Math.abs((h / 60) % 2 - 1)), m = l - c / 2;
+  let rgb = h < 60 ? [c,x,0] : h < 120 ? [x,c,0] : h < 180 ? [0,c,x] : h < 240 ? [0,x,c] : h < 300 ? [x,0,c] : [c,0,x];
+  return '#' + rgb.map(v => Math.round((v + m) * 255).toString(16).padStart(2,'0')).join('');
+}
+function paletteColors(pal) { return [pal.accent1, complementaryHex(pal.accent1), pal.background]; }
+function allPaletteColors() {
+  const seen = new Map();
+  PALETTES.forEach(pal => paletteColors(pal).forEach(c => { if (c) seen.set(c.toLowerCase(), c); }));
+  ['#50B85F', '#5EB5CC', '#E58C35', '#FFCE3E', '#E9E0AB', '#8338EC', '#3A86FF', '#FF623B', '#BEE00A'].forEach(c => seen.set(c.toLowerCase(), c));
+  return [...seen.values()].sort((a, b) => {
+    const A = hexHSL(a), B = hexHSL(b);
+    const ga = A.s < 0.12 ? 1 : 0, gb = B.s < 0.12 ? 1 : 0;
+    if (ga !== gb) return ga - gb;
+    if (ga === 1) return A.l - B.l;
+    return A.h - B.h || A.l - B.l;
+  });
+}
+const ALL_COLORS = allPaletteColors();
+function baseAccent1() { return prefs.accent || currentPalette().accent1; }
+function baseAccent2() { return prefs.accent2 || complementaryHex(baseAccent1()); }
+function effectiveAccent() { return prefs.invertHighlights ? baseAccent2() : baseAccent1(); }
+function effectiveAccent2() { return prefs.invertHighlights ? baseAccent1() : baseAccent2(); }
+function effectiveBg() { return prefs.bg || currentPalette().background; }
 function applyPalette() {
   const pal = currentPalette();
   const dark = document.documentElement.getAttribute('data-theme') === 'dark';
   const root = document.documentElement.style;
-  const base = dark ? pal.from : pal.fromL;
+  const base = effectiveAccent();
+  const accent2 = effectiveAccent2();
   root.setProperty('--vermilion', base);
-  root.setProperty('--vermilion-ink', dark ? pal.inkD : pal.inkL);
+  root.setProperty('--adult-class', base);
+  root.setProperty('--accent-button', accent2);
+  root.setProperty('--kids-class', accent2);
+  root.setProperty('--accent-button-ink', dark ? mixHex(accent2, '#ffffff', .40) : mixHex(accent2, '#000000', .28));
+  root.setProperty('--vermilion-ink', dark ? mixHex(base, '#ffffff', .40) : mixHex(base, '#000000', .28));
   root.setProperty('--vermilion-soft', hexA(base, dark ? .18 : .13));
+  const bgHue = prefs.bg || pal.background;
+  root.setProperty('--pal-2', accent2);
+  root.setProperty('--pal-3', bgHue);
+  root.setProperty('--paper', mixHex(dark ? '#070810' : '#f1f2fb', bgHue, dark ? .08 : .05));
+  root.setProperty('--paper-deep', mixHex(dark ? '#0a0b16' : '#e7e9f6', bgHue, dark ? .10 : .06));
+}
+function centerSliderEl(slider, smooth = false) {
+  const sels = slider.querySelectorAll('.color-dot.is-on');
+  if (!sels.length || !slider.clientWidth) return;
+  const sel = sels[Math.floor(sels.length / 2)];
+  const sr = slider.getBoundingClientRect(), er = sel.getBoundingClientRect();
+  const target = slider.scrollLeft + (er.left - sr.left) + (er.width / 2) - (slider.clientWidth / 2);
+  if (smooth) slider.scrollTo({ left: target, behavior: 'smooth' });
+  else slider.scrollLeft = target;
+}
+function updateColorSlider(kind, smooth = true) {
+  const slider = document.querySelector(`.color-slider[data-slider="${kind}"]`);
+  if (!slider) return;
+  const cur = (kind === 'accent' ? effectiveAccent() : effectiveBg()).toLowerCase();
+  slider.querySelectorAll('.color-dot').forEach(d => {
+    const isCustom = d.classList.contains('color-custom');
+    const on = isCustom ? !ALL_COLORS.some(c => c.toLowerCase() === cur) : (d.dataset.id || '').toLowerCase() === cur;
+    d.classList.toggle('is-on', on);
+  });
+  slider.querySelectorAll('input[type="color"]').forEach(inp => { if (inp.value.toLowerCase() !== cur) inp.value = cur; });
+  const row = slider.closest('.settings-row');
+  const curEl = row ? row.querySelector('.color-current') : null;
+  if (curEl) {
+    const dot = curEl.querySelector('i'), txt = curEl.querySelector('span');
+    if (dot) dot.style.background = cur;
+    if (txt) txt.textContent = cur.toUpperCase() + (prefs[kind] ? ' · personalizada' : ' · da paleta');
+  }
+  centerSliderEl(slider, smooth);
+}
+function centerColorSliders() {
+  document.querySelectorAll('.color-slider').forEach(s => centerSliderEl(s, false));
+}
+function bindColorSliders() {
+  document.querySelectorAll('.color-slider').forEach(slider => {
+    if (slider.dataset.bound) return;
+    slider.dataset.bound = '1';
+    slider.addEventListener('scroll', () => {
+      const total = slider.querySelectorAll('.color-dot').length;
+      if (!total) return;
+      const W = (total / 3) * 48;
+      if (slider.scrollLeft < W) {
+        slider.style.scrollSnapType = 'none';
+        slider.scrollLeft += W;
+        requestAnimationFrame(() => { slider.style.scrollSnapType = ''; });
+      } else if (slider.scrollLeft > 2 * W) {
+        slider.style.scrollSnapType = 'none';
+        slider.scrollLeft -= W;
+        requestAnimationFrame(() => { slider.style.scrollSnapType = ''; });
+      }
+    }, { passive: true });
+  });
 }
 function hexA(hex, a) {
   const h = hex.replace('#', ''); const n = parseInt(h.length === 3 ? h.split('').map(c => c + c).join('') : h, 16);
@@ -2158,11 +2309,11 @@ function hexA(hex, a) {
 }
 
 /* prefs de UI */
-const APP_VERSION = '2.56';
+const APP_VERSION = '2.73';
 /* assinatura do modelo de cobrança (fechamento novo + abertura com "outras pendências") */
 const WA_TPL_VER = 2;
 const WA_EMOJI_DEFAULT = '✅';
-let prefs = { theme: 'dark', view: 'table', beltCompact: true, pv: 3, palette: 'sangue',
+let prefs = { theme: 'dark', view: 'table', beltCompact: true, pv: 3, palette: 'profundo', accent: null, accent2: null, bg: null, invertHighlights: false,
   waNumber: '', waTime: '09:00', waTemplate: '', waLate: true, waPix: 'dojoarandu@gmail.com', waTplVer: WA_TPL_VER, waEmoji: WA_EMOJI_DEFAULT,
   hideTopbar: false };
 function savePrefs() { try { localStorage.setItem(COL_KEY, JSON.stringify(prefs)); } catch (e) {} }
@@ -2225,6 +2376,8 @@ const sum = (arr, f) => arr.reduce((a, x) => a + Number(f(x) || 0), 0);
 /* ----- derivados ----- */
 const activeStudents = () => db.students.filter(s => s.status === 'Ativo');
 const groupOf = s => s.classGroup || 'Adulto';
+const groupTone = g => g === 'Kids' ? 'group-tone--kids' : 'group-tone--adult';
+const groupBadge = g => `<span class="badge badge--outline ${groupTone(g)}">${esc(g)}</span>`;
 
 /* ------------------------------------------------------------
    LOCALIDADES DE ICAPUÍ
@@ -3136,6 +3289,7 @@ function render() {
   bindCharts();
   animateNumbers(root);
   updateThemeButton();
+  requestAnimationFrame(() => { bindColorSliders(); centerColorSliders(); });
 }
 
 function pageHead({ crumb, title, sub, actions = '' }) {
@@ -3947,12 +4101,12 @@ function pageHoje() {
   let bars;
   if (view.weekMetric === 'percent') {
     bars = groupedBars({
-      labels, series: [{ name: 'Adulto', color: 'var(--vermilion)', values: week.series.Adulto }, { name: 'Kids', color: 'var(--indigo)', values: week.series.Kids }],
+      labels, series: [{ name: 'Adulto', color: 'var(--adult-class, var(--vermilion))', values: week.series.Adulto }, { name: 'Kids', color: 'var(--kids-class, var(--accent-button, var(--indigo)))', values: week.series.Kids }],
       max: 100, format: v => Math.round(v) + '%', highlight: (TODAY.getDay() + 6) % 7
     });
   } else {
     bars = groupedBars({
-      labels, series: [{ name: 'Adulto', color: 'var(--vermilion)', values: week.series.Adulto }, { name: 'Kids', color: 'var(--indigo)', values: week.series.Kids }],
+      labels, series: [{ name: 'Adulto', color: 'var(--adult-class, var(--vermilion))', values: week.series.Adulto }, { name: 'Kids', color: 'var(--kids-class, var(--accent-button, var(--indigo)))', values: week.series.Kids }],
       max: Math.max(week.adultTotal, week.kidsTotal, 1), format: v => Math.round(v), highlight: (TODAY.getDay() + 6) % 7
     });
   }
@@ -4056,12 +4210,12 @@ function pageHoje() {
     </div>
     <div class="card col-4 kpi kpi--indigo">
       <div class="top"><span class="label">Recebido em ${MONTHS_SHORT[TODAY.getMonth()]}</span><span style="margin-left:auto;color:var(--ink-3)">${icon('wallet', 15)}</span></div>
-      <div><div class="value num" data-count="${paidSum}" data-money="1">R$ 0</div>
+      <div><div class="value num money-pos" data-count="${paidSum}" data-money="1">R$ 0</div>
       <div class="foot">${trendHTML(delta)}<span class="dim">vs. ${MONTHS_SHORT[+prevMonth.slice(5) - 1]}</span></div></div>
     </div>
     <div class="card col-4 kpi kpi--seal">
       <div class="top"><span class="label">Em aberto</span><span style="margin-left:auto;color:var(--ink-3)">${icon('receipt', 15)}</span></div>
-      <div><div class="value num" style="color:${pendingSum ? 'var(--vermilion-ink)' : 'inherit'}" data-count="${pendingSum}" data-money="1">R$ 0</div>
+      <div><div class="value num" style="color:${pendingSum ? 'var(--gold)' : 'inherit'}" data-count="${pendingSum}" data-money="1">R$ 0</div>
       <div class="foot">${pending.length ? `<span class="badge badge--warn">${pending.length} pendência${pending.length > 1 ? 's' : ''}</span>` : `<span class="badge badge--ok">tudo em dia</span>`} <button class="link" data-act="nav" data-page="financeiro" style="margin-left:auto">ver</button></div></div>
     </div>
 
@@ -4077,8 +4231,8 @@ function pageHoje() {
       </div>
       ${hasData(week.series.Adulto) || hasData(week.series.Kids) ? bars : chartEmpty('Sem chamadas nesta semana', 'Confirme um treino para começar a registrar presenças.')}
       <div class="legend">
-        <span><i style="background:var(--vermilion)"></i>Adulto · ${week.adultTotal} ativos</span>
-        <span><i style="background:var(--indigo)"></i>Kids · ${week.kidsTotal} ativos</span>
+        <span><i style="background:var(--adult-class,var(--vermilion))"></i>Adulto · ${week.adultTotal} ativos</span>
+        <span><i style="background:var(--kids-class,var(--accent-button,var(--indigo)))"></i>Kids · ${week.kidsTotal} ativos</span>
         ${!week.series.Kids.some(Number.isFinite) ? '<span class="dim">Kids sem treino nesta semana</span>' : ''}
       </div>
       <div style="display:flex;gap:18px;flex-wrap:wrap;margin-top:16px;padding-top:14px;border-top:1px solid var(--line-2)">
@@ -4102,7 +4256,7 @@ function pageHoje() {
       ${agenda}
       ${visitorsToday.length ? `<div style="margin-top:14px;padding-top:14px;border-top:1px dashed var(--line)">
         <div class="eyebrow" style="margin-bottom:8px">Visitas de hoje</div>
-        ${visitorsToday.map(v => `<div class="row" style="padding:6px 0"><i class="dot dot--gold"></i><span class="small">${esc(v.name)}</span><span class="tail badge badge--outline">${esc(v.classGroup || 'Adulto')}</span></div>`).join('')}
+        ${visitorsToday.map(v => `<div class="row" style="padding:6px 0"><i class="dot dot--gold"></i><span class="small">${esc(v.name)}</span><span class="tail badge badge--outline ${groupTone(v.classGroup || 'Adulto')}">${esc(v.classGroup || 'Adulto')}</span></div>`).join('')}
       </div>` : ''}
     </div>
 
@@ -4121,7 +4275,7 @@ function pageHoje() {
           <div style="min-width:0"><div class="title">${esc(s?.name || 'Aluno removido')}</div>
             <div class="meta">vence ${dateShort(p.dueDate)} ${late ? '<span class="badge badge--late" style="margin-left:4px">atrasada</span>' : ''}</div></div>
           <div class="tail" style="align-items:center;gap:6px">
-            <div class="num" style="font-size:13px;margin-right:2px">${money(p.amount)}</div>
+            <div class="num money-warn" style="font-size:13px;margin-right:2px">${money(p.amount)}</div>
             <div class="mini-acts">
               <button class="mini-btn wa-mini" data-act="wa-send" data-id="${p.id}" title="Cobrar pelo WhatsApp">${icon('whatsapp', 15)}</button>
               <button class="mini-btn" data-act="pay-now" data-id="${p.id}" title="Marcar como recebida">${icon('check', 15)}</button>
@@ -4217,7 +4371,7 @@ function studentRowsHTML(mode) {
         <div class="card-top" style="display:flex;align-items:center;gap:11px;min-width:0">
           ${avatarHTML(s.name)}
           <div style="min-width:0;flex:1"><div style="font-weight:650;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(s.name)}${s.role ? ` <span class="badge badge--role">${esc(s.role)}</span>` : ''}${s.bolsa ? ` <span class="badge badge--seal">Bolsista</span>` : ''}</div>
-          <div class="small dim">${esc(groupOf(s))}${s.age ? ' · ' + esc(s.age) + ' anos' : ''}</div></div>
+          <div class="small dim ${groupTone(groupOf(s))}">${esc(groupOf(s))}${s.age ? ' · ' + esc(s.age) + ' anos' : ''}</div></div>
           <div style="margin-left:auto;flex:none">${statusBadge(s.status)}</div>
         </div>
         <div style="display:flex;align-items:center;gap:10px;margin-top:14px;min-width:0">${beltHTML(s)}</div>
@@ -4247,7 +4401,7 @@ function studentRowsHTML(mode) {
         <div style="min-width:0"><b>${esc(s.name)}</b><div class="meta">${s.age ? esc(s.age) + ' anos' : '—'}${s.phone ? ' · ' + esc(s.phone) : ''}</div></div>
       </div></td>
       <td>${beltHTML(s)}</td>
-      <td><span class="badge badge--outline">${esc(groupOf(s))}</span></td>
+      <td>${groupBadge(groupOf(s))}</td>
       <td class="small" style="color:var(--ink-2)">${esc(s.locality || '—')}</td>
       <td>${freqBars(s)}</td>
       <td class="num small">${freqCount(s.id, 'year')}</td>
@@ -4374,7 +4528,7 @@ function visitorsBlockHTML(dateStr) {
     ${list.length ? `<div class="rows">${list.map(v => `<div class="visit-row">
       ${avatarHTML(v.name)}
       <div class="who">
-        <b>${esc(v.name)} <span class="badge badge--outline" style="margin-left:4px">${esc(v.classGroup || 'Adulto')}</span></b>
+        <b>${esc(v.name)} <span class="badge badge--outline ${groupTone(v.classGroup || 'Adulto')}" style="margin-left:4px">${esc(v.classGroup || 'Adulto')}</span></b>
         <small>${[v.belt || 'Sem experiência', v.phone, v.locality, v.invitedBy, v.notes].filter(Boolean).map(esc).join(' · ')}</small>
       </div>
       <div class="td-actions" style="opacity:1">
@@ -4453,7 +4607,7 @@ function pageFrequencia() {
   const todayIdx = (parseD(date).getDay() + 6) % 7;
   const bars = groupedBars({
     labels: ['seg', 'ter', 'qua', 'qui', 'sex', 'sáb', 'dom'],
-    series: [{ name: 'Adulto', color: 'var(--vermilion)', values: week.series.Adulto }, { name: 'Kids', color: 'var(--indigo)', values: week.series.Kids }],
+    series: [{ name: 'Adulto', color: 'var(--adult-class, var(--vermilion))', values: week.series.Adulto }, { name: 'Kids', color: 'var(--kids-class, var(--accent-button, var(--indigo)))', values: week.series.Kids }],
     max: view.weekMetric === 'percent' ? 100 : Math.max(week.adultTotal, week.kidsTotal, 1),
     format: v => view.weekMetric === 'percent' ? Math.round(v) + '%' : Math.round(v),
     highlight: todayIdx, height: 236
@@ -4463,8 +4617,8 @@ function pageFrequencia() {
   const line = lineChart({
     labels: mc.labels, pointLabels: mc.pointLabels,
     series: [
-      { name: 'Adulto', color: 'var(--vermilion)', values: mc.adult },
-      { name: 'Kids', color: 'var(--indigo)', values: mc.kids, connect: true },
+      { name: 'Adulto', color: 'var(--adult-class, var(--vermilion))', values: mc.adult },
+      { name: 'Kids', color: 'var(--kids-class, var(--accent-button, var(--indigo)))', values: mc.kids, connect: true },
       ...(view.showVisits ? [{ name: 'Visitas', color: 'var(--moss)', values: mc.visits, secondaryMax: maxVisits, uid: 'v', connect: true }] : [])
     ],
     max: view.monthMetric === 'percent' ? 100 : Math.max(mc.maxAdult, mc.maxKids, 1),
@@ -4517,8 +4671,8 @@ function pageFrequencia() {
       </div>
       ${hasData(week.series.Adulto) || hasData(week.series.Kids) ? bars : chartEmpty('Sem chamadas nesta semana', 'Confirme o treino da turma para abrir a chamada.')}
       <div class="legend">
-        <span><i style="background:var(--vermilion)"></i>Adulto · ${week.adultTotal} ativos</span>
-        <span><i style="background:var(--indigo)"></i>Kids · ${week.kidsTotal} ativos</span>
+        <span><i style="background:var(--adult-class,var(--vermilion))"></i>Adulto · ${week.adultTotal} ativos</span>
+        <span><i style="background:var(--kids-class,var(--accent-button,var(--indigo)))"></i>Kids · ${week.kidsTotal} ativos</span>
         <span class="dim">${view.weekMetric === 'percent' ? '100% = turma inteira' : 'presenças absolutas'}</span>
       </div>
       <div style="display:flex;gap:18px;flex-wrap:wrap;margin-top:16px;padding-top:14px;border-top:1px solid var(--line-2)">
@@ -4560,8 +4714,8 @@ function pageFrequencia() {
       </div>
       ${(hasData(mc.adult) || hasData(mc.kids)) ? line : chartEmpty('Mês ainda sem presenças', 'Escolha outro mês ou abra a chamada de um dia.')}
       <div class="legend">
-        <span><i style="background:var(--vermilion)"></i>Adulto</span>
-        <span><i style="background:var(--indigo)"></i>Kids</span>
+        <span><i style="background:var(--adult-class,var(--vermilion))"></i>Adulto</span>
+        <span><i style="background:var(--kids-class,var(--accent-button,var(--indigo)))"></i>Kids</span>
         ${view.showVisits ? '<span><i style="background:var(--moss)"></i>Visitas</span>' : ''}
       </div>
     </div>
@@ -4693,7 +4847,7 @@ function cobrancaCardHTML(list) {
           <div class="meta">${days > 0 ? `${days} dia${days > 1 ? 's' : ''} em atraso` : `vence ${dateShort(p.dueDate)}`}</div>
         </div>
         <div class="tail" style="display:flex;align-items:center;gap:8px">
-          <span class="num" style="font-size:13px">${money(p.amount)}</span>
+          <span class="num money-warn" style="font-size:13px">${money(p.amount)}</span>
           <button class="btn btn--sm" data-act="pay-now" data-id="${p.id}">${icon('check', 13)} Receber</button>
         </div>
       </div>`;
@@ -4742,12 +4896,12 @@ function mensalidadesView() {
   <div class="grid-3" style="margin-bottom:16px">
     <div class="card kpi kpi--moss">
       <div class="top"><span class="label">Recebido</span><span style="margin-left:auto;color:var(--moss)">${icon('checkCircle', 15)}</span></div>
-      <div><div class="value num" data-count="${paidSum}" data-money="1">R$ 0</div>
+      <div><div class="value num money-pos" data-count="${paidSum}" data-money="1">R$ 0</div>
       <div class="foot"><span class="dot dot--moss"></span>${paid.length} pagamento${paid.length === 1 ? '' : 's'} · ${paidSum + pendSum ? Math.round((paidSum / (paidSum + pendSum)) * 100) : 0}% do previsto</div></div>
     </div>
     <div class="card kpi kpi--gold">
       <div class="top"><span class="label">Pendente</span><span style="margin-left:auto;color:var(--gold)">${icon('clock', 15)}</span></div>
-      <div><div class="value num" style="color:${pendSum ? 'var(--vermilion-ink)' : 'inherit'}" data-count="${pendSum}" data-money="1">R$ 0</div>
+      <div><div class="value num" style="color:${pendSum ? 'var(--gold)' : 'inherit'}" data-count="${pendSum}" data-money="1">R$ 0</div>
       <div class="foot"><span class="dot dot--gold"></span>${pending.length} em aberto · ${pending.filter(isLatePayment).length} em atraso</div></div>
     </div>
     <div class="card kpi kpi--indigo">
@@ -4775,7 +4929,7 @@ function mensalidadesView() {
           ${Object.keys(byDue).sort((a, b) => Number(a) - Number(b)).map(day => `<div class="row" style="padding:6px 0">
             <span class="small" style="min-width:50px">dia ${day}</span>
             <span class="small dim">${byDue[day].n} aluno${byDue[day].n > 1 ? 's' : ''}${byDue[day].open ? ' · ' + byDue[day].open + ' aberto' + (byDue[day].open > 1 ? 's' : '') : ''}</span>
-            <span class="tail num small">${money(byDue[day].v)}</span>
+            <span class="tail num small money-warn">${money(byDue[day].v)}</span>
           </div>`).join('')}
         </div>
         <div class="row" style="padding:8px 0;border:0"><span class="small">Faltam gerar</span><strong class="tail num">${missing}</strong></div>
@@ -4797,7 +4951,7 @@ function mensalidadesView() {
             ${avatarHTML(st?.name || '?')}<div style="text-align:left"><b>${esc(st?.name || 'Aluno removido')}</b>
             <div class="meta">${esc(st?.plan || 'Mensal')} · ${esc(st?.locality || '—')}</div></div></button></td>
           <td class="small num" data-lbl="Vencimento">${p.dueDate ? dateBR(p.dueDate) : '—'}</td>
-          <td class="amount num" data-lbl="Valor">${money(p.amount)}</td>
+          <td class="amount num ${p.status === 'Pago' ? 'money-pos' : 'money-warn'}" data-lbl="Valor">${money(p.amount)}</td>
           <td data-lbl="Status"><span class="badge ${p.status === 'Pago' ? 'badge--ok' : late ? 'badge--late' : 'badge--warn'}">${p.status === 'Pago' ? 'pago' : late ? 'atrasado' : 'pendente'}</span></td>
           <td class="small" style="color:var(--ink-2)" data-lbl="Pago em">${p.paidAt ? dateBR(p.paidAt) + (p.method ? ` · ${esc(p.method)}` : '') : '—'}</td>
           <td class="c-acoes"><div class="td-actions">
@@ -4836,17 +4990,17 @@ function despesasView() {
   <div class="grid-3" style="margin-bottom:16px">
     <div class="card kpi kpi--seal">
       <div class="top"><span class="label">Despesas do mês</span><span style="margin-left:auto;color:var(--ink-3)">${icon('receipt', 15)}</span></div>
-      <div><div class="value num" data-count="${total}" data-money="1">R$ 0</div>
+      <div><div class="value num money-neg" data-count="${total}" data-money="1">R$ 0</div>
       <div class="foot"><span class="dot dot--seal"></span>${list.length} lançamentos</div></div>
     </div>
     <div class="card kpi kpi--moss">
       <div class="top"><span class="label">Receita recebida</span><span style="margin-left:auto;color:var(--moss)">${icon('wallet', 15)}</span></div>
-      <div><div class="value num" data-count="${revenue}" data-money="1">R$ 0</div>
+      <div><div class="value num money-pos" data-count="${revenue}" data-money="1">R$ 0</div>
       <div class="foot"><span class="dot dot--moss"></span>mensalidades pagas</div></div>
     </div>
     <div class="card kpi kpi--indigo">
       <div class="top"><span class="label">Saldo do mês</span><span style="margin-left:auto;color:var(--ink-3)">${icon('chart', 15)}</span></div>
-      <div><div class="value num" style="color:${net < 0 ? 'var(--vermilion-ink)' : 'var(--moss)'}" data-count="${net}" data-money="1">R$ 0</div>
+      <div><div class="value num" style="color:${net < 0 ? 'var(--money-neg)' : 'var(--money-pos)'}" data-count="${net}" data-money="1">R$ 0</div>
       <div class="foot"><span class="badge ${net >= 0 ? 'badge--ok' : 'badge--late'}">${net >= 0 ? 'positivo' : 'negativo'}</span> ${revenue ? Math.round((total / revenue) * 100) : 0}% da receita comprometida</div></div>
     </div>
   </div>
@@ -4862,7 +5016,7 @@ function despesasView() {
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px">
           <i style="width:8px;height:8px;border-radius:2px;background:${EXPENSE_COLORS[label] || 'var(--ink-3)'}"></i>
           <span class="small" style="flex:1">${esc(label)}</span>
-          <span class="num small">${money(value)}</span>
+          <span class="num small money-neg">${money(value)}</span>
           <span class="small dim" style="width:36px;text-align:right">${Math.round((value / Math.max(1, total)) * 100)}%</span>
         </div>
         <div style="height:7px;border-radius:99px;background:var(--line-2);overflow:hidden">
@@ -4871,7 +5025,7 @@ function despesasView() {
       </div>`).join('')}</div>` : `<div class="empty" style="flex:1"><b>Sem despesas no mês</b></div>`}
       <div class="row" style="border:0;margin-top:auto;padding-top:14px">
         <span class="small dim">Maior gasto do mês</span>
-        <span class="tail small" style="font-weight:600">${cats.length ? esc(cats[0][0]) + ' · ' + money(cats[0][1]) : '—'}</span>
+        <span class="tail small money-neg" style="font-weight:600">${cats.length ? esc(cats[0][0]) + ' · ' + money(cats[0][1]) : '—'}</span>
       </div>
     </div>
   </div>
@@ -4884,7 +5038,7 @@ function despesasView() {
         <td><span class="badge" style="background:color-mix(in srgb,${EXPENSE_COLORS[e.category] || 'var(--ink-3)'} 14%,transparent);color:${EXPENSE_COLORS[e.category] || 'var(--ink-3)'}">${esc(e.category || 'Outros')}</span></td>
         <td class="small num">${dateBR(e.date)}</td>
         <td class="small" style="color:var(--ink-2)">${esc(e.method || '—')}</td>
-        <td class="amount num">${money(e.amount)}</td>
+        <td class="amount num money-neg">${money(e.amount)}</td>
         <td><div class="td-actions">
           <button class="mini-btn" data-act="edit-expense" data-id="${e.id}" title="Editar">${icon('edit', 15)}</button>
           <button class="mini-btn mini-btn--danger" data-act="del-expense" data-id="${e.id}" title="Excluir">${icon('trash', 15)}</button>
@@ -5183,7 +5337,7 @@ function relatoriosGerenciais(cur) {
       ${debts.slice(0, 8).map(d => `<button class="rd-debt" data-act="open-profile" data-id="${d.s.id}">
         <span class="rd-debt-days ${d.atraso > 0 ? (d.atraso > 15 ? 'late' : 'warn') : ''}">${d.atraso > 0 ? d.atraso + 'd' : 'a vencer'}</span>
         <span class="rd-debt-name">${esc(d.s.name)}</span>
-        <span class="num small">${money(d.p.amount)}</span>
+        <span class="num small money-warn">${money(d.p.amount)}</span>
         <span class="rd-debt-go">${icon('arrowRight', 12)}</span>
       </button>`).join('')}
     </div>` : `<div class="empty"><span class="ico">${icon('checkCircle', 18)}</span><b>Nenhuma cobrança em aberto</b><small>Todo mundo em dia neste mês.</small></div>`}
@@ -5211,8 +5365,8 @@ function relatoriosView() {
   });
   const metric = view.repMetric;
   const series = {
-    revenue: { name: 'Receita', color: 'var(--moss)', values: data.map(d => d.rev), money: true },
-    expenses: { name: 'Despesas', color: 'var(--vermilion)', values: data.map(d => d.exp), money: true },
+    revenue: { name: 'Receita', color: 'var(--money-pos)', values: data.map(d => d.rev), money: true },
+    expenses: { name: 'Despesas', color: 'var(--money-neg)', values: data.map(d => d.exp), money: true },
     balance: { name: 'Saldo', color: 'var(--indigo)', values: data.map(d => d.net), money: true },
     frequency: { name: 'Presenças', color: 'var(--gold)', values: data.map(d => d.freq), money: false }
   }[metric];
@@ -5249,15 +5403,15 @@ function relatoriosView() {
   <div class="grid-3" style="margin-bottom:16px">
     <div class="card kpi kpi--moss">
       <div class="top"><span class="label">Receita · ${MONTHS_SHORT[+cur.slice(5) - 1]}</span><span style="margin-left:auto;color:var(--moss)">${icon('wallet', 15)}</span></div>
-      <div><div class="value num" data-count="${rev}" data-money="1">R$ 0</div><div class="foot">${paymentsOf(cur).filter(p => p.status === 'Pago').length} mensalidades pagas</div></div>
+      <div><div class="value num money-pos" data-count="${rev}" data-money="1">R$ 0</div><div class="foot">${paymentsOf(cur).filter(p => p.status === 'Pago').length} mensalidades pagas</div></div>
     </div>
     <div class="card kpi kpi--seal">
       <div class="top"><span class="label">Despesas · ${MONTHS_SHORT[+cur.slice(5) - 1]}</span><span style="margin-left:auto;color:var(--vermilion)">${icon('receipt', 15)}</span></div>
-      <div><div class="value num" data-count="${exp}" data-money="1">R$ 0</div><div class="foot">${expensesOf(cur).length} lançamentos</div></div>
+      <div><div class="value num money-neg" data-count="${exp}" data-money="1">R$ 0</div><div class="foot">${expensesOf(cur).length} lançamentos</div></div>
     </div>
     <div class="card kpi kpi--gold">
       <div class="top"><span class="label">Resultado</span><span style="margin-left:auto;color:var(--ink-3)">${icon('chart', 15)}</span></div>
-      <div><div class="value num" style="color:${rev - exp >= 0 ? 'var(--moss)' : 'var(--vermilion-ink)'}" data-count="${rev - exp}" data-money="1">R$ 0</div>
+      <div><div class="value num" style="color:${rev - exp >= 0 ? 'var(--money-pos)' : 'var(--money-neg)'}" data-count="${rev - exp}" data-money="1">R$ 0</div>
       <div class="foot">${rev - exp >= 0 ? 'mês superavitário' : 'mês deficitário'}</div></div>
     </div>
   </div>
@@ -5278,7 +5432,7 @@ function relatoriosView() {
       ${cats.length ? `<div style="display:flex;flex-direction:column;gap:12px">${cats.map(([label, value]) => `<div>
         <div style="display:flex;align-items:center;gap:8px;margin-bottom:5px">
           <span class="small" style="flex:1">${esc(label)}</span>
-          <span class="num small">${money(value)}</span>
+          <span class="num small money-neg">${money(value)}</span>
           <span class="small dim" style="width:34px;text-align:right">${Math.round((value / Math.max(1, exp)) * 100)}%</span>
         </div>
         <div style="height:6px;border-radius:99px;background:var(--line-2);overflow:hidden">
@@ -5306,9 +5460,9 @@ function relatoriosView() {
 function pageFinanceiro() {
   const tabs = { mensalidades: mensalidadesView, despesas: despesasView, relatorios: relatoriosView };
   const actions = view.tab === 'mensalidades'
-    ? `<button class="btn btn--primary" data-act="new-payment">${icon('plus', 15)} Registrar pagamento</button>`
+    ? `<button class="btn" data-act="new-payment">${icon('plus', 15)} Registrar pagamento</button>`
     : view.tab === 'despesas'
-      ? `<button class="btn btn--primary" data-act="new-expense">${icon('plus', 15)} Lançar despesa</button>`
+      ? `<button class="btn" data-act="new-expense">${icon('plus', 15)} Lançar despesa</button>`
       : `<button class="btn" data-act="export-csv">${icon('download', 15)} Exportar CSV</button>`;
   return `
   ${pageHead({
@@ -5328,17 +5482,26 @@ function pageAjustes() {
       <span class="rail" style="background:${rail}"></span>
       <div class="body"><i style="background:${card}"></i><i style="background:${card}"></i></div>
     </div>`;
-  const tIcon = v => v === 'dark' ? '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="display:block"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9-4.03-9-9-9z"/><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" stroke-width="2"/></svg>' : '<svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor" style="display:block"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>';
-  const themeOpt = (val, label, note, iconName) => `<button class="theme-opt" data-act="set-theme" data-id="${val}" aria-pressed="${prefs.theme === val}">
-      <div class="theme-prev">
-        ${val === 'auto'
-          ? mock('#f1f2fb', '#e7e9f6', '#ffffff') + mock('#070810', '#16182c', '#232646')
-          : val === 'dark'
-            ? mock('#070810', '#16182c', '#232646')
-            : mock('#f1f2fb', '#e7e9f6', '#ffffff')}
-      </div>
-      <b style="display:flex;align-items:center;gap:5px"><span class="t-icon">${tIcon(val)}</span> ${label}</b><small>${note}</small>
+  const tIcon = v => v === 'dark' ? '<svg viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>' : '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="4.2" fill="currentColor" stroke="none"/><path d="M12 2.5v2.2M12 19.3v2.2M4.9 4.9l1.6 1.6M17.5 17.5l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.9 19.1l1.6-1.6M17.5 6.5l1.6-1.6"/></svg>';
+  const themeOpt = (val, label) => `<button class="theme-opt" data-act="set-theme" data-id="${val}" aria-pressed="${prefs.theme === val}">
+      <span class="t-icon">${tIcon(val)}</span><b>${label}</b>
     </button>`;
+  const colorSlider = (kind, label, desc, current) => {
+    const cur = (current || '').toLowerCase();
+    const isOn = c => c.toLowerCase() === cur;
+    const customOn = !ALL_COLORS.some(isOn);
+    const oneCopy = ALL_COLORS.map(c => `<button type="button" class="color-dot${isOn(c) ? ' is-on' : ''}" data-act="set-color" data-kind="${kind}" data-id="${c}" style="background:${c}" title="${c}" aria-label="${label} ${c}"></button>`).join('')
+      + `<label class="color-dot color-custom${customOn ? ' is-on' : ''}" title="Cor personalizada"><input type="color" data-on="color-${kind}" value="${current}"></label>`;
+    return `<div class="settings-row" style="display:block">
+      <div class="txt"><h4>${label}</h4><p>${desc}</p></div>
+      <div class="color-slider-wrap">
+        <button type="button" class="color-arrow color-arrow--l" data-act="color-arrow" data-kind="${kind}" data-dir="-1" aria-label="Cor anterior">${icon('chevronLeft', 18)}</button>
+        <div class="color-slider" data-slider="${kind}">${oneCopy}${oneCopy}${oneCopy}</div>
+        <button type="button" class="color-arrow color-arrow--r" data-act="color-arrow" data-kind="${kind}" data-dir="1" aria-label="Próxima cor">${icon('chevronRight', 18)}</button>
+      </div>
+      <div class="color-current"><i style="background:${current}"></i><span>${current.toUpperCase()}${prefs[kind] ? ' · personalizada' : ' · da paleta'}</span></div>
+    </div>`;
+  };
 
   const sec = (id, title, sub, body, opts = {}) => `<div class="card set-sec${opts.open ? ' is-open' : ''}${opts.wide ? ' set-wide' : ''}" data-sec="${id}">
       <button type="button" class="set-head" data-act="toggle-sec" data-id="${id}" aria-expanded="${opts.open ? 'true' : 'false'}">
@@ -5351,21 +5514,29 @@ function pageAjustes() {
   const aparencia = sec('aparencia', 'Aparência', 'Dark é o padrão — Light continua à mão', `
     <div class="set-pad">
       <div class="theme-grid">
-        ${themeOpt('dark', 'Dark', 'Tema escuro', 'moon')}
-        ${themeOpt('light', 'Light', 'Tema claro', 'sun')}
+        ${themeOpt('dark', 'Dark')}
+        ${themeOpt('light', 'Light')}
       </div>
 
       <div class="settings-row" style="border-top:1px solid var(--line-2);margin-top:18px;display:block">
-        <div class="txt"><h4>Padrão de cores</h4><p>A paleta troca o acento de todo o app — botões, faixas de destaque, gráficos e detalhes neon.</p></div>
+        <div class="txt"><h4>Padrão de cores</h4><p>Cada paleta usa 3 cores: Destaque 1, Destaque 2 complementar e Fundo. Ajuste cada cor individualmente nos sliders.</p></div>
         <div class="pal-grid">
           ${PALETTES.map(p => `<button type="button" class="pal-opt pal-opt-small" data-act="set-palette" data-id="${p.id}" aria-pressed="${(prefs.palette || 'violet') === p.id}">
-            <span class="pal-glass" style="--p1:${p.swatches[0]};--p2:${p.swatches[1]};--p3:${p.swatches[2]}">
-              <i></i><i></i><i></i>
-            </span>
+            <span class="pal-glass">${(prefs.invertHighlights ? [paletteColors(p)[1], paletteColors(p)[0], paletteColors(p)[2]] : paletteColors(p)).map(c => `<i style="background:${c}" title="${c}"></i>`).join('')}</span>
             <b>${p.name}</b>
             ${(prefs.palette || 'violet') === p.id ? `<span class="pal-on">✓</span>` : ''}
           </button>`).join('')}
         </div>
+      </div>
+      <div class="settings-row" style="padding-top:12px;border-bottom:1px solid var(--line-2)">
+        <div class="txt"><h4>Inverter os destaques</h4><p>Troca as funções das duas cores: Destaque 1 passa para Destaque 2 e Destaque 2 passa para Destaque 1.</p></div>
+        <label class="switch"><input type="checkbox" data-on="toggle-highlight-invert" ${prefs.invertHighlights ? 'checked' : ''}><span class="track"></span></label>
+      </div>
+      ${colorSlider('accent', 'Destaque 1', 'Cor dos textos de destaque e da turma Adulto. Mostra 7 cores; role, arraste ou use as setas.', effectiveAccent())}
+      ${colorSlider('accent2', 'Destaque 2 complementar', 'Cor dos botões e da turma Kids. Começa complementar ao Destaque 1; você pode escolher outra cor.', effectiveAccent2())}
+      ${colorSlider('bg', 'Cor do fundo', 'O tom do fundo do app (mantém escuro no Dark e claro no Light). Role, arraste ou use as setas.', effectiveBg())}
+      <div class="settings-row" style="display:block;padding-bottom:0">
+        <div class="color-reset"><button class="btn btn--sm" data-act="reset-colors">${icon('rotate', 14)} Restaurar cores da paleta</button></div>
       </div>
       <div class="settings-row" style="margin-top:4px">
         <div class="txt"><h4>Faixa compacta</h4><p>Na lista de alunos, mostrar apenas a barra colorida e os graus, sem o nome da cor. Padrão do sistema.</p></div>
@@ -6772,7 +6943,7 @@ function financeHistoryHTML(s) {
         </h2>
         <div style="display:flex;gap:6px;margin-top:7px;flex-wrap:wrap">
           ${statusBadge(s.status)}
-          <span class="badge badge--outline">${esc(groupOf(s))}</span>
+          ${groupBadge(groupOf(s))}
           <span class="badge badge--outline">${esc(s.plan || 'Mensal')} · ${money(s.fee)}</span>
           <span class="badge badge--outline">vence dia ${esc(s.dueDay || 10)}</span>
         </div>
@@ -6790,7 +6961,7 @@ function financeHistoryHTML(s) {
 
     ${open.length ? `<div class="fh-alert ${late.length ? 'fh-alert--late' : ''}">
       ${icon('alert', 14)}
-      <div><b>${money(openSum)}</b> em aberto${late.length ? ` — ${late.map(p => waMonthShort(p.month)).join(', ')}` : ` · ${open.map(p => waMonthShort(p.month)).join(', ')}`}</div>
+      <div><b class="money-warn">${money(openSum)}</b> em aberto${late.length ? ` — ${late.map(p => waMonthShort(p.month)).join(', ')}` : ` · ${open.map(p => waMonthShort(p.month)).join(', ')}`}</div>
       <button class="btn btn--sm" data-act="wa-send" data-id="${open[0].id}">${icon('whatsapp', 13)} Cobrar</button>
     </div>` : `<div class="fh-alert fh-alert--ok">${icon('checkCircle', 14)} <b>Tudo em dia</b> — nenhuma mensalidade em aberto.</div>`}
 
@@ -6798,7 +6969,7 @@ function financeHistoryHTML(s) {
       ${Object.keys(byYear).sort().map(y => `<div class="fh-year-row" title="Pago em ${y}">
         <span>${y}</span>
         <div class="fh-track"><i style="width:${Math.round((byYear[y] / maxY) * 100)}%"></i></div>
-        <b>${money(byYear[y])}</b>
+        <b class="money-pos">${money(byYear[y])}</b>
       </div>`).join('') || '<div class="small dim">Sem lançamentos ainda.</div>'}
     </div>
 
@@ -6813,7 +6984,7 @@ function financeHistoryHTML(s) {
             ? `<span class="small">pago ${p.paidAt ? dateShort(p.paidAt) : ''}${p.method ? ' · ' + esc(p.method) : ''}</span>`
             : `<span class="badge ${isLate ? 'badge--late' : 'badge--warn'}" title="prazo até ${dateBR(payDeadline(p))}">${isLate ? 'atrasado' : 'pendente'}</span>
                ${!isLate ? `<small class="fh-days">${payWorkdaysLeft(p)} dia${payWorkdaysLeft(p) === 1 ? '' : 's'} úteis</small>` : ''}`}</div>
-          <b class="num">${money(p.amount)}</b>
+          <b class="num ${p.status === 'Pago' ? 'money-pos' : isLate ? 'money-neg' : 'money-warn'}">${money(p.amount)}</b>
           <div class="fh-acts">
             <button class="mini-btn" data-act="pay-edit" data-id="${p.id}" title="Editar esta mensalidade">${icon('edit', 14)}</button>
             ${p.status === 'Pago' ? '' : `<button class="mini-btn wa-mini" data-act="wa-send" data-id="${p.id}" title="Cobrar no WhatsApp">${icon('whatsapp', 14)}</button>`}
@@ -6851,7 +7022,7 @@ function profileHTML(s) {
         <div style="display:flex;gap:6px;margin-top:7px;flex-wrap:wrap">
           ${statusBadge(s.status)}
           ${s.role ? `<span class="badge badge--role">${esc(s.role)}</span>` : ''}${s.bolsa ? ` <span class="badge badge--seal">Bolsista</span>` : ''}
-          <span class="badge badge--outline">${esc(groupOf(s))}</span>
+          ${groupBadge(groupOf(s))}
           ${s.plan ? `<span class="badge badge--outline">${esc(s.plan)} · ${money(s.fee)}</span>` : ''}
         </div>
       </div>
@@ -6902,7 +7073,7 @@ function profileHTML(s) {
       return `<button class="row row--link" data-act="fin-history" data-id="${s.id}" title="Abrir o histórico financeiro de ${esc(s.name)}">
         <span class="small">${esc(mesTxt.charAt(0).toUpperCase() + mesTxt.slice(1))}</span>
         <span class="badge ${p.status === 'Pago' ? 'badge--ok' : isLate ? 'badge--late' : 'badge--warn'}" style="margin-left:8px">${p.status === 'Pago' ? 'pago' : isLate ? 'atrasado' : 'pendente'}</span>
-        <span class="tail num small">${money(p.amount)}</span>
+        <span class="tail num small ${p.status === 'Pago' ? 'money-pos' : isLate ? 'money-neg' : 'money-warn'}">${money(p.amount)}</span>
         ${icon('chevronRight', 13)}
       </button>`;
     }).join('')}</div>` : `<p class="small dim">Nenhuma mensalidade registrada.</p>`}
@@ -7326,7 +7497,10 @@ const ACTIONS = {
     if (btn && pop) { const aberto = !pop.hidden; if (aberto) menuBuild();
       btn.setAttribute('aria-expanded', String(aberto)); } },
   'rd-print': () => exportResumoGerencial(),
-  'set-palette': id => { prefs.palette = id; savePrefs(); applyTheme(); render(); toast('Paleta: ' + currentPalette().name, { icon: 'spark' }); },
+  'set-palette': id => { prefs.palette = id; prefs.accent = null; prefs.accent2 = null; prefs.bg = null; savePrefs(); applyTheme(); render(); toast('Paleta: ' + currentPalette().name, { icon: 'spark' }); },
+  'set-color': (id, el) => { const kind = el.dataset.kind; const key = kind === 'accent' ? (prefs.invertHighlights ? 'accent2' : 'accent') : kind === 'accent2' ? (prefs.invertHighlights ? 'accent' : 'accent2') : kind; prefs[key] = id; savePrefs(); applyTheme(); updateColorSlider(kind); if (kind === 'accent' || kind === 'accent2') updateColorSlider(kind === 'accent' ? 'accent2' : 'accent'); },
+  'color-arrow': (id, el) => { const s = document.querySelector(`.color-slider[data-slider="${el.dataset.kind}"]`); if (s) s.scrollBy({ left: Number(el.dataset.dir) * 48, behavior: 'smooth' }); },
+  'reset-colors': () => { prefs.accent = null; prefs.accent2 = null; prefs.bg = null; savePrefs(); applyTheme(); render(); toast('Cores restauradas da paleta.', { icon: 'check' }); },
   'export-backup': () => exportBackup(),
   'import-backup': () => importBackup(),
   'export-csv': () => exportCSV(),
@@ -7353,6 +7527,7 @@ const ACTIONS = {
     head.setAttribute('aria-expanded', String(abrir));
     card.classList.toggle('is-open', abrir);
     body.hidden = !abrir;
+    if (abrir && id === 'aparencia') requestAnimationFrame(() => requestAnimationFrame(centerColorSliders));
   },
   /* v2.42: o PIN saiu. Quem porta a entrada é o login por nome.
      "Entrar na nuvem" reabre o login de onde estiver. */
@@ -7522,7 +7697,11 @@ const INPUTS = {
   'exp-month': el => { view.expMonth = el.value || MONTH; render(); },
   'rep-month': el => { view.repMonth = el.value || MONTH; render(); },
   'toggle-visits': el => { view.showVisits = el.checked; render(); },
-  'toggle-belt-compact': el => { prefs.beltCompact = el.checked; savePrefs(); render(); }
+  'toggle-belt-compact': el => { prefs.beltCompact = el.checked; savePrefs(); render(); },
+  'toggle-highlight-invert': el => { prefs.invertHighlights = el.checked; savePrefs(); applyTheme(); render(); toast(el.checked ? 'Destaques invertidos.' : 'Destaques restaurados.', { icon: 'spark' }); },
+  'color-accent': el => { prefs[prefs.invertHighlights ? 'accent2' : 'accent'] = el.value; savePrefs(); applyTheme(); updateColorSlider('accent'); updateColorSlider('accent2'); },
+  'color-accent2': el => { prefs[prefs.invertHighlights ? 'accent' : 'accent2'] = el.value; savePrefs(); applyTheme(); updateColorSlider('accent'); updateColorSlider('accent2'); },
+  'color-bg': el => { prefs.bg = el.value; savePrefs(); applyTheme(); updateColorSlider('bg'); }
 };
 
 /* ============================================================

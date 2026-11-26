@@ -1,7 +1,7 @@
 /* Arandu — service worker.
    Guarda o app em cache para abrir pelo atalho e funcionar offline.
    Funciona com qualquer nome de arquivo (index.html, DojoArandu vXp.html…). */
-const CACHE = 'arandu-v2.56';
+const CACHE = 'arandu-v2.73';
 /* arquivos fixos do atalho (as imagens ficam em assets/) */
 const ASSETS = ['manifest.webmanifest', 'assets/icon-192.png', 'assets/icon-512.png'];
 
