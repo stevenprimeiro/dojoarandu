@@ -2008,6 +2008,7 @@ const dateBR = s => s ? parseD(s).toLocaleDateString('pt-BR', { day: '2-digit', 
 const dateShort = s => s ? parseD(s).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }).replace('.', '') : '—';
 const money = v => Number(v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 2 });
 const moneyShort = v => Number(v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 });
+const moneyAxis = v => Number(v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 });
 const monthBR = m => { if (!m) return ''; const [y, mo] = m.split('-'); return `${MONTHS[+mo - 1]} de ${y}`; };
 const monthBRCap = m => cap(monthBR(m));
 
@@ -2116,29 +2117,22 @@ function uid() { return Date.now().toString(36) + Math.random().toString(36).sli
    PALETAS DE COR (padrão de cores escolhido em Ajustes)
    ============================================================ */
 const PALETTES = [
-  { id: 'violet', name: 'Violeta neon', from: '#7b5cff', fromL: '#5b3ef0', inkL: '#452ecb', inkD: '#a78bfa',
-    note: 'o padrão do dojo', swatches: ['#7b5cff', '#6fb9ff', '#cdf95a'] },
-  { id: 'cyan', name: 'Ciano elétrico', from: '#38b6ff', fromL: '#0f7ad1', inkL: '#0b62ad', inkD: '#7fd0ff',
-    note: 'gelado e claro', swatches: ['#38b6ff', '#8ef0a8', '#cdf95a'] },
-  { id: 'emerald', name: 'Esmeralda', from: '#2fe08e', fromL: '#0e9a5c', inkL: '#0a7d49', inkD: '#7df5bd',
-    note: 'o tatame vivo', swatches: ['#2fe08e', '#6fb9ff', '#cdf95a'] },
-  { id: 'amber', name: 'Âmbar solar', from: '#ffab3d', fromL: '#c9741a', inkL: '#a25c11', inkD: '#ffcb7a',
-    note: 'quente, de academia', swatches: ['#ffab3d', '#ff7a90', '#cdf95a'] },
-  { id: 'rose', name: 'Rosa tatame', from: '#ff5d8f', fromL: '#d13a6c', inkL: '#a92c57', inkD: '#ff9dba',
-    note: 'ousado sem exagero', swatches: ['#ff5d8f', '#7b5cff', '#ffc46b'] },
-  { id: 'ice', name: 'Grafite', from: '#9fb3c8', fromL: '#5d7288', inkL: '#4a5d72', inkD: '#c8d6e5',
-    note: 'sóbrio, cara de clube', swatches: ['#9fb3c8', '#6fb9ff', '#eef1ff'] },
-  { id: 'red', name: 'Vermelho tatame', from: '#ef3d4f', fromL: '#c22133', inkL: '#9c1727', inkD: '#ff8792',
-    note: 'o vermelho clássico do jiu', swatches: ['#ef3d4f', '#ffc46b', '#eef1ff'] },
-  { id: 'moss', name: 'Verde musgo terroso', from: '#6f8f3f', fromL: '#4a6625', inkL: '#3b5216', inkD: '#b7d178',
-    note: 'terra, mata e tatame', swatches: ['#6f8f3f', '#a8834f', '#e8ddc4'] }
+  { id: 'sangue', name: 'Vermelho Sangue', from: '#b22222', fromL: '#d32f2f', inkL: '#8b1a1a', inkD: '#ff6b6b',
+    note: 'intenso, marca de tatame', swatches: ['#b22222', '#d32f2f', '#ff6b6b'] },
+  { id: 'veneno', name: 'Verde Veneno', from: '#006400', fromL: '#2e7d32', inkL: '#1b5e20', inkD: '#69f0ae',
+    note: 'agudo, de competição', swatches: ['#006400', '#2e7d32', '#69f0ae'] },
+  { id: 'fantasma', name: 'Violeta Fantasma', from: '#4b0082', fromL: '#6a1b9a', inkL: '#4a148c', inkD: '#e1bee7',
+    note: 'misterioso, da noite', swatches: ['#4b0082', '#6a1b9a', '#e1bee7'] },
+  { id: 'sombrio', name: 'Cinza Sombrio', from: '#37474f', fromL: '#546e7a', inkL: '#263238', inkD: '#cfd8dc',
+    note: 'sóbrio, cara de clube', swatches: ['#37474f', '#546e7a', '#cfd8dc'] },
+  { id: 'profundo', name: 'Azul Profundo', from: '#0d47a1', fromL: '#1565c0', inkL: '#0a3d91', inkD: '#64b5f6',
+    note: 'estável, da base', swatches: ['#0d47a1', '#1565c0', '#64b5f6'] }
 ];
 function currentPalette() { return PALETTES.find(p => p.id === prefs.palette) || PALETTES[0]; }
 function applyPalette() {
   const pal = currentPalette();
   const dark = document.documentElement.getAttribute('data-theme') === 'dark';
   const root = document.documentElement.style;
-  if (!pal || pal.id === 'violet') { root.removeProperty('--vermilion'); root.removeProperty('--vermilion-ink'); root.removeProperty('--vermilion-soft'); return; }
   const base = dark ? pal.from : pal.fromL;
   root.setProperty('--vermilion', base);
   root.setProperty('--vermilion-ink', dark ? pal.inkD : pal.inkL);
@@ -2154,7 +2148,7 @@ const APP_VERSION = '2.53';
 /* assinatura do modelo de cobrança (fechamento novo + abertura com "outras pendências") */
 const WA_TPL_VER = 2;
 const WA_EMOJI_DEFAULT = '✅';
-let prefs = { theme: 'dark', view: 'table', beltCompact: true, pv: 3, palette: 'violet',
+let prefs = { theme: 'dark', view: 'table', beltCompact: true, pv: 3, palette: 'sangue',
   waNumber: '', waTime: '09:00', waTemplate: '', waLate: true, waPix: 'dojoarandu@gmail.com', waTplVer: WA_TPL_VER, waEmoji: WA_EMOJI_DEFAULT,
   hideTopbar: false };
 function savePrefs() { try { localStorage.setItem(COL_KEY, JSON.stringify(prefs)); } catch (e) {} }
@@ -7484,7 +7478,15 @@ const ACTIONS = {
 };
 
 const INPUTS = {
-  'toggle-hide-topbar': el => { prefs.hideTopbar = el.checked; savePrefs(); },
+  'toggle-hide-topbar': el => { 
+    prefs.hideTopbar = el.checked; 
+    savePrefs(); 
+    /* aplica imediatamente: ao desativar, traz a barra de volta; ao ativar, ela esconde no próximo scroll */ 
+    if (!el.checked) { 
+      const bar = document.querySelector('.topbar'); 
+      if (bar) bar.classList.remove('is-tucked', 'is-scrolled'); 
+    } 
+  },
   'att-date': el => { view.attDate = el.value || TODAY_ISO; render(); },
   'cal-month': el => { view.calCursor = el.value || MONTH; render(); },
   'pay-month': el => { view.payMonth = el.value || MONTH; render(); },
