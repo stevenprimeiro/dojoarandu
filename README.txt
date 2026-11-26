@@ -51,7 +51,7 @@ HTML, CSS e JavaScript puros — sem bibliotecas, sem build, sem dependências. 
 Estrutura
 
 index.html                       o app inteiro
-DojoArandu v2.50p.html           a mesma coisa, com o nome da versão
+DojoArandu v2.51p.html           a mesma coisa, com o nome da versão
 sw.js                            service worker (offline e atalho)
 manifest.webmanifest             nome, ícone e cor do atalho
 README.md                        esta apresentação
@@ -63,6 +63,6 @@ assets/
   apple-touch-icon.png           ícone do iPhone
 
 Criador: Steven Primeiro
-Versão: 2.51 · novembro de 2026
+Versão: 2.52 · novembro de 2026
 
 Disciplina · Respeito · Evolução

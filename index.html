@@ -21,7 +21,7 @@
 <meta name="application-name" content="Arandu">
 <style>
 /* ============================================================
-   ARANDU · v2.51 — design system
+   ARANDU · v2.52 — design system
    Papel & tinta: editorial, quente, tátil.
    ============================================================ */
 :root{
@@ -2004,6 +2004,11 @@ const iso = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())
 const parseD = s => new Date(s + 'T12:00:00');
 const TODAY = new Date();
 const TODAY_ISO = iso(TODAY);
+const dateBR = s => s ? parseD(s).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '—';
+const dateShort = s => s ? parseD(s).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }).replace('.', '') : '—';
+const money = v => Number(v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 2 });
+const monthBR = m => { if (!m) return ''; const [y, mo] = m.split('-'); return `${MONTHS[+mo - 1]} de ${y}`; };
+const monthBRCap = m => cap(monthBR(m));
 
 /* ============================================================
    BASE REAL DO DOJO (dados iniciais)
@@ -2144,7 +2149,7 @@ function hexA(hex, a) {
 }
 
 /* prefs de UI */
-const APP_VERSION = '2.51';
+const APP_VERSION = '2.52';
 /* assinatura do modelo de cobrança (fechamento novo + abertura com "outras pendências") */
 const WA_TPL_VER = 2;
 const WA_EMOJI_DEFAULT = '✅';
@@ -2180,6 +2185,7 @@ function rng(seed) {
   let s = seed >>> 0;
   return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; };
 }
+const esc = s => String(s ?? '').replace(/[&<>\"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 const monthShort = m => { const [y, mo] = m.split('-'); return `${MONTHS_SHORT[+mo - 1]}/${y.slice(2)}`; };
 const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
 const pad2 = n => String(n).padStart(2, '0');
