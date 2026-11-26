@@ -2,7 +2,7 @@
 
 **Gestão do dia a dia de uma academia de jiu-jitsu** — alunos, chamada, mensalidades e treinos, em um único arquivo HTML que roda no navegador, no celular ou no computador, **sem servidor e sem nuvem**.
 
-Criado por **Steven Primeiro** · versão **2.53** · novembro de 2026
+Criado por **Steven Primeiro** · versão **2.55** · novembro de 2026
 
 ---
 
