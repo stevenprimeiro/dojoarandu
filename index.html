@@ -21,7 +21,7 @@
 <meta name="application-name" content="Arandu">
 <style>
 /* ============================================================
-   ARANDU · v2.52 — design system
+   ARANDU · v2.53 — design system
    Papel & tinta: editorial, quente, tátil.
    ============================================================ */
 :root{
@@ -2007,6 +2007,7 @@ const TODAY_ISO = iso(TODAY);
 const dateBR = s => s ? parseD(s).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '—';
 const dateShort = s => s ? parseD(s).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }).replace('.', '') : '—';
 const money = v => Number(v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 2 });
+const moneyShort = v => Number(v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 });
 const monthBR = m => { if (!m) return ''; const [y, mo] = m.split('-'); return `${MONTHS[+mo - 1]} de ${y}`; };
 const monthBRCap = m => cap(monthBR(m));
 
@@ -2015,8 +2016,8 @@ const monthBRCap = m => cap(monthBR(m));
    Backup importado em 24/11/2026 — é a base que abre no primeiro acesso
    e o "restaurar base inicial" em Ajustes.
    ============================================================ */
-const SEED_BACKUP_NAME = 'arandu-backup-2026-11-25.json';
-const SEED_BACKUP_LABEL = 'Base inicial · 25/11/2026';
+const SEED_BACKUP_NAME = 'base-exemplo.json';
+const SEED_BACKUP_LABEL = 'Base de exemplo (sem dados)';
 const SEED_DATA = {"students":[{"id":"demo-a0","name":"Aluno Exemplo","age":30,"locality":"Centro","belt":"Branca","degrees":0,"plan":"Mensal","fee":70,"dueDay":10,"joinDate":"2026-01-10","status":"Ativo","classGroup":"Adulto","phone":"(00) 00000-0000","role":"","guardian":""},{"id":"demo-k0","name":"Criança Exemplo","age":9,"locality":"Centro","belt":"Branca","degrees":0,"plan":"Mensal","fee":70,"dueDay":10,"joinDate":"2026-02-01","status":"Ativo","classGroup":"Kids","phone":"(00) 00000-0000","guardian":"Responsável Exemplo","role":""}],"payments":[{"id":"demo-p1","studentId":"demo-a0","month":"2026-11","dueDate":"2026-11-10","amount":70,"status":"Pendente","paidAt":"","method":""},{"id":"demo-p2","studentId":"demo-k0","month":"2026-11","dueDate":"2026-11-10","amount":70,"status":"Pago","paidAt":"2026-11-08","method":"Pix"}],"expenses":[],"attendance":{},"attendanceOpen":{},"trainings":[],"visitors":[],"customPositions":[]}
 const seedData = () => JSON.parse(JSON.stringify(SEED_DATA));
 
@@ -2149,7 +2150,7 @@ function hexA(hex, a) {
 }
 
 /* prefs de UI */
-const APP_VERSION = '2.52';
+const APP_VERSION = '2.53';
 /* assinatura do modelo de cobrança (fechamento novo + abertura com "outras pendências") */
 const WA_TPL_VER = 2;
 const WA_EMOJI_DEFAULT = '✅';
@@ -7478,6 +7479,7 @@ const ACTIONS = {
     });
     if (!ok) return;
     db = BLANK(); baseSnapshotMeta('empty', 'base vazia', db); save(); render(); toast('Base limpa.');
+    registrarLog('Esvaziou base de dados (limpar tudo)', 'backup');
   }
 };
 
@@ -8195,6 +8197,7 @@ function download(name, content, type = 'application/json') {
 }
 function exportBackup() {
   download(`arandu-backup-${TODAY_ISO}.json`, JSON.stringify(db, null, 2));
+  registrarLog(`Exportou backup: ${db.students.length} alunos, ${db.payments.length} mensalidades`, 'backup');
   toast('Backup baixado.', { icon: 'download' });
 }
 function importBackup() {
@@ -8218,6 +8221,7 @@ function importBackup() {
         db.trainings ||= []; db.visitors ||= []; db.customPositions ||= [];
         db.attendance ||= {}; db.attendanceOpen ||= {};
         baseSnapshotMeta('import', file.name, db);
+        registrarLog(`Importou backup "${file.name}": ${db.students.length} alunos, ${db.payments.length} mensalidades`, 'backup');
         save(); render(); toast('Backup importado.', { icon: 'checkCircle' });
       } catch (e) { toast('Arquivo inválido — envie um JSON do Arandu.'); }
     };
@@ -8254,6 +8258,7 @@ function exportCSV() {
   const csv = '\ufeff' + rows.map(r => r.map(q).join(';')).join('\n');
   const name = `arandu-${view.page === 'financeiro' ? view.tab : 'alunos'}-${TODAY_ISO}.csv`;
   download(name, csv, 'text/csv;charset=utf-8');
+  registrarLog(`Exportou CSV ${name} (${rows.length - 1} registros)`, 'backup');
   toast('CSV exportado.', { icon: 'download' });
 }
 
