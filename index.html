@@ -6,7 +6,7 @@
 <title>Arandu · Sistema do Dojo</title>
 <meta name="description" content="Arandu — gestão de dojo de Jiu-Jitsu: alunos, frequência, treinos e financeiro em um só lugar.">
 <meta name="color-scheme" content="light dark">
-<meta name="theme-color" content="#0f1117">
+<meta name="theme-color" content="#000000">
 <!-- atalho na tela inicial: declarado no HTML (não só via JS) para o
      navegador achar o ícone mesmo antes do script rodar -->
 <link rel="manifest" href="manifest.webmanifest">
@@ -21,7 +21,7 @@
 <meta name="application-name" content="Arandu">
 <style>
 /* ============================================================
-   ARANDU · v2.50 — design system
+   ARANDU · v2.51 — design system
    Papel & tinta: editorial, quente, tátil.
    ============================================================ */
 :root{
@@ -383,8 +383,9 @@ html[data-theme="dark"] .card--ink{background:#232019;color:var(--ink);border-co
 .time-sep::after{content:"\00a0"}
 
 /* estado da nuvem na barra: um ponto discreto */
-.cloud-dot{position:relative}
+.cloud-dot{position:relative;pointer-events:none;user-select:none}
 .cloud-dot[hidden]{display:none}
+.cloud-dot:focus,.cloud-dot:focus-visible,.cloud-dot:active{outline:none;box-shadow:none}
 .cloud-dot .dot-estado{
   position:absolute;right:7px;bottom:7px;width:7px;height:7px;border-radius:50%;
   border:1.5px solid var(--card);background:var(--ink-3);transition:background .25s;
@@ -2143,7 +2144,7 @@ function hexA(hex, a) {
 }
 
 /* prefs de UI */
-const APP_VERSION = '2.50';
+const APP_VERSION = '2.51';
 /* assinatura do modelo de cobrança (fechamento novo + abertura com "outras pendências") */
 const WA_TPL_VER = 2;
 const WA_EMOJI_DEFAULT = '✅';
@@ -2179,184 +2180,6 @@ function rng(seed) {
   let s = seed >>> 0;
   return () => { s = (s * 1664525 + 1013904223) >>> 0; return s / 4294967296; };
 }
-function demoData() {
-  const r = rng(20261120);
-  const D = n => { const d = new Date(TODAY); d.setDate(d.getDate() + n); return iso(d); };
-  const monthOf = n => { const d = new Date(TODAY.getFullYear(), TODAY.getMonth() + n, 1); return iso(d).slice(0, 7); };
-  const pick = arr => arr[Math.floor(r() * arr.length)];
-
-  /* Lista fictícia de alunos — nome, idade, localidade, faixa, graus, matrícula */
-  const adults = [
-    ['Adulto 01', 34, 'Centro', 'Marrom', 4, -1980], ['Adulto 02', 31, 'Bairro Alto', 'Marrom', 3, -1740],
-    ['Adulto 03', 27, 'Vila Nova', 'Branca', 0, -120], ['Adulto 04', 38, 'Centro', 'Branca', 3, -610],
-    ['Adulto 05', 22, 'Praia', 'Azul', 0, -430], ['Adulto 06', 41, 'Centro', 'Branca', 2, -320],
-    ['Adulto 07', 26, 'Bairro Alto', 'Branca', 4, -520], ['Adulto 08', 29, 'Centro', 'Branca', 3, -280],
-    ['Adulto 09', 24, 'Vila Nova', 'Branca', 4, -640], ['Adulto 10', 20, 'Praia', 'Branca', 2, -190],
-    ['Adulto 11', 19, 'Centro', 'Branca', 3, -350]
-  ];
-  const kids = [
-    ['Kid 01', 8, 'Centro', 'Branca', 0, -150], ['Kid 02', 6, 'Bairro Alto', 'Branca', 0, -70],
-    ['Kid 03', 8, 'Centro', 'Branca', 0, -110], ['Kid 04', 8, 'Vila Nova', 'Cinza', 0, -95],
-    ['Kid 05', 7, 'Praia', 'Branca', 0, -45]
-  ];
-  /* aluno de exemplo do lembrete de vencimento (vence hoje) */
-  const steven = ['Aluno Exemplo', 35, 'Centro', 'Azul', 0, -12];
-
-  const plans = ['Mensal', 'Mensal', 'Mensal', 'Trimestral', 'Mensal', 'Semestral'];
-  const students = [];
-  adults.forEach(([name, age, locality, belt, degrees, jd], i) => {
-    students.push({
-      id: 'demo-a' + i, name, age, locality, belt, degrees, plan: plans[i % plans.length],
-      fee: 70, dueDay: 5 + (i % 3) * 5, joinDate: D(jd), status: 'Ativo',
-      classGroup: 'Adulto', role: i === 0 ? 'Professor' : i === 1 ? 'Professor' : '',
-      phone: i === 0 ? '(85) 9786-5271'
-        : `(88) 9${pad(8000 + i * 37).slice(-4)}-${pad(1000 + i * 91).slice(-4)}`
-    });
-  });
-  kids.forEach(([name, age, locality, belt, degrees, jd], i) => {
-    students.push({
-      id: 'demo-k' + i, name, age, locality, belt, degrees, plan: 'Mensal', fee: 70,
-      dueDay: 10, joinDate: D(jd), status: 'Ativo', classGroup: 'Kids',
-      phone: `(88) 9${pad(8100 + i * 41).slice(-4)}-${pad(1200 + i * 73).slice(-4)}`,
-      guardian: ['Ana ' + name, 'Rafael ' + name, 'Carla ' + name][i % 3]
-    });
-  });
-  /* Aluno Exemplo — aluno de teste do lembrete (vence hoje, WhatsApp informado) */
-  students.push({
-    id: 'demo-steven', name: steven[0], age: steven[1], locality: steven[2], belt: steven[3],
-    degrees: steven[4], plan: 'Mensal', fee: 70, dueDay: TODAY.getDate(), joinDate: D(steven[5]),
-    status: 'Ativo', classGroup: 'Adulto', phone: '(00) 00000-0000', role: ''
-  });
-
-  /* mensalidades — 4 meses */
-  const payments = [];
-  const activeArr = students.filter(s => s.status === 'Ativo');
-  for (let m = -10; m <= 0; m++) {
-    const month = monthOf(m);
-    activeArr.forEach((s, i) => {
-      const lateChance = m === 0 ? 0.3 : m > -3 ? 0.08 : 0.015;
-      /* Steven: 2 meses em atraso (setembro e outubro); os demais quitados */
-      const paid = s.id === 'demo-steven' ? m < -2 : r() > lateChance;
-      const due = `${month}-${pad(Math.min(s.dueDay, 28))}`;
-      const payDay = `${month}-${pad(Math.min(s.dueDay, 28) + (s.id === 'demo-steven' ? 0 : Math.floor(r() * 5)))}`;
-      payments.push({
-        id: 'demo-p' + month + i, studentId: s.id, month, dueDate: due, amount: s.fee,
-        status: paid ? 'Pago' : 'Pendente', paidAt: paid ? payDay : '',
-        method: paid ? pick(METHODS.slice(0, 5)) : ''
-      });
-    });
-  }
-
-  /* frequência — 170 dias (~5,5 meses) */
-  const attendance = {}, attendanceOpen = {};
-  for (let back = 170; back >= 0; back--) {
-    const date = D(-back);
-    const wd = parseD(date).getDay();
-    for (const g of Object.keys(GROUPS)) {
-      if (!GROUPS[g].days.includes(wd)) continue;
-      if (r() < 0.06) continue; /* dia sem treino confirmado */
-      attendanceOpen[date] ||= {};
-      attendanceOpen[date][g] = true;
-      const roster = activeArr.filter(s => s.classGroup === g);
-      const rate = 0.55 + r() * 0.38;
-      const present = roster.filter(() => r() < rate).map(s => s.id);
-      attendance[date] ||= [];
-      present.forEach(id => { if (!attendance[date].includes(id)) attendance[date].push(id); });
-    }
-    if (back === 0) { /* hoje sempre com chamada viva */
-      attendanceOpen[date] ||= {};
-      for (const g of Object.keys(GROUPS)) {
-        if (!GROUPS[g].days.includes(wd)) continue;
-        attendanceOpen[date][g] = true;
-        const roster = activeArr.filter(s => s.classGroup === g);
-        attendance[date] ||= [];
-        roster.forEach((s, i) => { if (i % 4 !== 0 && !attendance[date].includes(s.id)) attendance[date].push(s.id); });
-      }
-    }
-  }
-
-  Object.keys(attendance).forEach(d => { attendance[d] = [...new Set(attendance[d])]; });
-
-  /* visitantes */
-  const visitors = [];
-  const names = ['Antônio Marcos Silva', 'Juliana Freitas Costa', 'Rafael Souza Teixeira', 'Mariana Oliveira Lima',
-    'Pedro Henrique Sousa', 'Camila Rodrigues Alves', 'Lucas Gabriel Ferreira', 'Ana Clara Nascimento',
-    'Bruno Costa Ribeiro', 'Isabela Martins Rocha', 'Matheus Almeida Santos', 'Beatriz Carvalho Lopes'];
-  const localities = ['Centro', 'Bairro Alto', 'Vila Nova', 'Praia', 'Centro', 'Centro', 'Centro'];
-  let vi = 0;
-  for (let back = 40; back >= 0; back -= 4) {
-    const date = D(-back);
-    if (!attendanceOpen[date]) continue;
-    const g = Object.keys(attendanceOpen[date])[0];
-    const n = back === 0 ? 2 : (r() > 0.6 ? 2 : 1);
-    for (let k = 0; k < n; k++) {
-      visitors.push({
-        id: 'demo-v' + vi, date, classGroup: g, name: names[vi % names.length],
-        phone: `(88) 9${pad(9000 + vi * 13).slice(-4)}-${pad(2000 + vi * 57).slice(-4)}`,
-        belt: ['Sem experiência', 'Sem experiência', 'Branca', 'Azul'][vi % 4],
-        invitedBy: ['Indicação de aluno', 'Instagram', 'Aula experimental', ''][vi % 4],
-        locality: localities[(vi * 3) % localities.length],
-        notes: vi % 5 === 0 ? 'Trouxe kimono emprestado' : 'Aula experimental'
-      });
-      vi++;
-    }
-  }
-
-  /* despesas */
-  const expenses = [];
-  const base = [
-    ['Ajuda de custo do professor', 'Salário', 380, 5], ['Garrafões de água mineral 20L', 'Água 20L', 36, 8],
-    ['Reposição e limpeza do tatame', 'Estrutura', 70, 12], ['Luvas e aparadores de treino', 'Equipamentos', 55, 16],
-    ['Faixas e graus para graduação', 'Faixas e graus', 85, 20], ['Energia elétrica do espaço', 'Energia', 62, 22],
-    ['Itens diversos do dojo', 'Outros', 40, 25]
-  ];
-  let ei = 0;
-  for (let m = -10; m <= 0; m++) {
-    const month = monthOf(m);
-    base.forEach(([description, category, amount, day]) => {
-      if (m === 0 && day > 18) return;
-      if (m < -6 && day > 20) return;
-      expenses.push({
-        id: 'demo-e' + (ei++), description, category, date: `${month}-${pad(day)}`,
-        amount: Math.round(amount * (0.9 + r() * 0.25)), method: pick(METHODS.slice(0, 4)),
-        quantity: category === 'Água 20L' ? 4 + Math.floor(r() * 3) : null
-      });
-    });
-    if (m === -2) expenses.push({ id: 'demo-e' + (ei++), description: 'Seminário de guarda fechada', category: 'Eventos', date: `${month}-15`, amount: 320, method: 'Pix', quantity: null });
-  }
-
-  /* treinos planejados */
-  const p = (name) => { const x = POSITION_DB.find(v => v.name === name); return x ? x.id : ''; };
-  const trainings = [
-    { id: 'demo-t1', title: 'Saída da montada e recuperação de guarda', date: D(0), duration: 75, level: 'Todos os níveis', format: 'Gi', warmup: 'Corrida leve, mobilidade de quadril, quedas técnicas em duplas.', drills: '3 rounds de 4 min de rola posicional começando da montada.', techniques: 'Upa em ponte e rotação; recuperação com joelho-escudo; recomposição da guarda fechada.', notes: 'Foco em respiração e base — sem finalização livre.', positions: ['Montada', 'Meia-guarda', 'Guarda fechada', 'Recuperação de guarda'].map(p).filter(Boolean) },
-    { id: 'demo-t2', title: 'Passagem de guarda com pressão', date: D(2), duration: 60, level: 'Intermediários', format: 'Gi', warmup: 'Mobilidade de joelho, exercícios de base e pegada.', drills: 'Knee cut alternado 5x1min; leg drag 5x1min.', techniques: 'Joelho cortando com underhook; stack pass; controle do quadril.', notes: 'Rodar em trios para corrigir detalhe do quadril.', positions: ['Passagem joelho cortando (knee slice)', 'Controle lateral (100 quilos)', 'Leg drag', 'Joelho na barriga (knee-on-belly)'].map(p).filter(Boolean) },
-    { id: 'demo-t3', title: 'Kids: brincadeiras de base e quedas', date: D(3), duration: 45, level: 'Kids', format: 'Gi', warmup: 'Pega-pega de tatame, rolamentos, ponte e queda sentada.', drills: 'Circuito de quedas técnicas em colchão.', techniques: 'Double leg simplificado, derrubada com pegada na gola e equilíbrio.', notes: 'Turma de 6 a 11 anos — atenção ao aquecimento lúdico.', positions: ['Double leg / baiana', 'Base em pé e luta por pegadas', 'Guarda fechada'].map(p).filter(Boolean) },
-    { id: 'demo-t4', title: 'Introdução ao leg lock para faixas roxas', date: D(-6), duration: 90, level: 'Avançados', format: 'No-Gi', warmup: 'Mobilidade de quadril e inversões.', drills: 'Entradas de ashi garami — 5 séries de 2 min.', techniques: 'Ashi garami interno, alinhamento de quadril, defesa com giro.', notes: 'Vedado heel hook até a faixa roxa.', positions: ['Ashi garami (controle básico da perna)', 'Saddle / honey hole (411)', '50/50 de pernas'].map(p).filter(Boolean) }
-  ];
-
-  return { students, payments, expenses, attendance, attendanceOpen, trainings, visitors, customPositions: [] };
-}
-
-/* ============================================================
-   3. UTILITÁRIOS
-   ============================================================ */
-const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-const money = v => Number(v || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 2 });
-const moneyAxis = v => {
-  const n = Math.abs(Number(v || 0));
-  if (!n) return '0';
-  if (n >= 1000) return (n / 1000).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + 'k';
-  return Math.round(n).toLocaleString('pt-BR');
-};
-const moneyShort = v => {
-  const n = Number(v || 0);
-  if (Math.abs(n) >= 1000) return 'R$ ' + (n / 1000).toLocaleString('pt-BR', { maximumFractionDigits: 1 }) + 'k';
-  return money(n);
-};
-const dateBR = s => s ? parseD(s).toLocaleDateString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric' }) : '—';
-const dateShort = s => s ? parseD(s).toLocaleDateString('pt-BR', { day: '2-digit', month: 'short' }).replace('.', '') : '—';
-const monthBR = m => { if (!m) return ''; const [y, mo] = m.split('-'); return `${MONTHS[+mo - 1]} de ${y}`; };
-const monthBRCap = m => cap(monthBR(m));
 const monthShort = m => { const [y, mo] = m.split('-'); return `${MONTHS_SHORT[+mo - 1]}/${y.slice(2)}`; };
 const cap = s => s.charAt(0).toUpperCase() + s.slice(1);
 const pad2 = n => String(n).padStart(2, '0');
@@ -3224,7 +3047,7 @@ function topbarInit() {
     const delta = y - last;
     last = y;
     if (!mobile() || prefs.hideTopbar === false) {
-      if (!tuckedByTap) bar.classList.remove('is-tucked', 'is-scrolled');
+      bar.classList.remove('is-tucked', 'is-scrolled');
       dirAcc = 0;
       return;
     }
@@ -3257,23 +3080,6 @@ function topbarInit() {
   publishH();
   window.addEventListener('resize', publishH, { passive: true });
   window.addEventListener('orientationchange', () => setTimeout(publishH, 200), { passive: true });
-
-  /* duplo toque na tela: esconde/mostra a barra superior (só no celular) */
-  let lastTap = 0, tuckedByTap = false;
-  document.documentElement.addEventListener('touchend', (ev) => {
-    const t = Date.now();
-    if (!mobile()) return;
-    if (t - lastTap < 250) {
-      ev.preventDefault();
-      tuckedByTap = !tuckedByTap;
-      bar.classList.toggle('is-tucked');
-    }
-    lastTap = t;
-  }, { passive: false });
-
-  /* enquanto a barra foi escondida por duplo toque, o scroll não a traz de volta */
-  const _apply = apply;
-  /* (apply já respeita prefs.hideTopbar === false; aqui só bloqueia o auto-mostrar do scroll) */
 }
 
 /* dock: retrai para um botão flutuante */
@@ -5542,24 +5348,6 @@ function pageAjustes() {
       </div>
     </div>`, { wide: true });
 
-  const celular = sec('celular', 'Celular', 'Atalho na tela inicial e barra do navegador', `<div class="set-pad">
-      <div class="settings-row" style="padding-top:0">
-        <div class="txt" style="width:100%">
-          <h4>Atalho na tela inicial</h4>
-          <p>Instala o Arandu como app: ícone na tela inicial, tela cheia e acesso em um toque.</p>
-          <div class="acts">
-            <button class="btn btn--sm btn--seal" data-act="install-app">${icon('download', 14)} Criar atalho</button>
-            <span class="small dim" id="installHint">${installHintText()}</span>
-          </div>
-          <div class="install-steps">${installStepsHTML()}</div>
-        </div>
-      </div>
-      <div class="settings-row">
-        <div class="txt"><h4>Esconder a barra ao rolar</h4><p>No celular, a barra do app sai de cena quando você desce e volta ao chegar no topo.</p></div>
-        <label class="switch"><input type="checkbox" data-on="toggle-hide-topbar" ${prefs.hideTopbar !== false ? 'checked' : ''}><span class="track"></span></label>
-      </div>
-    </div>`);
-
   const quemTela = ehMobile()
     ? (CLOUD.user ? esc(CLOUD.user.nome || CLOUD.user.email) : esc(perfilDoAparelho().nome))
     : esc(perfilDoAparelho().nome);
@@ -5569,10 +5357,14 @@ function pageAjustes() {
     : CLOUD.ativo
       ? `Conectado como ${quemTela} (${papelTela}).`
       : 'Configurada — entre para compartilhar a base.';
-  const nuvem = sec('nuvem', 'Conta e sincronização', nuvemTxt, `<div class="set-pad">
-      <div class="settings-row" style="padding-top:0">
+
+  /* ---- seção Desenvolvedor: banco de dados, backups, log e sistema ---- */
+  const dev = sec('desenvolvedor', 'Desenvolvedor', 'Banco de dados, backups e manutenção do sistema', `
+    <div class="set-pad">
+      <div class="settings-row" style="padding-top:0;border-bottom:0">
         <div class="txt" style="width:100%">
-          <h4>${CLOUD.ativo ? 'Conectado ao banco compartilhado' : 'Banco compartilhado (Supabase)'}</h4>
+          <h4>Banco compartilhado (nuvem)</h4>
+          <p>${nuvemTxt}</p>
           ${CLOUD.ativo ? `
           <div class="sec-facts" style="margin-top:10px">
             <div><b>${quemTela}</b><span>${ehMobile() ? esc(CLOUD.user.email) : ''} · perfil: ${papelTela}</span></div>
@@ -5595,49 +5387,22 @@ function pageAjustes() {
             <button class="btn btn--sm" data-act="cloud-entrar-agora">${icon('userPlus', 14)} Já configurado: entrar</button>
           </div>
           <div class="field-note" style="margin-top:10px">Arquivo de apoio com o SQL e o passo a passo: <b>SUPABASE.md</b>.</div>`}
-        </div>
-      </div>
-    </div>`);
-
-
-  const seedCor = BASE.origin === 'seed' ? 'badge--ok' : BASE.origin === 'empty' ? 'badge--late' : 'badge--warn';
-  const seedNome = BASE.origin === 'seed' ? 'Base inicial do dojo' : BASE.origin === 'empty' ? 'Base vazia' : 'Backup importado';
-  const baseAtiva = `<div class="base-active">
-      <div class="base-active-head">
-        <span class="base-ico">${icon('download', 16)}</span>
-        <div style="min-width:0">
-          <div class="eyebrow" style="margin-bottom:3px">Backup ativado</div>
-          <div class="base-file" title="${esc(BASE.file || '')}">${esc(BASE.file || '—')}</div>
-        </div>
-        <span class="badge ${seedCor}" style="margin-left:auto">${esc(seedNome)}</span>
-      </div>
-      <div class="base-grid">
-        <div><span>Alunos</span><b>${BASE.counts?.students ?? db.students.length}</b></div>
-        <div><span>Mensalidades</span><b>${BASE.counts?.payments ?? db.payments.length}</b></div>
-        <div><span>Dias de chamada</span><b>${BASE.counts?.days ?? Object.keys(db.attendance).length}</b></div>
-        <div><span>Ativado em</span><b>${BASE.importedAt ? dateBR(BASE.importedAt) : dateBR(TODAY_ISO)}</b></div>
-      </div>
-      <div class="base-acts">
-        <button class="btn btn--sm" data-act="restore-seed">${icon('rotate', 13)} Restaurar base inicial</button>
-        <span class="small dim">${BASE.origin === 'seed' ? 'Você está na base oficial.' : 'A base oficial é a ' + esc(SEED_BACKUP_NAME) + '.'}</span>
-      </div>
-    </div>`;
-
-  const dev = sec('desenvolvedor', 'Desenvolvedor', 'Backups, manutenção da base e registro de tudo que muda', `
-    <div class="set-pad">
-      <div class="settings-row" style="padding-top:0;border-bottom:0">
-        <div class="txt" style="width:100%">
-          <h4>Nuvem — online / offline</h4>
-          <p>Quando está <b>offline</b>, o app para de enviar arquivos para o banco compartilhado e fica só neste aparelho. Ao voltar para <b>online</b>, você escolhe qual base vale como principal: a deste celular ou a da nuvem.</p>
-          <div class="acts" style="margin-top:10px">
-            <label class="switch"><input type="checkbox" data-act="toggle-nuvem-offline" ${CLOUD.offline ? '' : 'checked'}><span class="track"></span></label>
-            <span class="tail small num" style="font-weight:600">${CLOUD.offline ? 'Desligado (só neste aparelho)' : 'Ligado (compartilhado)'}</span>
-          </div>
           ${CLOUD.ultimoLogNuvem ? `<p class="small dim" style="margin-top:8px">Última entrada no log da nuvem: <b>${new Date(CLOUD.ultimoLogNuvem).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</b>.</p>` : ''}
+          <div class="settings-row" style="margin-top:14px;border-top:1px solid var(--line-2)">
+            <div class="txt" style="width:100%">
+              <h4>Nuvem — online / offline</h4>
+              <p>Quando está <b>offline</b>, o app para de enviar arquivos para o banco compartilhado e fica só neste aparelho.</p>
+              <div class="acts" style="margin-top:10px">
+                <label class="switch"><input type="checkbox" data-act="toggle-nuvem-offline" ${CLOUD.offline ? '' : 'checked'}><span class="track"></span></label>
+                <span class="tail small num" style="font-weight:600">${CLOUD.offline ? 'Desligado (só neste aparelho)' : 'Ligado (compartilhado)'}</span>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
-    <div class="set-pad">
+
+    <div class="set-pad" style="border-top:1px solid var(--line-2)">
       <div class="settings-row" style="padding-top:0;border-bottom:0">
         <div class="txt" style="width:100%">
           <h4>Registro de alterações</h4>
@@ -5648,30 +5413,43 @@ function pageAjustes() {
         </div>
       </div>
     </div>
+
     <div class="set-pad" style="border-top:1px solid var(--line-2)">
       <div class="settings-row" style="padding-top:0;border-bottom:0">
         <div class="txt" style="width:100%">
           <h4>Base em uso</h4>
-          <p>É a base que está aberta agora neste navegador. Importar um backup ou carregar a demonstração substitui a base ativa.</p>
-          ${baseAtiva}
+          <p>É a base que está aberta agora neste navegador. Importar um backup substitui a base ativa.</p>
+          <div class="base-active">
+            <div class="base-active-head">
+              <span class="base-ico">${icon('download', 16)}</span>
+              <div style="min-width:0">
+                <div class="eyebrow" style="margin-bottom:3px">Backup ativado</div>
+                <div class="base-file" title="${esc(BASE.file || '')}">${esc(BASE.file || '—')}</div>
+              </div>
+              <span class="badge ${BASE.origin === 'seed' ? 'badge--ok' : BASE.origin === 'empty' ? 'badge--late' : 'badge--warn'}" style="margin-left:auto">${esc(BASE.origin === 'seed' ? 'Base inicial do dojo' : BASE.origin === 'empty' ? 'Base vazia' : 'Backup importado')}</span>
+            </div>
+            <div class="base-grid">
+              <div><span>Alunos</span><b>${BASE.counts?.students ?? db.students.length}</b></div>
+              <div><span>Mensalidades</span><b>${BASE.counts?.payments ?? db.payments.length}</b></div>
+              <div><span>Dias de chamada</span><b>${BASE.counts?.days ?? Object.keys(db.attendance).length}</b></div>
+              <div><span>Ativado em</span><b>${BASE.importedAt ? dateBR(BASE.importedAt) : dateBR(TODAY_ISO)}</b></div>
+            </div>
+            <div class="base-acts">
+              <button class="btn btn--sm" data-act="restore-seed">${icon('rotate', 13)} Restaurar base inicial</button>
+              <span class="small dim">${BASE.origin === 'seed' ? 'Você está na base oficial.' : 'A base oficial é a ' + esc(SEED_BACKUP_NAME) + '.'}</span>
+            </div>
+          </div>
         </div>
       </div>
       <div class="settings-row" style="border-bottom:0">
         <div class="txt" style="width:100%">
           <h4>Backup completo</h4>
-          <p>Baixe um JSON com alunos, frequências, mensalidades, despesas, visitas e treinos. Importe para restaurar ou migrar de aparelho.</p>
+          <p>Baixe um JSON com alunos, frequências, mensalidades, despesas e treinos. Importe para restaurar ou migrar de aparelho.</p>
           <div class="acts">
             <button class="btn btn--sm btn--primary" data-act="export-backup">${icon('download', 14)} Baixar</button>
             <button class="btn btn--sm" data-act="import-backup">${icon('upload', 14)} Importar</button>
             <button class="btn btn--sm" data-act="export-csv">${icon('list', 14)} CSV</button>
           </div>
-        </div>
-      </div>
-      <div class="settings-row">
-        <div class="txt">
-          <h4>Dados de demonstração</h4>
-          <p>Base fictícia — 17 alunos, 75 dias de chamada, 11 meses de mensalidades, despesas e treinos — para explorar o sistema. <b>Substitui a base atual</b>; depois use “Restaurar base inicial” para voltar aos dados reais.</p>
-          <div class="acts"><button class="btn btn--sm" data-act="load-demo">${icon('spark', 14)} Carregar demonstração</button></div>
         </div>
       </div>
       <div class="settings-row" style="border-bottom:0">
@@ -5682,6 +5460,7 @@ function pageAjustes() {
         </div>
       </div>
     </div>
+
     <div class="set-pad" style="border-top:1px solid var(--line-2)">
       <div style="height:8px;border-radius:99px;background:var(--line-2);overflow:hidden">
         <div style="height:100%;width:${pctStorage}%;background:var(--vermilion);border-radius:99px;transition:width .6s var(--ease)"></div>
@@ -5695,13 +5474,11 @@ function pageAjustes() {
   ${pageHead({
     crumb: 'Preferências',
     title: `<h1 class="page-title">Ajustes</h1>`,
-    sub: 'Tema, cópias de segurança e manutenção da base local do dojo.',
-    actions: `<button class="btn" data-act="export-backup">${icon('download', 15)} Baixar backup</button>`
+    sub: 'Tema, aparência e manutenção da base.',
+    actions: ''
   })}
   <div class="set-stack">
     ${aparencia}
-    ${celular}
-    ${nuvem}
     ${dev}
   </div>
   <div class="card card--paper" style="display:flex;gap:20px;align-items:center;flex-wrap:wrap;margin-top:16px">
@@ -7523,20 +7300,7 @@ const ACTIONS = {
   'export-backup': () => exportBackup(),
   'import-backup': () => importBackup(),
   'export-csv': () => exportCSV(),
-  'load-demo': async () => {
-    const ok = await confirmDialog({ title: 'Carregar demonstração', message: 'A base fictícia substituirá todos os dados deste navegador.\nBaixe um backup antes se quiser conservá-los.', confirmText: 'Carregar' });
-    if (!ok) return;
-    db = demoData(); baseSnapshotMeta('demo', 'demonstração fictícia', db); save(); render(); toast('Demonstração carregada.', { icon: 'spark' });
-  },
-  /* visitante: entra direto na base de demonstração, sem login */
-  'entrar-visitante': async () => {
-    const ok = await confirmDialog({ title: 'Entrar como visitante', message: 'A base de demonstração substituirá todos os dados deste navegador.\nVocê ainda não está conectado à nuvem.\nBaixe um backup antes se quiser conservar seus dados.', confirmText: 'Entrar como visitante' });
-    if (!ok) return;
-    db = demoData(); baseSnapshotMeta('demo', 'demonstração fictícia', db); save(); render();
-    view.baseModo = 'demo';
-    toast('Modo visitante: base de demonstração. Entre na nuvem para usar a base compartilhada.', { icon: 'spark' });
-    render();
-  },
+
   /* liga/desliga o modo offline da nuvem */
   'toggle-nuvem-offline': async el => {
     const ligando = !CLOUD.offline;
@@ -8164,7 +7928,7 @@ function cloudLoginHTML() {
         <button class="btn btn--primary" style="width:100%;margin-top:10px" data-act="cloud-entrar">Entrar</button>
       </div>
       <button class="link small" style="display:block;margin:16px auto 0" data-act="cloud-modo-local">Continuar só neste aparelho</button>
-      <button class="btn btn--sm" style="width:100%;margin-top:8px" data-act="entrar-visitante">${icon('spark', 14)} Entrar como visitante</button>
+
       <p class="small dim" style="text-align:center;margin-top:16px;font-size:10.5px;line-height:1.5">
         Ninguém se cadastra sozinho: o acesso é criado pelo Steven.</p>
     </div>
@@ -8351,7 +8115,7 @@ function pwaSetup() {
     const url = URL.createObjectURL(new Blob([JSON.stringify({
       name: 'Arandu · Sistema do Dojo', short_name: 'Arandu', start_url: here,
       scope: here.replace(/[^/]*$/, ''), display: 'standalone',
-      background_color: '#0f1117', theme_color: '#0f1117', icons
+      background_color: '#000000', theme_color: '#000000', icons
     })], { type: 'application/manifest+json' }));
     head('link', { rel: 'manifest', href: url });
     head('link', { rel: 'apple-touch-icon', href: pwaIconData(180) });
@@ -8369,7 +8133,7 @@ function pwaSetup() {
         .then(j => { if (!Array.isArray(j.icons) || !j.icons.length) throw new Error('sem ícones'); })
         .catch(() => { link.remove(); useBlob(); });
     }
-    head('meta', { name: 'theme-color', content: '#0f1117' });
+    head('meta', { name: 'theme-color', content: '#000000' });
     head('meta', { name: 'apple-mobile-web-app-capable', content: 'yes' });
     head('meta', { name: 'apple-mobile-web-app-title', content: 'Arandu' });
     head('meta', { name: 'mobile-web-app-capable', content: 'yes' });
@@ -8504,8 +8268,7 @@ function cmdSources() {
     { label: 'Abrir chamada de hoje', icon: 'check', run: () => go('frequencia', { state: { attDate: TODAY_ISO } }) },
     { label: 'Baixar backup', icon: 'download', run: () => exportBackup() },
     { label: 'Exportar CSV', icon: 'list', run: () => exportCSV() },
-    { label: 'Alternar tema', icon: 'moon', run: () => cycleTheme() },
-    { label: 'Carregar demonstração', icon: 'spark', run: () => ACTIONS['load-demo']() }
+    { label: 'Alternar tema', icon: 'moon', run: () => cycleTheme() }
   ].map(a => ({ ...a, group: 'Ações', hint: '' }));
   const students = db.students.map(s => ({
     group: 'Alunos', label: s.name, icon: 'users', hint: groupOf(s), run: () => openProfile(s.id)
