@@ -2,7 +2,7 @@
 
 **Gestão do dia a dia de uma academia de jiu-jitsu** — alunos, chamada, mensalidades e treinos, em um único arquivo HTML que roda no navegador, no celular ou no computador, **sem servidor e sem nuvem**.
 
-Criado por **Steven Primeiro** · versão **2.55** · novembro de 2026
+Criado por **Steven Primeiro** · versão **2.53** · novembro de 2026
 
 ---
 
@@ -84,7 +84,7 @@ HTML, CSS e JavaScript puros — sem bibliotecas, sem build, sem dependências. 
 
 ```
 index.html              o app inteiro (versão pública, sem dados reais)
-DojoArandu v2.55p.html  a mesma coisa, com o nome da versão
+DojoArandu v2.56p.html  a mesma coisa, com o nome da versão
 sw.js                   service worker (offline e atalho)
 manifest.webmanifest    nome, ícone e cor do atalho
 README.md               esta apresentação
@@ -99,6 +99,6 @@ assets/
 ---
 
 **Criador:** Steven Primeiro  
-**Versão:** 2.55 · novembro de 2026  
+**Versão:** 2.56 · novembro de 2026  
 
 *Disciplina · Respeito · Evolução*

@@ -21,7 +21,7 @@
 <meta name="application-name" content="Arandu">
 <style>
 /* ============================================================
-   ARANDU · v2.55 — design system
+   ARANDU · v2.56 — design system
    Papel & tinta: editorial, quente, tátil.
    ============================================================ */
 :root{
@@ -1486,11 +1486,15 @@ html.lowfx .map-page-head{backdrop-filter:none;background:var(--paper)}
 .map-edge-from b{font-size:13px}
 
 /* ---- paletas em Ajustes ---- */
-.pal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(128px,1fr));gap:9px;margin-top:12px}
+.pal-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:8px;margin-top:10px}
 .pal-opt{position:relative;display:flex;flex-direction:column;gap:4px;align-items:flex-start;padding:9px;border-radius:13px;border:1px solid var(--line);background:var(--card-2);text-align:left;transition:transform .18s var(--ease),border-color .18s}
 .pal-opt:hover{transform:translateY(-2px);border-color:color-mix(in srgb,var(--vermilion) 40%,var(--line))}
 .pal-opt[aria-pressed="true"]{border-color:var(--vermilion);box-shadow:0 0 0 3px color-mix(in srgb,var(--vermilion) 14%,transparent)}
 .pal-opt b{font-size:11.5px}
+.pal-opt-small{padding:5px;border-radius:8px;gap:2px}
+.pal-opt-small b{font-size:7px}
+.pal-opt-small .pal-glass{height:30px;border-radius:6px}
+.pal-opt-small .pal-on{right:5px;bottom:34px;width:14px;height:14px}
 
 .badge--role{background:color-mix(in srgb,var(--gold) 22%,transparent);color:var(--gold);border:1px solid color-mix(in srgb,var(--gold) 38%,transparent);font-size:9px;letter-spacing:.05em;text-transform:uppercase;padding:2px 6px;border-radius:6px;vertical-align:middle;font-weight:700}
 
@@ -2120,15 +2124,23 @@ function uid() { return Date.now().toString(36) + Math.random().toString(36).sli
    ============================================================ */
 const PALETTES = [
   { id: 'sangue', name: 'Vermelho Sangue', from: '#b22222', fromL: '#d32f2f', inkL: '#8b1a1a', inkD: '#ff6b6b',
-    note: 'intenso, marca de tatame', swatches: ['#b22222', '#d32f2f', '#ff6b6b'] },
+    swatches: ['#b22222', '#d32f2f', '#ff6b6b'] },
   { id: 'profundo', name: 'Azul Profundo', from: '#0d47a1', fromL: '#1565c0', inkL: '#0a3d91', inkD: '#64b5f6',
-    note: 'estável, da base', swatches: ['#0d47a1', '#1565c0', '#64b5f6'] },
+    swatches: ['#0d47a1', '#1565c0', '#64b5f6'] },
   { id: 'veneno', name: 'Verde Veneno', from: '#006400', fromL: '#2e7d32', inkL: '#1b5e20', inkD: '#69f0ae',
-    note: 'agudo, de competição', swatches: ['#006400', '#2e7d32', '#69f0ae'] },
+    swatches: ['#006400', '#2e7d32', '#69f0ae'] },
   { id: 'fantasma', name: 'Violeta Fantasma', from: '#7b2cbf', fromL: '#9d4edd', inkL: '#5b21b6', inkD: '#afa8ff',
-    note: 'misterioso, da noite', swatches: ['#7b2cbf', '#9d4edd', '#afa8ff'] },
+    swatches: ['#7b2cbf', '#9d4edd', '#afa8ff'] },
   { id: 'sombrio', name: 'Cinza Sombrio', from: '#37474f', fromL: '#546e7a', inkL: '#263238', inkD: '#cfd8dc',
-    note: 'sóbrio, cara de clube', swatches: ['#37474f', '#546e7a', '#cfd8dc'] }
+    swatches: ['#37474f', '#546e7a', '#cfd8dc'] },
+  { id: 'analoga', name: 'Análogas', from: '#0d47a1', fromL: '#1e90ff', inkL: '#0a3d91', inkD: '#64b5f6',
+    swatches: ['#0d47a1', '#1e90ff', '#00bcd4'] },
+  { id: 'complementar', name: 'Complementar', from: '#0d47a1', fromL: '#1565c0', inkL: '#0a3d91', inkD: '#ff9d00',
+    swatches: ['#0d47a1', '#ff9d00', '#f57c00'] },
+  { id: 'triadica', name: 'Triádica', from: '#d32f2f', fromL: '#ff5252', inkL: '#8b1a1a', inkD: '#ffcdd2',
+    swatches: ['#d32f2f', '#ffc107', '#3f51b5'] },
+  { id: 'tetradica', name: 'Tetrádica', from: '#d32f2f', fromL: '#ff5252', inkL: '#8b1a1a', inkD: '#ffcdd2',
+    swatches: ['#d32f2f', '#4caf50', '#2196f3', '#ffc107'] }
 ];
 function currentPalette() { return PALETTES.find(p => p.id === prefs.palette) || PALETTES[0]; }
 function applyPalette() {
@@ -2146,7 +2158,7 @@ function hexA(hex, a) {
 }
 
 /* prefs de UI */
-const APP_VERSION = '2.55';
+const APP_VERSION = '2.56';
 /* assinatura do modelo de cobrança (fechamento novo + abertura com "outras pendências") */
 const WA_TPL_VER = 2;
 const WA_EMOJI_DEFAULT = '✅';
@@ -3896,13 +3908,13 @@ function pageHoje() {
   const prevPaid = sum(paymentsOf(prevMonth).filter(p => p.status === 'Pago'), p => p.amount);
   const delta = prevPaid > 0 ? ((paidSum - prevPaid) / prevPaid) * 100 : 0;
   const newThisMonth = db.students.filter(s => (s.joinDate || '').startsWith(MONTH)).length;
-  const pct = active.length ? Math.round((present / active.length) * 100) : 0;
-
   /* última data com presença registrada (último treino) */
   const attDates = Object.keys(db.attendance || {}).filter(d => db.attendance[d] && db.attendance[d].length > 0).sort();
   const lastAttDate = attDates.length ? attDates[attDates.length - 1] : null;
   const lastIds = lastAttDate ? attendanceOf(lastAttDate) : [];
   const lastPresent = active.filter(s => lastIds.includes(s.id)).length;
+
+  const pct = active.length ? Math.round((lastPresent / active.length) * 100) : 0;
 
   /* agenda */
   const wd = TODAY.getDay();
@@ -5346,11 +5358,11 @@ function pageAjustes() {
       <div class="settings-row" style="border-top:1px solid var(--line-2);margin-top:18px;display:block">
         <div class="txt"><h4>Padrão de cores</h4><p>A paleta troca o acento de todo o app — botões, faixas de destaque, gráficos e detalhes neon.</p></div>
         <div class="pal-grid">
-          ${PALETTES.map(p => `<button type="button" class="pal-opt" data-act="set-palette" data-id="${p.id}" aria-pressed="${(prefs.palette || 'violet') === p.id}">
+          ${PALETTES.map(p => `<button type="button" class="pal-opt pal-opt-small" data-act="set-palette" data-id="${p.id}" aria-pressed="${(prefs.palette || 'violet') === p.id}">
             <span class="pal-glass" style="--p1:${p.swatches[0]};--p2:${p.swatches[1]};--p3:${p.swatches[2]}">
               <i></i><i></i><i></i>
             </span>
-            <b>${p.name}</b><small>${p.note}</small>
+            <b>${p.name}</b>
             ${(prefs.palette || 'violet') === p.id ? `<span class="pal-on">✓</span>` : ''}
           </button>`).join('')}
         </div>
