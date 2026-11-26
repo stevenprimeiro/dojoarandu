@@ -84,7 +84,7 @@ HTML, CSS e JavaScript puros — sem bibliotecas, sem build, sem dependências. 
 
 ```
 index.html              o app inteiro (versão pública, sem dados reais)
-DojoArandu v2.73p.html  a mesma coisa, com o nome da versão
+DojoArandu v2.78p.html  a mesma coisa, com o nome da versão
 sw.js                   service worker (offline e atalho)
 manifest.webmanifest    nome, ícone e cor do atalho
 README.md               esta apresentação
@@ -99,6 +99,6 @@ assets/
 ---
 
 **Criador:** Steven Primeiro  
-**Versão:** 2.73 · novembro de 2026  
+**Versão:** 2.78 · novembro de 2026  
 
 *Disciplina · Respeito · Evolução*
