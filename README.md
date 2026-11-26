@@ -2,7 +2,7 @@
 
 **Gestão do dia a dia de uma academia de jiu-jitsu** — alunos, chamada, mensalidades e treinos, em um único arquivo HTML que roda no navegador, no celular ou no computador, **sem servidor e sem nuvem**.
 
-Criado por **Steven Primeiro** · versão **2.31**
+Criado por **Steven Primeiro** · versão **2.49**
 
 ![Tela inicial no computador](assets/print-desktop.jpg)
 
@@ -21,7 +21,7 @@ Criado por **Steven Primeiro** · versão **2.31**
 | **Treinos** | Planejamento com mapa mental de posições do jiu-jitsu — da guarda à finalização, ligadas como um grafo que cresce da esquerda para a direita. |
 | **Financeiro** | Mensalidades mês a mês, extrato por aluno, despesas por categoria, recebido × em aberto, atrasados. |
 | **Cobrança** | Texto de cobrança pronto para o WhatsApp, com Pix, emoji escolhido por você e envio em um toque. |
-| **Celular** | Atalho na tela inicial (PWA), funciona offline e a barra de topo se esconde ao rolar. |
+| **Celular** | Atalho na tela inicial (PWA), funciona offline e a barra de topo fica visível por padrão — toque duas vezes na tela para escondê-la ou mostrá-la. |
 | **Segurança** | Entrada pelo login do professor (nome + senha), sem PIN separado. |
 | **Vários professores** | Base compartilhada opcional no Supabase: uma conta por pessoa, o que um marca aparece nos outros. Veja `SUPABASE.md`. |
 
@@ -57,7 +57,9 @@ Criado por **Steven Primeiro** · versão **2.31**
 ## Ajustes que valem conhecer
 
 - **Aparência** — tema escuro/claro/sistema, 8 padrões de cor (incluindo *Vermelho tatame* e *Verde musgo*) e densidade da lista de alunos.
-- **Celular** — posição do botão flutuante, esconder a barra ao rolar e criar atalho.
+- **Celular** — posição do botão flutuante, esconder a barra ao rolar (duplo toque na tela) e criar atalho.
+- **Nuvem online/offline** — em Ajustes → Desenvolvedor você pode desligar a nuvem para ficar só neste aparelho. Ao ligar de novo, escolhe se a base deste celular ou a da nuvem vale como principal.
+- **Visitante** — na tela de entrada, toque "Entrar como visitante" para explorar a base de demonstração sem fazer login.
 - **Segurança** — login por nome do professor (Steven, Nicholas, Anderson) com senha; a base do dojo só abre para quem entrou.
 - As seções abrem ao toque no título e se recolhem no toque seguinte.
 
@@ -78,7 +80,7 @@ HTML, CSS e JavaScript puros — sem bibliotecas, sem build, sem dependências. 
 
 ```
 index.html                       o app inteiro
-DojoArandu v2.48p.html           a mesma coisa, com o nome da versão
+DojoArandu v2.50p.html           a mesma coisa, com o nome da versão
 sw.js                            service worker (offline e atalho)
 manifest.webmanifest             nome, ícone e cor do atalho
 README.md                        esta apresentação
@@ -95,6 +97,6 @@ assets/
 ---
 
 **Criador:** Steven Primeiro
-**Versão:** 2.48 · novembro de 2026
+**Versão:** 2.50 · novembro de 2026
 
 *Disciplina · Respeito · Evolução*

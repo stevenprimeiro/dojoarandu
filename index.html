@@ -21,7 +21,7 @@
 <meta name="application-name" content="Arandu">
 <style>
 /* ============================================================
-   ARANDU · v2.48 — design system
+   ARANDU · v2.50 — design system
    Papel & tinta: editorial, quente, tátil.
    ============================================================ */
 :root{
@@ -167,7 +167,9 @@ img,svg{display:block;max-width:100%}
 }/* no celular a navegação é o menu do botão: a barra de links do desktop sai de cena */
 @media(max-width:900px){.nav{display:none!important}
   /* a aba Ajustes da barra é coisa de desktop; no celular ela vive no menu do botão */
-  .nav-desk{display:none!important}}
+  .nav-desk{display:none!important}
+  /* ícone do menu um pouco maior para tocar no celular (+10%) */
+  #menuBtn{width:42px;height:42px}}
 
 .nav a:hover{color:var(--ink);background:color-mix(in srgb,var(--ink) 6%,transparent)}
 .nav a[aria-current="page"]{color:var(--vermilion)}
@@ -1945,7 +1947,7 @@ html.lowfx .view-anim>*{animation:none !important}
         <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.6-3.6"/></svg>
         <span class="kbd-label">Buscar</span>
       </button>
-      <button class="icon-btn cloud-dot" id="cloudDot" hidden aria-live="polite" aria-label="Estado da nuvem" title="Nuvem"></button>
+      <span class="icon-btn cloud-dot" id="cloudDot" hidden aria-live="polite" aria-label="Estado da nuvem" role="status"></span>
       <button class="icon-btn menu-btn" id="menuBtn" aria-label="Menu de páginas" aria-expanded="false" aria-controls="pageMenu"></button>
     </div>
   </header>
@@ -2141,13 +2143,13 @@ function hexA(hex, a) {
 }
 
 /* prefs de UI */
-const APP_VERSION = '2.48';
+const APP_VERSION = '2.50';
 /* assinatura do modelo de cobrança (fechamento novo + abertura com "outras pendências") */
 const WA_TPL_VER = 2;
 const WA_EMOJI_DEFAULT = '✅';
 let prefs = { theme: 'dark', view: 'table', beltCompact: true, pv: 3, palette: 'violet',
   waNumber: '', waTime: '09:00', waTemplate: '', waLate: true, waPix: 'dojoarandu@gmail.com', waTplVer: WA_TPL_VER, waEmoji: WA_EMOJI_DEFAULT,
-  hideTopbar: true };
+  hideTopbar: false };
 function savePrefs() { try { localStorage.setItem(COL_KEY, JSON.stringify(prefs)); } catch (e) {} }
 (() => {
   let stored = null;
@@ -3222,7 +3224,7 @@ function topbarInit() {
     const delta = y - last;
     last = y;
     if (!mobile() || prefs.hideTopbar === false) {
-      bar.classList.remove('is-tucked', 'is-scrolled');
+      if (!tuckedByTap) bar.classList.remove('is-tucked', 'is-scrolled');
       dirAcc = 0;
       return;
     }
@@ -3255,6 +3257,23 @@ function topbarInit() {
   publishH();
   window.addEventListener('resize', publishH, { passive: true });
   window.addEventListener('orientationchange', () => setTimeout(publishH, 200), { passive: true });
+
+  /* duplo toque na tela: esconde/mostra a barra superior (só no celular) */
+  let lastTap = 0, tuckedByTap = false;
+  document.documentElement.addEventListener('touchend', (ev) => {
+    const t = Date.now();
+    if (!mobile()) return;
+    if (t - lastTap < 250) {
+      ev.preventDefault();
+      tuckedByTap = !tuckedByTap;
+      bar.classList.toggle('is-tucked');
+    }
+    lastTap = t;
+  }, { passive: false });
+
+  /* enquanto a barra foi escondida por duplo toque, o scroll não a traz de volta */
+  const _apply = apply;
+  /* (apply já respeita prefs.hideTopbar === false; aqui só bloqueia o auto-mostrar do scroll) */
 }
 
 /* dock: retrai para um botão flutuante */
@@ -5608,6 +5627,19 @@ function pageAjustes() {
     <div class="set-pad">
       <div class="settings-row" style="padding-top:0;border-bottom:0">
         <div class="txt" style="width:100%">
+          <h4>Nuvem — online / offline</h4>
+          <p>Quando está <b>offline</b>, o app para de enviar arquivos para o banco compartilhado e fica só neste aparelho. Ao voltar para <b>online</b>, você escolhe qual base vale como principal: a deste celular ou a da nuvem.</p>
+          <div class="acts" style="margin-top:10px">
+            <label class="switch"><input type="checkbox" data-act="toggle-nuvem-offline" ${CLOUD.offline ? '' : 'checked'}><span class="track"></span></label>
+            <span class="tail small num" style="font-weight:600">${CLOUD.offline ? 'Desligado (só neste aparelho)' : 'Ligado (compartilhado)'}</span>
+          </div>
+          ${CLOUD.ultimoLogNuvem ? `<p class="small dim" style="margin-top:8px">Última entrada no log da nuvem: <b>${new Date(CLOUD.ultimoLogNuvem).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</b>.</p>` : ''}
+        </div>
+      </div>
+    </div>
+    <div class="set-pad">
+      <div class="settings-row" style="padding-top:0;border-bottom:0">
+        <div class="txt" style="width:100%">
           <h4>Registro de alterações</h4>
           <p>O sistema anota cada mudança feita na base — aluno incluído, mensalidade confirmada, presença marcada — com hora e nome de quem fez.${db.log && db.log.length ? ` <b>${db.log.length}</b> registro(s) guardado(s).` : ' Nada registrado ainda.'}</p>
           <div class="acts">
@@ -7496,6 +7528,28 @@ const ACTIONS = {
     if (!ok) return;
     db = demoData(); baseSnapshotMeta('demo', 'demonstração fictícia', db); save(); render(); toast('Demonstração carregada.', { icon: 'spark' });
   },
+  /* visitante: entra direto na base de demonstração, sem login */
+  'entrar-visitante': async () => {
+    const ok = await confirmDialog({ title: 'Entrar como visitante', message: 'A base de demonstração substituirá todos os dados deste navegador.\nVocê ainda não está conectado à nuvem.\nBaixe um backup antes se quiser conservar seus dados.', confirmText: 'Entrar como visitante' });
+    if (!ok) return;
+    db = demoData(); baseSnapshotMeta('demo', 'demonstração fictícia', db); save(); render();
+    view.baseModo = 'demo';
+    toast('Modo visitante: base de demonstração. Entre na nuvem para usar a base compartilhada.', { icon: 'spark' });
+    render();
+  },
+  /* liga/desliga o modo offline da nuvem */
+  'toggle-nuvem-offline': async el => {
+    const ligando = !CLOUD.offline;
+    CLOUD.offline = ligando;
+    savePrefs();
+    cloudPintar();
+    if (!ligando) {
+      toast('Nuvem desligada: este aparelho parou de enviar arquivos para o banco compartilhado.', { icon: 'shield', ms: 5000 });
+      return;
+    }
+    /* voltando para online: pergunta qual base vale como principal */
+    await escolherDBPrincipalAoVoltarOnline();
+  },
   'toggle-sec': id => {
     const card = document.querySelector(`.set-sec[data-sec="${id}"]`);
     if (!card) return;
@@ -7701,10 +7755,12 @@ const CLOUD = {
   key: CLOUD_PADRAO.key,
   user: null,       /* { id, email, nome, papel }         */
   ativo: false,
+  offline: false,   /* o usuário desligou a nuvem neste aparelho */
   erro: '',
   salvando: false,
   pendente: false,
   ultimo: 0,
+  ultimoLogNuvem: null, /* data/hora do último log gravado na nuvem */
   canal: null
 };
 /* Quem entra no dojo. A tela de login mostra só estes nomes — o e-mail de
@@ -7943,7 +7999,7 @@ function snapshotBoa() {
 let cloudPushTimer = null;
 let cloudTravaAvisada = false;
 function cloudPush() {
-  if (!CLOUD.ativo) return;
+  if (!CLOUD.ativo || CLOUD.offline) return;
   CLOUD.pendente = true;
   clearTimeout(cloudPushTimer);
   cloudPushTimer = setTimeout(cloudPushAgora, 900);   /* agrupa várias edições seguidas */
@@ -7966,7 +8022,7 @@ function cloudDocs() {
 }
 
 async function cloudPushAgora() {
-  if (!CLOUD.ativo || CLOUD.salvando) return;
+  if (!CLOUD.ativo || CLOUD.offline || CLOUD.salvando) return;
   /* trava de segurança: base vazia não sobrescreve a nuvem */
   if (baseDadosVazia()) {
     CLOUD.pendente = false;
@@ -8023,7 +8079,7 @@ function cloudPoll() {
     } catch (e) { /* sem rede: segue o fluxo normal */ }
   })();
   const sincronizar = async (forcar) => {
-    if (!CLOUD.ativo || CLOUD.salvando || CLOUD.pendente) return;
+    if (!CLOUD.ativo || CLOUD.offline || CLOUD.salvando || CLOUD.pendente) return;
     if (document.visibilityState === 'hidden' && !forcar) return;
     try {
       const antes = JSON.stringify(db);
@@ -8108,6 +8164,7 @@ function cloudLoginHTML() {
         <button class="btn btn--primary" style="width:100%;margin-top:10px" data-act="cloud-entrar">Entrar</button>
       </div>
       <button class="link small" style="display:block;margin:16px auto 0" data-act="cloud-modo-local">Continuar só neste aparelho</button>
+      <button class="btn btn--sm" style="width:100%;margin-top:8px" data-act="entrar-visitante">${icon('spark', 14)} Entrar como visitante</button>
       <p class="small dim" style="text-align:center;margin-top:16px;font-size:10.5px;line-height:1.5">
         Ninguém se cadastra sozinho: o acesso é criado pelo Steven.</p>
     </div>
@@ -8141,8 +8198,10 @@ function cloudPintar() {
   el.hidden = false;                 /* sempre visível: é o único aviso de nuvem no celular */
   const online = navigator.onLine !== false;
   let estado = 'ok', rotulo = '';
+  /* o usuário desligou a nuvem neste aparelho: ponto cinza, sem enviar nem receber */
+  if (CLOUD.offline) { estado = 'offline'; rotulo = 'Nuvem desligada por você: só este aparelho vê os dados. Ligue em Ajustes → Desenvolvedor para compartilhar.'; }
   /* sem banco configurado ou sem sessão: ponto cinza, não some */
-  if (!cloudConfigurado()) { estado = 'offline'; rotulo = 'Nuvem desligada: a base fica só neste aparelho. Ative em Ajustes → Nuvem.'; }
+  else if (!cloudConfigurado()) { estado = 'offline'; rotulo = 'Nuvem desligada: a base fica só neste aparelho. Ative em Ajustes → Nuvem.'; }
   else if (!CLOUD.ativo) { estado = 'offline'; rotulo = 'Sem sessão na nuvem: entre com o seu nome em Ajustes → Nuvem.'; }
   else if (!online) { estado = 'offline'; rotulo = 'Sem internet — a base fica só neste aparelho até a conexão voltar.'; }
   else if (CLOUD.erro) { estado = 'erro'; rotulo = 'Falha ao falar com o banco: ' + CLOUD.erro; }
@@ -8154,6 +8213,60 @@ function cloudPintar() {
   el.dataset.estado = estado;
   el.title = rotulo;
   el.setAttribute('aria-label', 'Nuvem: ' + rotulo);
+}
+
+/* ---- volta online após ter estado offline: pergunta qual base vale como principal ---- */
+async function buscarUltimoLogNuvem() {
+  if (!cloudConfigurado() || !CLOUD.ativo) return null;
+  try {
+    const linhas = await cloudFetch('/rest/v1/dojo_docs?select=doc_id,atualizado_em&doc_id=eq.log');
+    if (!Array.isArray(linhas) || !linhas.length) return null;
+    return linhas[0].atualizado_em || null;
+  } catch (e) { return null; }
+}
+
+/* modal de escolha: celular ou nuvem */
+async function escolherDBPrincipalAoVoltarOnline() {
+  const ultimo = await buscarUltimoLogNuvem();
+  const txtUltimo = ultimo
+    ? `Última entrada no log da nuvem: <b>${new Date(ultimo).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</b>.`
+    : 'Não foi possível ler a data do último registro na nuvem.';
+
+  const escolha = await confirmDialog({
+    title: 'Nuvem ligada novamente',
+    message: `O banco compartilhado está disponível de novo. Qual base deve ficar como principal?<br><br>${txtUltimo}<br><br>Escolher <b>celular</b> envia seus dados locais para a nuvem (sobrepõe o que estiver lá). Escolher <b>nuvem</b> baixa a base do banco e substitui a deste aparelho.`,
+    confirmText: 'Usar a nuvem',
+    cancelText: 'Usar este celular'
+  });
+
+  if (escolha) {
+    /* nuvem tem prioridade: baixa do banco sobrepondo o local */
+    CLOUD.recebendo = true; cloudPintar();
+    try {
+      await cloudPull();
+      render();
+      toast('Base da nuvem carregada sobre a deste aparelho.', { icon: 'download', ms: 5000 });
+    } catch (e) {
+      CLOUD.erro = e.message || 'falha ao baixar';
+      toast('Não foi possível baixar a base da nuvem: ' + CLOUD.erro, { icon: 'alert', ms: 6000 });
+    } finally {
+      CLOUD.recebendo = false; cloudPintar();
+    }
+  } else {
+    /* celular tem prioridade: envia o local para a nuvem sobrepondo o que estiver lá */
+    CLOUD.salvando = true; cloudPintar();
+    try {
+      /* força o envio mesmo que não esteja pendente */
+      await cloudPushAgora();
+      render();
+      toast('Seus dados locais foram enviados para a nuvem.', { icon: 'checkCircle', ms: 5000 });
+    } catch (e) {
+      CLOUD.erro = e.message || 'falha ao enviar';
+      toast('Não foi possível enviar para a nuvem: ' + CLOUD.erro, { icon: 'alert', ms: 6000 });
+    } finally {
+      CLOUD.salvando = false; cloudPintar();
+    }
+  }
 }
 
 /* o app inteiro chama isto depois de gravar/lers: mantém o indicador honesto */
