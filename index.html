@@ -21,7 +21,7 @@
 <meta name="application-name" content="Arandu">
 <style>
 /* ============================================================
-   ARANDU · v2.53 — design system
+   ARANDU · v2.54 — design system
    Papel & tinta: editorial, quente, tátil.
    ============================================================ */
 :root{
@@ -1101,6 +1101,7 @@ html[data-theme="dark"] .toast .act{color:var(--vermilion-ink)}
 .tp-half.bevel .body i{opacity:.9}
 .theme-opt b{font-size:12.5px}
 .theme-opt small{display:block;font-size:11px;color:var(--ink-3)}
+.t-icon{font-size:14px;opacity:.9}
 
 /* ---------- mobile dock ---------- */
 .dock{
@@ -2119,14 +2120,14 @@ function uid() { return Date.now().toString(36) + Math.random().toString(36).sli
 const PALETTES = [
   { id: 'sangue', name: 'Vermelho Sangue', from: '#b22222', fromL: '#d32f2f', inkL: '#8b1a1a', inkD: '#ff6b6b',
     note: 'intenso, marca de tatame', swatches: ['#b22222', '#d32f2f', '#ff6b6b'] },
+  { id: 'profundo', name: 'Azul Profundo', from: '#0d47a1', fromL: '#1565c0', inkL: '#0a3d91', inkD: '#64b5f6',
+    note: 'estável, da base', swatches: ['#0d47a1', '#1565c0', '#64b5f6'] },
   { id: 'veneno', name: 'Verde Veneno', from: '#006400', fromL: '#2e7d32', inkL: '#1b5e20', inkD: '#69f0ae',
     note: 'agudo, de competição', swatches: ['#006400', '#2e7d32', '#69f0ae'] },
-  { id: 'fantasma', name: 'Violeta Fantasma', from: '#4b0082', fromL: '#6a1b9a', inkL: '#4a148c', inkD: '#e1bee7',
-    note: 'misterioso, da noite', swatches: ['#4b0082', '#6a1b9a', '#e1bee7'] },
+  { id: 'fantasma', name: 'Violeta Fantasma', from: '#7b2cbf', fromL: '#9d4edd', inkL: '#5b21b6', inkD: '#afa8ff',
+    note: 'misterioso, da noite', swatches: ['#7b2cbf', '#9d4edd', '#afa8ff'] },
   { id: 'sombrio', name: 'Cinza Sombrio', from: '#37474f', fromL: '#546e7a', inkL: '#263238', inkD: '#cfd8dc',
-    note: 'sóbrio, cara de clube', swatches: ['#37474f', '#546e7a', '#cfd8dc'] },
-  { id: 'profundo', name: 'Azul Profundo', from: '#0d47a1', fromL: '#1565c0', inkL: '#0a3d91', inkD: '#64b5f6',
-    note: 'estável, da base', swatches: ['#0d47a1', '#1565c0', '#64b5f6'] }
+    note: 'sóbrio, cara de clube', swatches: ['#37474f', '#546e7a', '#cfd8dc'] }
 ];
 function currentPalette() { return PALETTES.find(p => p.id === prefs.palette) || PALETTES[0]; }
 function applyPalette() {
@@ -2144,7 +2145,7 @@ function hexA(hex, a) {
 }
 
 /* prefs de UI */
-const APP_VERSION = '2.53';
+const APP_VERSION = '2.54';
 /* assinatura do modelo de cobrança (fechamento novo + abertura com "outras pendências") */
 const WA_TPL_VER = 2;
 const WA_EMOJI_DEFAULT = '✅';
@@ -2264,6 +2265,7 @@ function freqCount(id, period) {
 function ensureMonthly(month) {
   let added = 0;
   activeStudents().forEach(s => {
+    if (s.bolsa) return; /* bolsista não recebe mensalidade */
     if (!db.payments.some(p => p.studentId === s.id && p.month === month)) {
       db.payments.push({ id: uid(), studentId: s.id, month, dueDate: dueFor(s, month), amount: Number(s.fee) || 0, status: 'Pendente', paidAt: '', method: '' });
       added++;
@@ -2994,7 +2996,7 @@ function menuBuild() {
       ${icon(n.icon, 16)}<span>${n.label}</span></a>`).join('') +
     `<div class="menu-sep"></div>
      <button type="button" role="menuitem" data-act="set-theme" data-id="${temaClaro() ? 'dark' : 'light'}">
-       ${icon(temaClaro() ? 'moon' : 'sun', 16)}
+       ${temaClaro() ? '🌙' : '☀️'}
        <span>${temaClaro() ? 'Tema escuro' : 'Tema claro'}</span></button>
      <a href="#ajustes" role="menuitem" data-act="nav" data-page="ajustes" ${atual === 'ajustes' ? 'aria-current="page"' : ''}>
        ${icon('settings', 16)}<span>Ajustes</span></a>`;
@@ -4172,6 +4174,7 @@ function filteredStudents() {
     if (f === 'Ativos') ok = s.status === 'Ativo';
     else if (f === 'Inativos') ok = s.status !== 'Ativo';
     else if (f === 'Adulto' || f === 'Kids') ok = groupOf(s) === f;
+    else if (f === 'Bolsistas') ok = s.bolsa === true;
     if (!ok) return false;
     if (!q) return true;
     return `${s.name} ${s.phone} ${s.belt} ${s.locality} ${s.guardian || ''} ${s.guardianPhone || ''}`.toLowerCase().includes(q);
@@ -4197,7 +4200,7 @@ function studentRowsHTML(mode) {
       ${arr.length ? `<div class="grid-3 student-cards">${arr.map(s => `<button class="card card--paper student-card" style="text-align:left;padding:16px;border-radius:18px" data-act="open-profile" data-id="${s.id}">
         <div class="card-top" style="display:flex;align-items:center;gap:11px;min-width:0">
           ${avatarHTML(s.name)}
-          <div style="min-width:0;flex:1"><div style="font-weight:650;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(s.name)}${s.role ? ` <span class="badge badge--role">${esc(s.role)}</span>` : ''}</div>
+          <div style="min-width:0;flex:1"><div style="font-weight:650;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(s.name)}${s.role ? ` <span class="badge badge--role">${esc(s.role)}</span>` : ''}${s.bolsa ? ` <span class="badge badge--seal">Bolsista</span>` : ''}</div>
           <div class="small dim">${esc(groupOf(s))}${s.age ? ' · ' + esc(s.age) + ' anos' : ''}</div></div>
           <div style="margin-left:auto;flex:none">${statusBadge(s.status)}</div>
         </div>
@@ -4233,7 +4236,7 @@ function studentRowsHTML(mode) {
       <td>${freqBars(s)}</td>
       <td class="num small">${freqCount(s.id, 'year')}</td>
       <td><div class="small">${esc(s.plan || 'Mensal')}</div><div class="meta dim num" style="font-size:11.5px">${money(s.fee)}</div></td>
-      <td>${statusBadge(s.status)}</td>
+      <td>${statusBadge(s.status)}${s.bolsa ? `<span class="badge badge--seal" style="display:block;margin-top:2px">Bolsista</span>` : ''}</td>
       <td><div class="td-actions">
         <button class="mini-btn" data-act="open-profile" data-id="${s.id}" title="Perfil">${icon('target', 15)}</button>
         <button class="mini-btn" data-act="edit-student" data-id="${s.id}" title="Editar">${icon('edit', 15)}</button>
@@ -4247,12 +4250,14 @@ function pageAlunos() {
   /* no celular a tabela larga força repaint caro: usa a visão em cartões */
   const mobileCards = window.matchMedia && window.matchMedia('(max-width:900px)').matches;
   const viewMode = mobileCards ? 'cards' : view.studentsView;
+  const bolsaCount = db.students.filter(s => s.bolsa).length;
   const counts = {
     Todos: total, Ativos: active, Inativos: total - active,
     Adulto: db.students.filter(s => groupOf(s) === 'Adulto').length,
-    Kids: db.students.filter(s => groupOf(s) === 'Kids').length
+    Kids: db.students.filter(s => groupOf(s) === 'Kids').length,
+    Bolsistas: bolsaCount
   };
-  const chips = ['Todos', 'Ativos', 'Inativos', 'Adulto', 'Kids'].map(f =>
+  const chips = ['Todos', 'Ativos', 'Inativos', 'Adulto', 'Kids', 'Bolsistas'].map(f =>
     `<button class="chip" data-act="filter-students" data-id="${f}" aria-pressed="${view.filter === f}">${f}<span class="count">${counts[f]}</span></button>`).join('');
   return `
   ${pageHead({
@@ -4688,6 +4693,7 @@ function cobrancaCardHTML(list) {
 
 function mensalidadesView() {
   const m = view.payMonth;
+  const bolsaCount = db.students.filter(s => s.bolsa).length;
   const list = paymentsOf(m).slice();
   const get = {
     student: p => studentById(p.studentId)?.name || '', due: p => p.dueDate || '',
@@ -4699,7 +4705,7 @@ function mensalidadesView() {
   const paidSum = sum(paid, p => p.amount), pendSum = sum(pending, p => p.amount);
   const ticket = list.length ? (paidSum + pendSum) / list.length : 0;
   const th = (k, l) => `<th ${key === k ? `aria-sort="${dir === 1 ? 'ascending' : 'descending'}"` : ''}><button data-act="sort-pay" data-id="${k}">${l}<span class="arrow">${key === k ? (dir === 1 ? '↑' : '↓') : '↕'}</span></button></th>`;
-  const missing = activeStudents().filter(x => !db.payments.some(p => p.studentId === x.id && p.month === m)).length;
+  const missing = activeStudents().filter(x => !x.bolsa && !db.payments.some(p => p.studentId === x.id && p.month === m)).length;
   const byDue = {};
   list.forEach(p => {
     const day = String(Number((p.dueDate || '').slice(8, 10)) || 0);
@@ -4732,6 +4738,11 @@ function mensalidadesView() {
       <div class="top"><span class="label">Ticket médio</span><span style="margin-left:auto;color:var(--ink-3)">${icon('target', 15)}</span></div>
       <div><div class="value num" data-count="${ticket}" data-money="1">R$ 0</div>
       <div class="foot"><span class="dot dot--indigo"></span>por aluno em ${monthBR(m)}</div></div>
+    </div>
+    <div class="card kpi kpi--seal">
+      <div class="top"><span class="label">Bolsistas</span><span style="margin-left:auto;color:var(--vermilion)">${icon('user', 15)}</span></div>
+      <div><div class="value num" style="color:var(--vermilion-ink)">${bolsaCount}</div>
+      <div class="foot"><span class="dot dot--seal"></span>${bolsaCount} aluno${bolsaCount !== 1 ? 's' : ''} isento${bolsaCount !== 1 ? 's' : ''} de mensalidade</div></div>
     </div>
   </div>
 
@@ -5270,6 +5281,7 @@ function relatoriosView() {
         <div class="row"><span class="small">Média por chamada</span><strong class="tail num">${avgPerCall}</strong></div>
         <div class="row"><span class="small">Visitas registradas</span><strong class="tail num">${db.visitors.filter(v => (v.date || '').startsWith(cur)).length}</strong></div>
         <div class="row"><span class="small">Alunos em atraso</span><strong class="tail num" style="color:var(--vermilion-ink)">${paymentsOf(cur).filter(isLatePayment).length}</strong></div>
+        <div class="row"><span class="small">Alunos bolsistas</span><strong class="tail num" style="color:var(--vermilion-ink)">${db.students.filter(s => s.bolsa).length}</strong></div>
       </div>
     </div>
   </div>`;
@@ -5300,6 +5312,7 @@ function pageAjustes() {
       <span class="rail" style="background:${rail}"></span>
       <div class="body"><i style="background:${card}"></i><i style="background:${card}"></i></div>
     </div>`;
+  const tIcon = v => v === 'dark' ? '🌙' : v === 'light' ? '☀️' : '📱';
   const themeOpt = (val, label, note, iconName) => `<button class="theme-opt" data-act="set-theme" data-id="${val}" aria-pressed="${prefs.theme === val}">
       <div class="theme-prev">
         ${val === 'auto'
@@ -5308,7 +5321,7 @@ function pageAjustes() {
             ? mock('#070810', '#16182c', '#232646')
             : mock('#f1f2fb', '#e7e9f6', '#ffffff')}
       </div>
-      <b style="display:flex;align-items:center;gap:5px">${icon(iconName, 13)} ${label}</b><small>${note}</small>
+      <b style="display:flex;align-items:center;gap:5px"><span class="t-icon">${tIcon(val)}</span> ${label}</b><small>${note}</small>
     </button>`;
 
   const sec = (id, title, sub, body, opts = {}) => `<div class="card set-sec${opts.open ? ' is-open' : ''}${opts.wide ? ' set-wide' : ''}" data-sec="${id}">
@@ -5335,7 +5348,7 @@ function pageAjustes() {
               <i></i><i></i><i></i>
             </span>
             <b>${p.name}</b><small>${p.note}</small>
-            ${(prefs.palette || 'violet') === p.id ? `<span class="pal-on">${icon('check', 11)}</span>` : ''}
+            ${(prefs.palette || 'violet') === p.id ? `<span class="pal-on">✓</span>` : ''}
           </button>`).join('')}
         </div>
       </div>
@@ -5616,6 +5629,7 @@ function studentForm(id, prefill = null, onSaved = null) {
     ${fieldHTML({ name: 'phone', label: 'Telefone / WhatsApp', type: 'tel', value: s?.phone || '', placeholder: '(88) 99999-9999' })}
     ${fieldAutocompleteHTML({ name: 'locality', label: 'Localidade', value: s?.locality || '', placeholder: 'Comece a digitar… Ex.: Tre', hint: 'Sugere as localidades de Icapuí — pode escrever outra.' })}
     ${fieldHTML({ name: 'plan', label: 'Plano', type: 'select', value: s?.plan || 'Mensal', options: PLANS })}
+    ${fieldHTML({ name: 'bolsa', label: 'Bolsista', type: 'select', value: s?.bolsa ? 'sim' : 'nao', options: ['nao', 'sim'] })}
     <div class="form-field full resp-block" id="respBlock" hidden>
       <div class="resp-head">
         <span class="resp-ico">${icon('users', 14)}</span>
@@ -5669,7 +5683,7 @@ function studentForm(id, prefill = null, onSaved = null) {
         locality: data.locality.trim(), guardian: (data.guardian || '').trim(),
         guardianPhone: (data.guardianPhone || '').trim(), plan: data.plan,
         fee: data.feeMode === 'outro' ? (Number(data.fee) || 0) : FEE_DEFAULT,
-        dueDay: Number(data.dueDay) || 10, joinDate: data.joinDate || TODAY_ISO
+        dueDay: Number(data.dueDay) || 10, joinDate: data.joinDate || TODAY_ISO, bolsa: data.bolsa === 'sim'
       };
       if (isEdit) {
         const target = studentById(id);
@@ -6821,7 +6835,7 @@ function profileHTML(s) {
         <h2 id="drawerTitle" class="serif" style="font-family:var(--serif);font-size:26px;font-weight:500;letter-spacing:-.02em;margin-top:2px">${esc(s.name)}</h2>
         <div style="display:flex;gap:6px;margin-top:7px;flex-wrap:wrap">
           ${statusBadge(s.status)}
-          ${s.role ? `<span class="badge badge--role">${esc(s.role)}</span>` : ''}
+          ${s.role ? `<span class="badge badge--role">${esc(s.role)}</span>` : ''}${s.bolsa ? ` <span class="badge badge--seal">Bolsista</span>` : ''}
           <span class="badge badge--outline">${esc(groupOf(s))}</span>
           ${s.plan ? `<span class="badge badge--outline">${esc(s.plan)} · ${money(s.fee)}</span>` : ''}
         </div>
