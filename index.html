@@ -21,7 +21,7 @@
 <meta name="application-name" content="Arandu">
 <style>
 /* ============================================================
-   ARANDU · v2.81 — design system
+   ARANDU · v2.85 — design system
    Papel & tinta: editorial, quente, tátil.
    ============================================================ */
 :root{
@@ -2094,8 +2094,8 @@ const monthBRCap = m => cap(monthBR(m));
    Backup importado em 24/11/2026 — é a base que abre no primeiro acesso
    e o "restaurar base inicial" em Ajustes.
    ============================================================ */
-const SEED_BACKUP_NAME = 'base-exemplo.json';
-const SEED_BACKUP_LABEL = 'Base de exemplo (sem dados)';
+const SEED_BACKUP_NAME = 'arandu-backup-2026-11-26-limpo.json';
+const SEED_BACKUP_LABEL = 'Base atualizada · 26/11/2026 (frequências reais desde 23/11)';
 const SEED_DATA = {"students":[{"id":"demo-a0","name":"Aluno Exemplo","age":30,"locality":"Centro","belt":"Branca","degrees":0,"plan":"Mensal","fee":70,"dueDay":10,"joinDate":"2026-01-10","status":"Ativo","classGroup":"Adulto","phone":"(00) 00000-0000","role":"","guardian":""},{"id":"demo-k0","name":"Criança Exemplo","age":9,"locality":"Centro","belt":"Branca","degrees":0,"plan":"Mensal","fee":70,"dueDay":10,"joinDate":"2026-02-01","status":"Ativo","classGroup":"Kids","phone":"(00) 00000-0000","guardian":"Responsável Exemplo","role":""}],"payments":[{"id":"demo-p1","studentId":"demo-a0","month":"2026-11","dueDate":"2026-11-10","amount":70,"status":"Pendente","paidAt":"","method":""},{"id":"demo-p2","studentId":"demo-k0","month":"2026-11","dueDate":"2026-11-10","amount":70,"status":"Pago","paidAt":"2026-11-08","method":"Pix"}],"expenses":[],"attendance":{},"attendanceOpen":{},"trainings":[],"visitors":[],"customPositions":[]}
 const seedData = () => JSON.parse(JSON.stringify(SEED_DATA));
 
@@ -2153,6 +2153,28 @@ function baseSnapshotMeta(source, name, data) {
   BASE.counts = { students: (data.students || []).length, payments: (data.payments || []).length, days: Object.keys(data.attendance || {}).length };
   try { localStorage.setItem(BASE_KEY, JSON.stringify({ origin: BASE.origin, file: BASE.file, label: BASE.label, importedAt: BASE.importedAt, counts: BASE.counts })); } catch (e) {}
 }
+const REAL_ATTENDANCE_FROM='2026-11-23';
+function cleanFrequencyTestResidue(data) {
+  const result={oldDates:0,demoIds:0,oldLogs:0};
+  if(!data||typeof data!=='object') return result;
+  data.attendance=data.attendance&&typeof data.attendance==='object'?data.attendance:{};
+  data.attendanceOpen=data.attendanceOpen&&typeof data.attendanceOpen==='object'?data.attendanceOpen:{};
+  for(const date of Object.keys(data.attendance)) if(date<REAL_ATTENDANCE_FROM){delete data.attendance[date];result.oldDates++;}
+  for(const date of Object.keys(data.attendanceOpen)) if(date<REAL_ATTENDANCE_FROM){
+    const prior=data.attendanceOpen[date]||{};data.attendanceOpen[date]={Adulto:false,Kids:false};
+    if(prior.Adulto||prior.Kids) result.oldDates++;
+  }
+  const dateRe=/(\d{2})\/(\d{2})\/(\d{2,4})/;
+  data.log=(Array.isArray(data.log)?data.log:[]).filter(row=>{
+    const m=row&&row.t==='presenca'&&dateRe.exec(String(row.txt||''));
+    if(!m) return true;
+    const yr=m[3].length===2?'20'+m[3]:m[3];
+    const day=`${yr}-${m[2]}-${m[1]}`;
+    if(day<REAL_ATTENDANCE_FROM){result.oldLogs++;return false;}return true;
+  });
+  return result;
+}
+
 function load() {
   let data = null;
   try { data = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { data = null; }
@@ -2176,6 +2198,17 @@ function load() {
   /* log: usa o que já estava salvo e tira a foto inicial da base */
   try { const lg = JSON.parse(localStorage.getItem(LOG_KEY) || 'null'); if (Array.isArray(lg) && (!db.log || !db.log.length)) db.log = lg; } catch (e) {}
   logPreparar();
+}
+function migrateFrequencyTestResidue() {
+  if(SEED_BACKUP_NAME==='base-exemplo.json') return;
+  const key='arandu-frequency-clean-v1';
+  try { if(localStorage.getItem(key)==='1') return; } catch(e) {}
+  const stats=cleanFrequencyTestResidue(db);
+  if(stats.oldDates||stats.oldLogs){
+    registrarLog(`Limpou resíduos de teste da frequência: ${stats.oldDates} chamadas antigas fechadas/removidas e ${stats.oldLogs} eventos antigos removidos; frequências desde 23/11 preservadas.`,'backup');
+    save({log:false,local:true});
+  }
+  try { localStorage.setItem(key,'1'); } catch(e) {}
 }
 function save(opts = {}) {
   /* antes de gravar: narra no log tudo o que mudou desde a última gravação */
@@ -2336,13 +2369,13 @@ function hexA(hex, a) {
 }
 
 /* prefs de UI */
-const APP_VERSION = '2.81';
+const APP_VERSION = '2.85';
 /* assinatura do modelo de cobrança (fechamento novo + abertura com "outras pendências") */
 const WA_TPL_VER = 2;
 const WA_EMOJI_DEFAULT = '✅';
-let prefs = { theme: 'dark', view: 'table', beltCompact: true, pv: 3, palette: 'dojo', accent: null, accent2: null, bg: null, invertHighlights: false,
+let prefs = { theme: 'dark', view: 'table', beltCompact: true, pv: 3, palette: 'dojo', accent: null, accent2: null, bg: null, invertHighlights: false, capAdulto: null, capKids: null, promotionDegrees: 4,
   waNumber: '', waTime: '09:00', waTemplate: '', waLate: true, waPix: 'dojoarandu@gmail.com', waTplVer: WA_TPL_VER, waEmoji: WA_EMOJI_DEFAULT,
-  hideTopbar: false };
+  hideTopbar: true };
 function savePrefs() { try { localStorage.setItem(COL_KEY, JSON.stringify(prefs)); } catch (e) {} }
 (() => {
   let stored = null;
@@ -2409,6 +2442,12 @@ const sum = (arr, f) => arr.reduce((a, x) => a + Number(f(x) || 0), 0);
 
 /* ----- derivados ----- */
 const activeStudents = () => db.students.filter(s => s.status === 'Ativo');
+function activeOnDate(s, date) {
+  if (!s || (s.joinDate && s.joinDate > date)) return false;
+  const events = Array.isArray(s.statusEvents) ? s.statusEvents.filter(e => /^\d{4}-\d{2}-\d{2}$/.test(e.date || '') && e.date <= date).sort((a,b)=>a.date.localeCompare(b.date)) : [];
+  if (events.length) return events[events.length - 1].status === 'Ativo';
+  return s.status === 'Ativo' || date < TODAY_ISO; /* estados antigos sem trilha: estimativa */
+}
 const groupOf = s => s.classGroup || 'Adulto';
 const groupTone = g => g === 'Kids' ? 'group-tone--kids' : 'group-tone--adult';
 const groupBadge = g => `<span class="badge badge--outline ${groupTone(g)}">${esc(g)}</span>`;
@@ -3893,7 +3932,7 @@ function showWaFallback(s, p, url, num, opts = {}) {
   const quemM = alvoM.ehResponsavel ? `${alvoM.nome} (responsável por ${alvoM.alunoPrimeiro})` : alvoM.alunoPrimeiro;
   const telBonito = num.replace(/^55/, '').replace(/^(\d{2})(\d{4,5})(\d{4})$/, '($1) $2-$3');
   const m = openModal({
-    title: 'Enviar mensagem?', eyebrow: s.name + ' · ' + money(p.amount), submitText: '', onSubmit: () => true,
+    title: 'Enviar mensagem?', eyebrow: studentDisplayName(s) + ' · ' + money(p.amount), submitText: '', onSubmit: () => true,
     body: `<p class="small dim" style="margin-bottom:10px">${opts.confirmar
         ? `Esta é a mensagem que vai para <b>${esc(quemM)}</b> em ${esc(telBonito)}.`
         : 'O navegador bloqueou a janela automática. Toque no botão abaixo para abrir a conversa — a mensagem já vai escrita.'}</p>
@@ -3901,7 +3940,7 @@ function showWaFallback(s, p, url, num, opts = {}) {
       ${opts.confirmar ? `<pre class="wa-preview" style="max-height:220px;overflow:auto;margin-bottom:12px">${esc(texto)}</pre>` : ''}
       <div class="lock-wrap" style="display:block">
         <a class="btn btn--primary" style="width:100%;justify-content:center;text-decoration:none" href="${url}" target="_blank" rel="noopener" data-wa-abrir>
-          ${icon('whatsapp', 15)} Abrir conversa de ${esc(alvoM.ehResponsavel ? alvoM.nome.split(' ')[0] : s.name.split(' ')[0])}
+          ${icon('whatsapp', 15)} Abrir conversa de ${esc(alvoM.ehResponsavel ? alvoM.nome.split(' ')[0] : studentDisplayName(s))}
         </a>
       </div>
       <div class="field-note" style="margin-top:10px">Número: <b>${esc(telBonito)}</b>${alvoM.ehResponsavel ? ' · do responsável' : ''}</div>`
@@ -3937,9 +3976,9 @@ function waCardHTML() {
       ${[...due, ...late].slice(0, 4).map(({ p, s, kind }) => {
         const done = waDoneToday(p.id);
         return `<div class="row">
-          ${avatarHTML(s.name)}
+          ${avatarHTML(studentDisplayName(s))}
           <div style="min-width:0">
-            <div class="title">${esc(s.name)} ${done ? '<span class="badge badge--ok" style="margin-left:4px">avisado</span>' : ''}</div>
+            <div class="title">${esc(studentDisplayName(s))} ${done ? '<span class="badge badge--ok" style="margin-left:4px">avisado</span>' : ''}</div>
             <div class="meta">${kind === 'hoje' ? `vence <b>hoje</b>` : `vence ${dateShort(p.dueDate)}`} · ${money(p.amount)} · ${waDestino(s).ehResponsavel
               ? `${icon('users', 10)} ${esc(waDestino(s).nome.split(' ')[0])} <span class="dim">(resp.)</span>`
               : esc(waDestino(s).phone || 'sem telefone')}</div>
@@ -3962,9 +4001,9 @@ function waCenter() {
   const row = ({ p, s, kind }) => {
     const done = waDoneToday(p.id);
     return `<div class="wa-row">
-      ${avatarHTML(s.name)}
+      ${avatarHTML(studentDisplayName(s))}
       <div style="min-width:0;flex:1">
-        <div style="font-weight:650;font-size:13px">${esc(s.name)}</div>
+        <div style="font-weight:650;font-size:13px">${esc(studentDisplayName(s))}</div>
         <div class="small dim">${kind === 'hoje' ? 'vence hoje' : 'vencida em ' + dateBR(p.dueDate)} · ${money(p.amount)} · ${waDestino(s).ehResponsavel
           ? `para ${esc(waDestino(s).nome)} <span class="dim">(resp. de ${esc(waDestino(s).alunoPrimeiro)})</span>`
           : esc(waDestino(s).phone || 'sem telefone')}</div>
@@ -4114,6 +4153,22 @@ function gruposHojeTexto(n, durante, curto = false) {
   return n ? 'O tatame está <em>aberto</em>.' : durante ? 'O tatame está <em>vivo</em>.' : 'O tatame <em>descansa</em>.';
 }
 
+function nextScheduledClass() {
+  const now=new Date(), todayMinutes=now.getHours()*60+now.getMinutes();
+  const toMinutes=t=>{const [h,m]=t.split(':').map(Number);return h*60+m;};
+  for(let offset=0;offset<=7;offset++){
+    const date=new Date(TODAY);date.setDate(date.getDate()+offset);
+    const options=Object.keys(GROUPS).filter(g=>GROUPS[g].days.includes(date.getDay()) &&
+      (offset>0 || todayMinutes<toMinutes(GROUPS[g].start))).sort((a,b)=>toMinutes(GROUPS[a].start)-toMinutes(GROUPS[b].start));
+    if(options.length) return {date,group:options[0],start:GROUPS[options[0]].start};
+  }
+  return {date:TODAY,group:'Adulto',start:GROUPS.Adulto.start};
+}
+function nextScheduledClassText(next) {
+  const day=next.date.getTime()===TODAY.getTime()?'hoje':WEEKDAYS_LONG[next.date.getDay()];
+  return `Próximo treino: ${next.group}, ${day} às ${next.start}.`;
+}
+
 function pageHoje() {
   const active = activeStudents();
   const todayIds = attendanceOf(TODAY_ISO);
@@ -4138,13 +4193,9 @@ function pageHoje() {
   /* agenda */
   const wd = TODAY.getDay();
   const faseAdulto = sessionPhase(TODAY, 'Adulto');
-  const nextDay = (() => {
-    /* primeira tentativa: o treino de HOJE, se ele ainda não terminou.
-       Antes o cálculo começava amanhã e anunciava quinta num dia de quarta. */
-    if (faseAdulto.fase === 'antes' || faseAdulto.fase === 'durante') return TODAY;
-    for (let i = 1; i <= 7; i++) { const d = new Date(TODAY); d.setDate(d.getDate() + i); if (GROUPS.Adulto.days.includes(d.getDay())) return d; }
-    return TODAY;
-  })();
+  const nextSession = nextScheduledClass();
+  const nextDay = nextSession.date;
+  const nextText = nextScheduledClassText(nextSession);
   const encerrado = faseAdulto.fase === 'encerrado';
   const durante = faseAdulto.fase === 'durante';
   const agenda = Object.keys(GROUPS).map(g => {
@@ -4184,9 +4235,9 @@ function pageHoje() {
   ${pageHead({
     crumb: todayLong(),
     title: `<h1 class="page-title">${homeOssGreeting().replace(/^(Oss, )(.+?)([.!])$/, '$1<em>$2</em>$3')}</h1>`,
-    sub: active.length
-      ? `<b style="color:var(--ink)">${present}</b> de ${active.length} alunos já passaram pelo tatame hoje${visitorsToday.length ? ` e ${visitorsToday.length} visita${visitorsToday.length > 1 ? 's' : ''} apareceu${visitorsToday.length > 1 ? 'ram' : ''}` : ''}.`
-      : 'Cadastre o primeiro aluno para começar a acompanhar o dojo.',
+    sub: (() => { const last=lastTrainingSummary(); return last
+      ? `<b style="color:var(--ink)">Último treino:</b> ${last.present} presença${last.present===1?'':'s'} · ${dateBR(last.date)} · ${last.groups.map(esc).join(' + ')}`
+      : 'Ainda não há chamada registrada para mostrar o último treino.'; })(),
     actions: `<button class="btn" data-act="nav" data-page="frequencia">${icon('check', 15)} Chamada</button>
       <button class="btn btn--ghost btn--neon-a1" data-act="new-student">${icon('userPlus', 15)} Nova matrícula</button>`
   })}
@@ -4223,12 +4274,12 @@ function pageHoje() {
             ? 'Treino <em>encerrado</em>.'
             : gruposHojeTexto(groupsToday.length, durante)}</h2>
           <p style="margin-top:10px">${encerrado
-            ? `O treino adulto de hoje foi das ${GROUPS.Adulto.start} às ${GROUPS.Adulto.end}. ${todayIds.length ? `Ficaram <b>${present} presenças</b> registradas no tatame.` : 'Ninguém foi marcado na chamada — se o treino aconteceu, registre agora.'} Próximo treino: ${nextDay.getTime() === TODAY.getTime() ? 'hoje' : WEEKDAYS_LONG[nextDay.getDay()]}, ${GROUPS.Adulto.start}.`
+            ? `O treino adulto de hoje foi das ${GROUPS.Adulto.start} às ${GROUPS.Adulto.end}. ${todayIds.length ? `Ficaram <b>${present} presenças</b> registradas no tatame.` : 'Ninguém foi marcado na chamada — se o treino aconteceu, registre agora.'} ${nextText}`
             : groupsToday.length
               ? `${groupsToday.length} turma${groupsToday.length > 1 ? 's' : ''} confirmada${groupsToday.length > 1 ? 's' : ''} hoje. Registre as presenças enquanto a memória do treino está fresca.`
               : (durante
                   ? `O treino adulto está rolando agora — ${GROUPS.Adulto.start} às ${GROUPS.Adulto.end}. Abra a chamada e marque quem está no tatame.`
-                  : `Nenhuma turma confirmada hoje. Próximo treino adulto: ${nextDay.getTime() === TODAY.getTime() ? 'hoje' : WEEKDAYS_LONG[nextDay.getDay()]}, ${GROUPS.Adulto.start}.`)}</p>
+                  : nextText)}</p>
           <div class="hero-actions">
             <button class="btn btn--ghost btn--neon-a2" data-act="go-att">${icon('check', 15)} ${groupsToday.length ? 'Abrir chamada' : 'Confirmar treino'}</button>
             <button class="btn btn--ghost" data-act="new-training">${icon('layers', 15)} Planejar treino</button>
@@ -4239,8 +4290,8 @@ function pageHoje() {
           <div class="hs"><b class="num">${groupsToday.length}<span style="font-size:13px;color:var(--ink-3)">/2</span></b><span>turmas confirmadas</span></div>
           <div class="hs"><b class="num" style="color:${pending.length ? 'var(--vermilion-ink)' : 'var(--moss)'}">${pending.length}</b><span>mensalidade${pending.length === 1 ? '' : 's'} em aberto</span></div>
           <div class="hs"><b class="num">${visitorsToday.length}</b><span>visita${visitorsToday.length === 1 ? '' : 's'} hoje</span></div>
-          <div class="hs hs--wide"><span>${encerrado ? 'Próximo treino adulto' : 'Treino adulto hoje'}</span><b class="num">${encerrado
-            ? `${WEEKDAYS[nextDay.getDay()]} ${pad(nextDay.getDate())}/${pad(nextDay.getMonth() + 1)} · ${GROUPS.Adulto.start}`
+          <div class="hs hs--wide"><span>${encerrado ? `Próximo treino ${nextSession.group}` : `Treino ${GROUPS.Adulto.label} hoje`}</span><b class="num">${encerrado
+            ? `${WEEKDAYS[nextDay.getDay()]} ${pad(nextDay.getDate())}/${pad(nextDay.getMonth() + 1)} · ${nextSession.start}`
             : `${GROUPS.Adulto.start}<span class="time-sep">–</span>${GROUPS.Adulto.end}`}</b></div>
         </div>
         </div>
@@ -4336,8 +4387,8 @@ function pageHoje() {
         const s = studentById(p.studentId);
         const late = isLatePayment(p);
         return `<div class="row">
-          ${avatarHTML(s?.name || '?')}
-          <div style="min-width:0"><div class="title">${esc(s?.name || 'Aluno removido')}</div>
+          ${avatarHTML(s?studentDisplayName(s):'?')}
+          <div style="min-width:0"><div class="title">${esc(s?studentDisplayName(s):'Aluno removido')}</div>
             <div class="meta">vence ${dateShort(p.dueDate)} ${late ? '<span class="badge badge--late" style="margin-left:4px">atrasada</span>' : ''}</div></div>
           <div class="tail" style="align-items:center;gap:6px">
             <div class="num money-warn" style="font-size:13px;margin-right:2px">${money(p.amount)}</div>
@@ -4369,7 +4420,7 @@ function pageHoje() {
       ${db.visitors.length ? `<div class="rows">${db.visitors.slice().sort((a, b) => (b.date || '').localeCompare(a.date || '')).slice(0, 4).map(v => `<div class="row" style="padding:9px 0">
         <i class="dot dot--gold"></i>
         <div style="min-width:0"><div class="title" style="font-size:12.8px">${esc(v.name)}</div><div class="meta">${dateShort(v.date)} · ${esc(v.belt || 'Sem experiência')}</div></div>
-        <button class="mini-btn" data-act="convert-visitor" data-id="${v.id}" title="Transformar em aluno">${icon('userPlus', 15)}</button>
+        ${v.convertedStudentId ? `<span class="badge badge--ok">Matriculado</span>` : `<button class="mini-btn" data-act="convert-visitor" data-id="${v.id}" title="Transformar em aluno">${icon('userPlus', 15)}</button>`}
       </div>`).join('')}</div>` : `<div class="empty"><span class="ico">${icon('users', 18)}</span><b>Sem visitas registradas</b></div>`}
     </div>
     <div class="card col-12">
@@ -4412,11 +4463,11 @@ function filteredStudents() {
     else if (f === 'Bolsistas') ok = s.bolsa === true;
     if (!ok) return false;
     if (!q) return true;
-    return `${s.name} ${s.phone} ${s.belt} ${s.locality} ${s.guardian || ''} ${s.guardianPhone || ''}`.toLowerCase().includes(q);
+    return `${s.name} ${studentDisplayName(s)} ${s.phone} ${s.belt} ${s.locality} ${s.guardian || ''} ${s.guardianPhone || ''}`.toLowerCase().includes(q);
   });
 }
 const SORT_GET = {
-  name: s => s.name || '', belt: s => beltRank(s.belt), classGroup: s => groupOf(s), locality: s => s.locality || '',
+  name: s => studentDisplayName(s), belt: s => beltRank(s.belt), classGroup: s => groupOf(s), locality: s => s.locality || '',
   freqWeek: s => freqCount(s.id, 'week'), freqMonth: s => freqCount(s.id, 'month'), freqYear: s => freqCount(s.id, 'year'),
   fee: s => Number(s.fee) || 0, status: s => s.status || '', age: s => Number(s.age) || 0
 };
@@ -4434,8 +4485,8 @@ function studentRowsHTML(mode) {
     return `<div style="padding:14px">
       ${arr.length ? `<div class="grid-3 student-cards">${arr.map(s => `<button class="card card--paper student-card" style="text-align:left;padding:16px;border-radius:18px" data-act="open-profile" data-id="${s.id}">
         <div class="card-top" style="display:flex;align-items:center;gap:11px;min-width:0">
-          ${avatarHTML(s.name)}
-          <div style="min-width:0;flex:1"><div style="font-weight:650;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(s.name)}${s.role ? ` <span class="badge badge--role">${esc(s.role)}</span>` : ''}${s.bolsa ? ` <span class="badge badge--seal">Bolsista</span>` : ''}</div>
+          ${avatarHTML(studentDisplayName(s))}
+          <div style="min-width:0;flex:1"><div style="font-weight:650;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(studentDisplayName(s))}${s.role ? ` <span class="badge badge--role">${esc(s.role)}</span>` : ''}${s.bolsa ? ` <span class="badge badge--seal">Bolsista</span>` : ''}</div>
           <div class="small dim ${groupTone(groupOf(s))}">${esc(groupOf(s))}${s.age ? ' · ' + esc(s.age) + ' anos' : ''}</div></div>
           <div style="margin-left:auto;flex:none">${statusBadge(s.status)}</div>
         </div>
@@ -4462,8 +4513,8 @@ function studentRowsHTML(mode) {
     </tr></thead>
     <tbody>${arr.length ? arr.map(s => `<tr>
       <td><div class="identity">
-        <button class="avatar avatar--btn" data-act="open-profile" data-id="${s.id}" aria-label="Ver perfil de ${esc(s.name)}">${esc((s.name || '?').charAt(0).toUpperCase())}</button>
-        <div style="min-width:0"><b>${esc(s.name)}</b><div class="meta">${s.age ? esc(s.age) + ' anos' : '—'}${s.phone ? ' · ' + esc(s.phone) : ''}</div></div>
+        <button class="avatar avatar--btn" data-act="open-profile" data-id="${s.id}" aria-label="Ver perfil de ${esc(studentDisplayName(s))}">${esc((studentDisplayName(s) || '?').charAt(0).toUpperCase())}</button>
+        <div style="min-width:0"><b>${esc(studentDisplayName(s))}</b><div class="meta">${s.age ? esc(s.age) + ' anos' : '—'}${s.phone ? ' · ' + esc(s.phone) : ''}</div></div>
       </div></td>
       <td>${beltHTML(s)}</td>
       <td>${groupBadge(groupOf(s))}</td>
@@ -4494,17 +4545,17 @@ function studentAnalyticsHTML(m = MONTH) {
     yFormat: v => view.monthMetric === 'percent' ? Math.round(v) + '%' : Math.round(v),
     xLabelEvery: 2, height: 220, highlight: m === MONTH ? TODAY.getDate() - 1 : -1
   });
-  const mediaAluno = freq.porGrupo.length ? (freq.porGrupo.reduce((a,g)=>a+g.perAluno,0)/freq.porGrupo.length).toFixed(1).replace('.', ',') : '0,0';
+  const mediaAluno = freq.taxaPresenca.toFixed(1).replace('.', ',');
   const maxBelt = Math.max(1, ...belts.dist.map(b=>b.n));
   const maxRank = Math.max(1, ...people.ranking.map(r=>r.n));
-  const lowPresence = freq.risco.filter(x=>x.n<=2).slice(0,5);
+  const lowPresence = freq.risco.filter(x=>x.eligible>=4&&x.rate<50).slice(0,5);
   return `<section class="student-analytics" aria-label="Indicadores dos alunos">
     <div class="card-head" style="margin:22px 0 12px"><div><h2 style="font:700 16px var(--cond);letter-spacing:.08em;text-transform:uppercase">Indicadores dos alunos</h2><div class="sub">${monthBR(m)} · frequência, equipe e graduação</div></div></div>
     <div class="rd-kpis">
       ${rdKpi('Alunos ativos',activeStudents().length,`${db.students.length-activeStudents().length} inativos`,'moss','users')}
       ${rdKpi('Novas matrículas',coh.novos,'neste mês','indigo','userPlus')}
       ${rdKpi('Retenção',coh.retencao.toFixed(1).replace('.',',')+'%',`${coh.churn} saída${coh.churn===1?'':'s'} no mês`,'gold','chart')}
-      ${rdKpi('Assiduidade',mediaAluno+'×',`${freq.dias} dias com chamada`,'seal','checkCircle')}
+      ${rdKpi('Taxa de presença',mediaAluno+'%',`${freq.presencas} presenças · ${freq.sessoesRealizadas} sessões realizadas`,'seal','checkCircle')}
     </div>
     <div class="bento student-analytics-grid">
       <div class="card col-12">
@@ -4520,15 +4571,15 @@ function studentAnalyticsHTML(m = MONTH) {
       <div class="card col-6">
         <div class="card-head"><div><h3>Faixas e graduação</h3><div class="sub">${belts.total} ativos · média ${belts.mediaGraus.toFixed(1).replace('.',',')} graus</div></div></div>
         <div class="rd-belts">${belts.dist.map(b=>`<div class="rd-belt"><i style="background:${b.color}"></i><span>${esc(b.name)}</span><span class="rd-belt-track"><b style="width:${Math.round(b.n/maxBelt*100)}%"></b></span><b class="num">${b.n}</b></div>`).join('')||'<div class="empty"><b>Sem faixas registradas</b></div>'}</div>
-        ${belts.aptos.length?`<div class="rd-alert">${icon('award',14)} ${belts.aptos.length} com 4 graus: ${belts.aptos.slice(0,4).map(x=>`<button class="lnk" data-act="open-profile" data-id="${x.s.id}">${esc(x.s.name.split(' ')[0])}</button>`).join(', ')}</div>`:''}
+        ${belts.aptos.length?`<div class="rd-alert">${icon('award',14)} ${belts.aptos.length} para revisar (limite configurado): ${belts.aptos.slice(0,4).map(x=>`<button class="lnk" data-act="open-profile" data-id="${x.s.id}">${esc(studentDisplayName(x.s))}</button>`).join(', ')}</div>`:''}
       </div>
       <div class="card col-6">
         <div class="card-head"><div><h3>Resumo da equipe</h3><div class="sub">Mais presenças no mês</div></div></div>
-        <div class="rd-rank">${people.ranking.map((r,i)=>`<button class="rd-rank-row" data-act="open-profile" data-id="${r.s.id}"><span class="rd-rank-n">${pad(i+1)}</span><span class="rd-rank-name">${esc(r.s.name)}</span><span class="rd-rank-track"><i style="width:${Math.round(r.n/maxRank*100)}%"></i></span><b class="num">${r.n}</b></button>`).join('')||'<div class="empty"><b>Sem presenças no mês</b></div>'}</div>
+        <div class="rd-rank">${people.ranking.map((r,i)=>`<button class="rd-rank-row" data-act="open-profile" data-id="${r.s.id}"><span class="rd-rank-n">${pad(i+1)}</span><span class="rd-rank-name">${esc(studentDisplayName(r.s))}</span><span class="rd-rank-track"><i style="width:${Math.round(r.n/maxRank*100)}%"></i></span><b class="num">${r.n}</b></button>`).join('')||'<div class="empty"><b>Sem presenças no mês</b></div>'}</div>
       </div>
       <div class="card col-6">
-        <div class="card-head"><div><h3>Atenção à frequência</h3><div class="sub">Alunos ativos com até 2 presenças no mês</div></div></div>
-        <div class="rd-rank">${lowPresence.map(x=>`<button class="rd-rank-row" data-act="open-profile" data-id="${x.s.id}"><span class="rd-rank-name">${esc(x.s.name)}</span><span class="rd-rank-track"><i style="width:${Math.min(100,x.n*25)}%"></i></span><b class="num">${x.n}</b></button>`).join('')||'<div class="empty"><b>Sem alunos com frequência baixa</b></div>'}</div>
+        <div class="card-head"><div><h3>Atenção à frequência</h3><div class="sub">Alunos com presença abaixo de 50% em 4+ sessões abertas</div></div></div>
+        <div class="rd-rank">${lowPresence.map(x=>`<button class="rd-rank-row" data-act="open-profile" data-id="${x.s.id}"><span class="rd-rank-name">${esc(studentDisplayName(x.s))}</span><span class="rd-rank-track"><i style="width:${Math.min(100,x.rate)}%"></i></span><b class="num">${x.n}/${x.eligible}</b></button>`).join('')||'<div class="empty"><b>Sem alunos com frequência baixa</b></div>'}</div>
       </div>
     </div>
   </section>`;
@@ -4631,7 +4682,7 @@ function sessionCardHTML(g, dateStr) {
             </div>`
           : `<div class="roster">${roster.map(s => `<button class="check" role="checkbox" aria-checked="${marked.includes(s.id)}" data-on="${marked.includes(s.id)}" data-act="toggle-att" data-id="${s.id}">
               <span class="box">${icon('check', 11)}</span>
-              <span class="who"><b>${esc(s.name)}</b><small>${esc(beltText(s))}${degreeOf(s) ? ' graus' : ''}</small></span>
+              <span class="who"><b>${esc(studentDisplayName(s))}</b><small>${esc(beltText(s))}${degreeOf(s) ? ' graus' : ''}</small></span>
             </button>`).join('')}</div>`}
     </div>
   </div>`;
@@ -4652,7 +4703,7 @@ function visitorsBlockHTML(dateStr) {
         <small>${[v.belt || 'Sem experiência', v.phone, v.locality, v.invitedBy, v.notes].filter(Boolean).map(esc).join(' · ')}</small>
       </div>
       <div class="td-actions" style="opacity:1">
-        <button class="mini-btn" data-act="convert-visitor" data-id="${v.id}" title="Transformar em aluno">${icon('userPlus', 15)}</button>
+        ${v.convertedStudentId ? `<span class="badge badge--ok">Matriculado</span>` : `<button class="mini-btn" data-act="convert-visitor" data-id="${v.id}" title="Transformar em aluno">${icon('userPlus', 15)}</button>`}
         <button class="mini-btn mini-btn--danger" data-act="del-visitor" data-id="${v.id}" title="Remover">${icon('trash', 15)}</button>
       </div>
     </div>`).join('')}</div>` : `<div class="empty" style="padding:22px"><span class="ico">${icon('users', 18)}</span><b>Nenhuma visita neste dia</b><small>Registre quem chega de fora para não perder o contato.</small></div>`}
@@ -4961,9 +5012,9 @@ function cobrancaCardHTML(list) {
       const st = studentById(p.studentId);
       const days = Math.max(0, Math.round((parseD(TODAY_ISO) - parseD(p.dueDate || TODAY_ISO)) / 864e5));
       return `<div class="row">
-        ${avatarHTML(st?.name || '?')}
+        ${avatarHTML(st?studentDisplayName(st):'?')}
         <div style="min-width:0">
-          <div class="title">${esc(st?.name || 'Aluno removido')}</div>
+          <div class="title">${esc(st?studentDisplayName(st):'Aluno removido')}</div>
           <div class="meta">${days > 0 ? `${days} dia${days > 1 ? 's' : ''} em atraso` : `vence ${dateShort(p.dueDate)}`}</div>
         </div>
         <div class="tail" style="display:flex;align-items:center;gap:8px">
@@ -5068,7 +5119,7 @@ function mensalidadesView() {
         const late = isLatePayment(p);
         return `<tr>
           <td class="c-aluno"><button type="button" class="identity identity--link" data-act="fin-history" data-id="${p.studentId}" title="Ver histórico financeiro">
-            ${avatarHTML(st?.name || '?')}<div style="text-align:left"><b>${esc(st?.name || 'Aluno removido')}</b>
+            ${avatarHTML(st?studentDisplayName(st):'?')}<div style="text-align:left"><b>${esc(st?studentDisplayName(st):'Aluno removido')}</b>
             <div class="meta">${esc(st?.plan || 'Mensal')} · ${esc(st?.locality || '—')}</div></div></button></td>
           <td class="small num" data-lbl="Vencimento">${p.dueDate ? dateBR(p.dueDate) : '—'}</td>
           <td class="amount num ${p.status === 'Pago' ? 'money-pos' : 'money-warn'}" data-lbl="Valor">${money(p.amount)}</td>
@@ -5174,25 +5225,17 @@ function rdHash(str) { let h = 0; for (let i = 0; i < str.length; i++) h = (h * 
 
 /* retenção: aluno com presença entrou antes do mês e ainda está ativo */
 function rdCohort(m) {
-  const ativos = activeStudents();
-  const base = ativos.filter(s => (s.joinDate || '2000-01').slice(0, 7) <= m);
-  const novos = db.students.filter(s => (s.joinDate || '').startsWith(m));
-  /* saída: aluno inativo cujo último registro (aula ou mensalidade) cai no mês */
-  const lastSeen = s => {
-    const aulas = studentDates(s.id).slice(-1)[0] || '';
-    const pays = db.payments.filter(p => p.studentId === s.id).map(p => p.month).sort().slice(-1)[0] || '';
-    return (aulas.slice(0, 7) > pays ? aulas.slice(0, 7) : pays);
-  };
-  const inativos = db.students.filter(s => s.status !== 'Ativo');
-  const churn = inativos.filter(s => lastSeen(s) === m);
-  const churnEstimado = inativos.filter(s => !lastSeen(s));
+  const start = `${m}-01`, end = `${m}-${pad(daysInMonth(m))}`;
+  const cohort = db.students.filter(s => activeOnDate(s, start));
+  const retained = cohort.filter(s => activeOnDate(s, end)).length;
+  const novos = db.students.filter(s => (s.joinDate || '').startsWith(m)).length;
+  const saidas = cohort.length - retained;
+  const semHistorico = db.students.filter(s => s.status !== 'Ativo' && !Array.isArray(s.statusEvents)).length;
   return {
-    base: base.length,
-    novos: novos.length,
-    churn: churn.length,
-    taxa: base.length ? Math.round((churn.length / base.length) * 1000) / 10 : 0,
-    retencao: base.length ? Math.round(((base.length - churn.length) / base.length) * 1000) / 10 : 100,
-    churnEstimado: churnEstimado.length
+    base: cohort.length, novos, churn: saidas,
+    taxa: cohort.length ? Math.round((saidas / cohort.length) * 1000) / 10 : 0,
+    retencao: cohort.length ? Math.round((retained / cohort.length) * 1000) / 10 : 100,
+    churnEstimado: semHistorico, historicoParcial: semHistorico > 0
   };
 }
 
@@ -5205,46 +5248,79 @@ function rdDelinquency(m) {
   const valorAberto = sum(aberto, p => p.amount);
   const valorAtraso = sum(atrasados, p => p.amount);
   const faturado = sum(pays, p => p.amount) || 1;
+  const faixasAtraso = {'1–7 dias':0,'8–30 dias':0,'31–60 dias':0,'60+ dias':0};
+  atrasados.forEach(p=>{const d=Math.max(0,Math.floor((parseD(TODAY_ISO)-parseD(payDeadline(p)))/86400000));const k=d<=7?'1–7 dias':d<=30?'8–30 dias':d<=60?'31–60 dias':'60+ dias';faixasAtraso[k]+=Number(p.amount)||0;});
   return {
     n: pays.length, pagos: pagos.length, atrasados: atrasados.length, abertos: aberto.length,
     valorAberto, valorAtraso,
     pctAtraso: Math.round((valorAtraso / faturado) * 1000) / 10,
+    taxaRecebimento: Math.round((sum(pagos,p=>p.amount)/faturado)*1000)/10, faixasAtraso,
     ticket: Math.round(sum(pagos, p => p.amount) / Math.max(1, pagos.length))
   };
 }
 
 /* frequência do mês por grupo, com média e alunos em risco de evasão */
-function rdFrequency(m) {
-  const days = new Set(Object.keys(db.attendance).filter(d => d.startsWith(m)));
-  const media = lastMonths(6, m).map(mm => {
-    const ds = Object.keys(db.attendance).filter(d => d.startsWith(mm));
-    const total = ds.reduce((a, d) => a + attendanceOf(d).length, 0);
-    return { m: mm, total, calls: ds.length, avg: ds.length ? Math.round(total / ds.length) : 0 };
-  });
-  const porGrupo = Object.keys(GROUPS).map(g => {
-    const total = [...days].reduce((a, d) => a + attendanceOf(d).filter(id => groupOf(studentById(id) || {}) === g).length, 0);
-    const head = rosterOf(g).length;
-    return { g, total, head, perAluno: head ? Math.round((total / head) * 10) / 10 : 0 };
-  });
-  /* dias previstos de treino no mês = soma dos dias de cada turma no calendário real */
-  const [yy, mm2] = m.split('-').map(Number);
-  const diasComTreino = (() => {
-    const dim = m === MONTH ? TODAY.getDate() : new Date(yy, mm2, 0).getDate();
-    let n = 0;
-    for (let d = 1; d <= dim; d++) {
-      const wd = new Date(yy, mm2 - 1, d).getDay();
-      if (Object.keys(GROUPS).some(g => GROUPS[g].days.includes(wd)) || wd === 6) n++;
+function rdFrequencySessions(month) {
+  const [yy,mm]=month.split('-').map(Number), end=month===MONTH?TODAY.getDate():daysInMonth(month);
+  let held=0,present=0;
+  for(let d=1;d<=end;d++){
+    const date=`${month}-${pad(d)}`,wd=new Date(yy,mm-1,d).getDay();
+    for(const g of Object.keys(GROUPS)) if(GROUPS[g].days.includes(wd)&&sessionOpen(date,g)){
+      held++; present+=attendanceOf(date).filter(id=>{const st=studentById(id);return st&&groupOf(st)===g&&activeOnDate(st,date);}).length;
     }
-    return n;
-  })();
-  const ocupacao = Math.round((days.size / Math.max(1, diasComTreino)) * 100);
-  /* quem treinou pouco/muito no mês */
-  const risco = activeStudents().map(s => {
-    const n = studentDates(s.id).filter(d => d.startsWith(m)).length;
-    const ult = studentDates(s.id).slice(-1)[0] || '';
-    return { s, n, ult };
-  }).sort((a, b) => a.n - b.n);
-  return { dias: days.size, media, porGrupo, ocupacao, risco };
+  }
+  return {held,present};
+}
+
+function rdFrequency(m) {
+  const [yy, mm] = m.split('-').map(Number);
+  const endDay = m === MONTH ? TODAY.getDate() : daysInMonth(m);
+  const sessions = Object.fromEntries(Object.keys(GROUPS).map(g => [g, { planned: 0, held: 0, present: 0, eligibleSeats: 0 }]));
+  const days = new Set();
+  for (let day = 1; day <= endDay; day++) {
+    const date = `${m}-${pad(day)}`, wd = new Date(yy, mm - 1, day).getDay();
+    for (const g of Object.keys(GROUPS)) {
+      if (!GROUPS[g].days.includes(wd)) continue;
+      const row = sessions[g]; row.planned++;
+      if (!sessionOpen(date, g)) continue;
+      row.held++; days.add(date);
+      const eligible = db.students.filter(st => groupOf(st) === g && activeOnDate(st, date));
+      row.eligibleSeats += eligible.length;
+      row.present += attendanceOf(date).filter(id => eligible.some(st => st.id === id)).length;
+    }
+  }
+  const porGrupo = Object.keys(GROUPS).map(g => {
+    const x = sessions[g], cap = Number(g === 'Adulto' ? prefs.capAdulto : prefs.capKids) || 0;
+    return { g, total: x.present, head: rosterOf(g).length, calls: x.held, planned: x.planned,
+      perAluno: x.held ? Math.round(x.present / Math.max(1, rosterOf(g).length) * 10) / 10 : 0,
+      perSession: x.held ? Math.round(x.present / x.held * 10) / 10 : 0,
+      attendanceRate: x.eligibleSeats ? Math.round(x.present / x.eligibleSeats * 1000) / 10 : 0,
+      capacityRate: cap && x.held ? Math.round(x.present / (cap * x.held) * 1000) / 10 : null };
+  });
+  const planned = Object.values(sessions).reduce((a,x)=>a+x.planned,0);
+  const held = Object.values(sessions).reduce((a,x)=>a+x.held,0);
+  const seats = Object.values(sessions).reduce((a,x)=>a+x.eligibleSeats,0);
+  const present = Object.values(sessions).reduce((a,x)=>a+x.present,0);
+  const media = lastMonths(6,m).map(mm => {
+    const fc = rdFrequencySessions(mm);
+    return {m:mm,total:fc.present,calls:fc.held,avg:fc.held?Math.round(fc.present/fc.held):0};
+  });
+  const risco = activeStudents().map(st => {
+    const eligible = Object.keys(GROUPS).reduce((a,g)=>a+scheduledHeldFor(st,g,m,endDay),0);
+    const n = studentDates(st.id).filter(d=>d.startsWith(m)).length;
+    return {s:st,n,eligible,rate:eligible?Math.round(n/eligible*1000)/10:0,ult:studentDates(st.id).slice(-1)[0]||''};
+  }).filter(x=>x.eligible>0).sort((a,b)=>a.rate-b.rate || b.eligible-a.eligible);
+  return { dias:days.size, media, porGrupo, ocupacao:planned?Math.round(held/planned*100):0,
+    sessoesPrevistas:planned,sessoesRealizadas:held,presencas:present,taxaPresenca:seats?Math.round(present/seats*1000)/10:0,risco };
+}
+function scheduledHeldFor(student, group, month, endDay) {
+  const [yy,mm]=month.split('-').map(Number); let count=0;
+  const from=Math.max(1,Number((student.joinDate||month+'-01').slice(8,10)));
+  for(let day=from;day<=endDay;day++) {
+    const date=`${month}-${pad(day)}`;
+    if(GROUPS[group].days.includes(new Date(yy,mm-1,day).getDay()) && sessionOpen(date,group)) count++;
+  }
+  return count;
 }
 
 /* faixas: distribuição e próximo grau */
@@ -5253,28 +5329,26 @@ function rdBelts() {
   const dist = BELTS.map(([name, color]) => ({ name, color, n: ativos.filter(s => s.belt === name).length }))
     .filter(b => b.n > 0).sort((a, b) => b.n - a.n);
   const graus = ativos.map(s => ({ s, graus: degreeOf(s) }));
-  const aptos = graus.filter(x => x.graus >= 4);
+  const aptos = graus.filter(x => x.graus >= (Number(prefs.promotionDegrees) || 4));
   const semGrau = graus.filter(x => x.graus === 0).length;
   return { dist, total: ativos.length, aptos, semGrau, mediaGraus: ativos.length ? Math.round((sum(graus, x => x.graus) / ativos.length) * 10) / 10 : 0 };
 }
 
 /* visão de caixa: 6 meses, tendência e projeção */
 function rdCash(m) {
-  const months = lastMonths(6, m);
-  const rows = months.map(mm => {
-    const rev = sum(paymentsOf(mm).filter(p => p.status === 'Pago'), p => p.amount);
-    const exp = sum(expensesOf(mm), e => e.amount);
-    return { m: mm, rev, exp, net: rev - exp };
-  });
-  const rec = rows.map(r => r.rev).filter(v => v > 0);
-  const média = rec.length ? rec.reduce((a, b) => a + b, 0) / rec.length : 0;
-  const ultimo = rows[rows.length - 1] || { rev: 0, exp: 0, net: 0 };
-  const mesAtual = rows.find(r => r.m === m) || ultimo;
-  const variacao = rec.length >= 2 ? Math.round(((rec[rec.length - 1] - rec[rec.length - 2]) / Math.max(1, rec[rec.length - 2])) * 1000) / 10 : 0;
-  const fixas = sum(expensesOf(m).filter(e => ['Salário', 'Aluguel', 'Energia'].includes(e.category)), e => e.amount);
-  const fixasMeses = rows.map(r => sum(expensesOf(r.m).filter(e => ['Salário', 'Aluguel', 'Energia'].includes(e.category)), e => e.amount));
-  const fixaMédia = fixasMeses.filter(v => v > 0).length ? Math.round(fixasMeses.reduce((a, b) => a + b, 0) / fixasMeses.filter(v => v > 0).length) : 0;
-  return { rows, média: Math.round(média), ultimo, mesAtual, variacao, fixas, fixaMédia, projecao: Math.round(mesAtual.rev - fixaMédia) };
+  const months=lastMonths(6,m), dayEnd=m===MONTH?TODAY.getDate():daysInMonth(m), days=daysInMonth(m);
+  const income=(mm,through=daysInMonth(mm))=>sum(db.payments.filter(p=>p.status==='Pago'&&String(p.paidAt||p.month||'').startsWith(mm)&&(!p.paidAt||p.paidAt.slice(8,10)<=pad(through))),p=>p.amount);
+  const expense=mm=>sum(expensesOf(mm),e=>e.amount);
+  const rows=months.map(mm=>{const rev=income(mm,mm===m?dayEnd:daysInMonth(mm)),exp=expense(mm);return {m:mm,rev,exp,net:rev-exp};});
+  const allMonths=months.map(mm=>income(mm,daysInMonth(mm)));
+  const média=allMonths.length?allMonths.reduce((a,b)=>a+b,0)/allMonths.length:0;
+  const ultimo=rows[rows.length-1]||{rev:0,exp:0,net:0},mesAtual=rows.find(r=>r.m===m)||ultimo;
+  const previous=monthShift(m,-1),prevIncome=income(previous,Math.min(dayEnd,daysInMonth(previous)));
+  const variacao=prevIncome>0?Math.round((mesAtual.rev-prevIncome)/prevIncome*1000)/10:null;
+  const fixasMeses=months.map(mm=>sum(expensesOf(mm).filter(e=>e.fixed===true||['Salário','Aluguel','Energia'].includes(e.category)),e=>e.amount));
+  const valoresFixos=fixasMeses.filter(v=>v>0),fixaMédia=valoresFixos.length?Math.round(valoresFixos.reduce((a,b)=>a+b,0)/valoresFixos.length):0;
+  const runRate=dayEnd?Math.round(mesAtual.rev/dayEnd*days):0;
+  return {rows,média:Math.round(média),ultimo,mesAtual,variacao,fixas:fixasMeses[fixasMeses.length-1]||0,fixaMédia,projecao:runRate-fixaMédia,runRate,parcial:m===MONTH&&dayEnd<days};
 }
 
 /* cobrança: quem deve agora, ordenado por valor/dias */
@@ -5378,7 +5452,7 @@ function relatoriosGerenciais(cur) {
   const maxCash = Math.max(1, ...cash.rows.map(r => Math.max(r.rev, r.exp)));
   const caixa = `<div class="card">
     <div class="card-head"><div><h3>Caixa dos últimos 6 meses</h3><div class="sub">Receita paga × despesa · ${monthBR(cur)}</div></div>
-      <div class="tail"><span class="rd-trend ${cash.variacao >= 0 ? 'up' : 'down'}">${cash.variacao >= 0 ? '▲' : '▼'} ${Math.abs(cash.variacao).toFixed(1).replace('.', ',')}%</span></div></div>
+      <div class="tail"><span class="rd-trend ${cash.variacao >= 0 ? 'up' : 'down'}">${cash.variacao === null ? '— sem base anterior' : `${cash.variacao >= 0 ? '▲' : '▼'} ${Math.abs(cash.variacao).toFixed(1).replace('.', ',')}%`}</span></div></div>
     <div class="rd-cash">
       ${cash.rows.map(r => `<div class="rd-cash-col">
         <div class="rd-cash-bars">
@@ -5390,7 +5464,7 @@ function relatoriosGerenciais(cur) {
       </div>`).join('')}
     </div>
     <div class="rd-legend"><span><i class="rev"></i>receita</span><span><i class="exp"></i>despesa</span><span class="rd-legend-tip">média de receita ${money(cash.média)}</span></div>
-    <div class="rd-note">${icon('chart', 13)} Custo fixo médio ${money(cash.fixaMédia)} · receita do mês ${money(cash.mesAtual.rev)} → ${cash.projecao >= 0 ? 'sobra' : 'déficit'} projetado de <b>${money(Math.abs(cash.projecao))}</b>${cash.projecao >= 0 ? ' por mês' : ' no mês'}.</div>
+    <div class="rd-note">${icon('chart', 13)} Custo fixo médio ${money(cash.fixaMédia)} · recebido no período ${money(cash.mesAtual.rev)} · estimativa linear até o fim do mês: <b>${money(cash.projecao)}</b> após custos fixos (não é previsão contábil).</div>
   </div>`;
 
   const maxGrupo = Math.max(1, ...freq.porGrupo.map(g => g.total));
@@ -5430,7 +5504,7 @@ function relatoriosGerenciais(cur) {
         <b class="num">${b.n}</b>
       </div>`).join('')}
     </div>
-    ${belts.aptos.length ? `<div class="rd-alert">${icon('alert', 14)} <b>${belts.aptos.length}</b> aluno${belts.aptos.length > 1 ? 's' : ''} com 4 graus — prontos para a próxima faixa: ${belts.aptos.slice(0, 4).map(x => `<button class="lnk" data-act="open-profile" data-id="${x.s.id}">${esc(x.s.name.split(' ')[0])}</button>`).join(', ')}${belts.aptos.length > 4 ? '…' : ''}</div>` : ''}
+    ${belts.aptos.length ? `<div class="rd-alert">${icon('alert', 14)} <b>${belts.aptos.length}</b> aluno${belts.aptos.length > 1 ? 's' : ''} no limite de revisão (configurável): ${belts.aptos.slice(0, 4).map(x => `<button class="lnk" data-act="open-profile" data-id="${x.s.id}">${esc(studentDisplayName(x.s))}</button>`).join(', ')}${belts.aptos.length > 4 ? '…' : ''}</div>` : ''}
     ${belts.semGrau ? `<div class="rd-note">${icon('spark', 13)} ${belts.semGrau} aluno${belts.semGrau > 1 ? 's' : ''} sem grau registrado.</div>` : ''}
   </div>`;
 
@@ -5440,13 +5514,13 @@ function relatoriosGerenciais(cur) {
     <div class="rd-rank">
       ${people.ranking.map((r, i) => `<button class="rd-rank-row" data-act="open-profile" data-id="${r.s.id}">
         <span class="rd-rank-n">${pad(i + 1)}</span>
-        <span class="rd-rank-name">${esc(r.s.name)}</span>
+        <span class="rd-rank-name">${esc(studentDisplayName(r.s))}</span>
         <span class="rd-rank-track"><i style="width:${Math.round((r.n / maxRank) * 100)}%"></i></span>
         <b class="num">${r.n}</b>
       </button>`).join('') || '<div class="empty"><b>Sem presenças no mês</b></div>'}
     </div>
-    ${freq.risco.filter(x => x.n <= 2 && x.s.status === 'Ativo').slice(0, 4).length ? `<div class="rd-alert rd-alert--soft">${icon('users', 14)} Pouca presença: ${freq.risco.filter(x => x.n <= 2).slice(0, 4).map(x => `<button class="lnk" data-act="open-profile" data-id="${x.s.id}">${esc(x.s.name.split(' ')[0])}</button>`).join(', ')}</div>` : ''}
-    ${people.veteranos.length ? `<div class="rd-note">${icon('spark', 13)} Tempo médio de casa: <b>${people.mesesMedio} meses</b> · veteranos: ${people.veteranos.map(v => `<button class="lnk" data-act="open-profile" data-id="${v.s.id}">${esc(v.s.name.split(' ')[0])} (${v.meses}m)</button>`).join(', ')}</div>` : ''}
+    ${freq.risco.filter(x => x.n <= 2 && x.s.status === 'Ativo').slice(0, 4).length ? `<div class="rd-alert rd-alert--soft">${icon('users', 14)} Pouca presença: ${freq.risco.filter(x => x.n <= 2).slice(0, 4).map(x => `<button class="lnk" data-act="open-profile" data-id="${x.s.id}">${esc(studentDisplayName(x.s))}</button>`).join(', ')}</div>` : ''}
+    ${people.veteranos.length ? `<div class="rd-note">${icon('spark', 13)} Tempo médio de casa: <b>${people.mesesMedio} meses</b> · veteranos: ${people.veteranos.map(v => `<button class="lnk" data-act="open-profile" data-id="${v.s.id}">${esc(studentDisplayName(v.s))} (${v.meses}m)</button>`).join(', ')}</div>` : ''}
   </div>`;
 
   /* ---------- linha 4: cobrança ---------- */
@@ -5456,7 +5530,7 @@ function relatoriosGerenciais(cur) {
     ${debts.length ? `<div class="rd-debts">
       ${debts.slice(0, 8).map(d => `<button class="rd-debt" data-act="open-profile" data-id="${d.s.id}">
         <span class="rd-debt-days ${d.atraso > 0 ? (d.atraso > 15 ? 'late' : 'warn') : ''}">${d.atraso > 0 ? d.atraso + 'd' : 'a vencer'}</span>
-        <span class="rd-debt-name">${esc(d.s.name)}</span>
+        <span class="rd-debt-name">${esc(studentDisplayName(d.s))}</span>
         <span class="num small money-warn">${money(d.p.amount)}</span>
         <span class="rd-debt-go">${icon('arrowRight', 12)}</span>
       </button>`).join('')}
@@ -5656,6 +5730,8 @@ function pageAjustes() {
   /* ---- seção Desenvolvedor: banco de dados, backups, log e sistema ---- */
   const dev = sec('desenvolvedor', 'Desenvolvedor', 'Banco de dados, backups e manutenção do sistema', `
     <div class="set-pad">
+      <div class="settings-row" style="display:block;border-bottom:0;padding-bottom:0"><div class="txt"><h4>Parâmetros dos indicadores</h4><p>Capacidade Adulto/Kids é a lotação de referência por aula para estimar ocupação (não limita matrículas nem presenças). O limite de graus é um alerta de revisão, não aprovação automática.</p></div><div class="form-grid" style="margin-top:10px"><label class="form-field"><span class="lbl">Capacidade Adulto (opcional)</span><input class="field" type="number" min="1" max="500" data-on="cap-adulto" value="${prefs.capAdulto||''}" placeholder="Sem limite"></label><label class="form-field"><span class="lbl">Capacidade Kids (opcional)</span><input class="field" type="number" min="1" max="500" data-on="cap-kids" value="${prefs.capKids||''}" placeholder="Sem limite"></label><label class="form-field"><span class="lbl">Graus para aviso de revisão</span><input class="field" type="number" min="1" max="4" data-on="promotion-degrees" value="${prefs.promotionDegrees||4}"></label></div></div>
+
       <div class="settings-row" style="padding-top:0;border-bottom:0">
         <div class="txt" style="width:100%">
           <h4>Banco compartilhado (nuvem)</h4>
@@ -5897,13 +5973,44 @@ function weekSeries(refDate) {
    ============================================================ */
 const BELT_OPTIONS = BELTS.map(b => b[0]);
 
+const COMMON_FIRST_NAMES = new Set(['francisco','joao','luis','luiz','jose','maria','ana','pedro']);
+function suggestedNickname(fullName) {
+  const parts=String(fullName||'').trim().split(/\s+/).filter(Boolean);
+  if(!parts.length) return '';
+  const normalized=parts[0].normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase();
+  return parts.length>1&&COMMON_FIRST_NAMES.has(normalized)?`${parts[0]} ${parts[1]}`:parts[0];
+}
+function studentDisplayName(student) { return student.nickname||suggestedNickname(student.name)||student.name||''; }
+function mountNicknameAutofill(root, student) {
+  const name=root.querySelector('#f_name'), nick=root.querySelector('#f_nickname');
+  if(!name||!nick) return;
+  let manual=!!student?.nickname&&student.nickname!==suggestedNickname(student.name);
+  let lastAuto=nick.value;
+  name.addEventListener('input',()=>{if(!manual){nick.value=suggestedNickname(name.value);lastAuto=nick.value;}});
+  nick.addEventListener('input',()=>{if(nick.value!==lastAuto) manual=true;});
+}
+function lastTrainingSummary() {
+  const dates=Object.keys(db.attendanceOpen||{}).filter(d=>/^\d{4}-\d{2}-\d{2}$/.test(d)).sort().reverse();
+  for(const date of dates){
+    const state=db.attendanceOpen[date]||{};
+    const groups=Object.keys(GROUPS).filter(g=>Object.prototype.hasOwnProperty.call(state,g));
+    if(!groups.length) continue;
+    const ids=attendanceOf(date);
+    const present=ids.filter(id=>{const st=studentById(id);return st&&groups.includes(groupOf(st))&&activeOnDate(st,date);}).length;
+    return {date,present,groups};
+  }
+  return null;
+}
+
 function studentForm(id, prefill = null, onSaved = null) {
   const isEdit = !!id;
   const s = id ? studentById(id) : (prefill ? { ...prefill } : null);
   const body = `<div class="form-grid">
     ${fieldHTML({ name: 'name', label: 'Nome completo', value: s?.name || '', required: true, full: true, placeholder: 'Ex.: João Pedro da Silva' })}
+    ${fieldHTML({ name: 'nickname', label: 'Apelido (nome exibido)', value: s?.nickname || suggestedNickname(s?.name || ''), required: true, full: true, placeholder: 'Ex.: João Pedro' })}
     ${fieldHTML({ name: 'classGroup', label: 'Turma', type: 'select', value: s?.classGroup || 'Adulto', options: ['Adulto', 'Kids'] })}
     ${fieldHTML({ name: 'status', label: 'Status', type: 'select', value: s?.status || 'Ativo', options: ['Ativo', 'Inativo'] })}
+    ${fieldHTML({ name: 'statusDate', label: 'Data da mudança de status (opcional)', type: 'date', value: TODAY_ISO })}
     ${fieldHTML({ name: 'belt', label: 'Faixa', type: 'belt', value: s?.belt || 'Branca' })}
     ${fieldHTML({ name: 'degrees', label: 'Graus', type: 'degrees', value: s?.degrees ?? 0 })}
     ${fieldHTML({ name: 'age', label: 'Idade', type: 'number', value: s?.age ?? '', min: 3, max: 99, placeholder: '28' })}
@@ -5949,6 +6056,7 @@ function studentForm(id, prefill = null, onSaved = null) {
     body,
     submitText: isEdit ? 'Salvar alterações' : 'Matricular aluno',
     onMount: root => {
+      mountNicknameAutofill(root, s);
       mountBeltPicker(root);
       mountClassBeltGroup(root);
       mountFeeMode(root);
@@ -5959,7 +6067,7 @@ function studentForm(id, prefill = null, onSaved = null) {
       if (!data.name || !data.name.trim()) { toast('Informe o nome do aluno.'); return false; }
       if (data.feeMode === 'outro' && !(Number(data.fee) > 0)) { toast('Informe o valor da mensalidade.'); return false; }
       const obj = {
-        name: data.name.trim(), classGroup: data.classGroup, status: data.status, belt: data.belt,
+        name: data.name.trim(), nickname: (data.nickname || suggestedNickname(data.name)).trim(), classGroup: data.classGroup, status: data.status, belt: data.belt,
         degrees: Number(data.degrees) || 0, age: data.age ? Number(data.age) : '', phone: data.phone.trim(),
         locality: data.locality.trim(), guardian: (data.guardian || '').trim(),
         guardianPhone: (data.guardianPhone || '').trim(), plan: data.plan,
@@ -5968,10 +6076,21 @@ function studentForm(id, prefill = null, onSaved = null) {
       };
       if (isEdit) {
         const target = studentById(id);
-        if (target) Object.assign(target, obj);
+        if (target) {
+          const changed = target.status !== obj.status;
+          const history = Array.isArray(target.statusEvents) ? target.statusEvents : [];
+          Object.assign(target, obj);
+          if (changed) {
+            const effectiveDate = data.statusDate || TODAY_ISO;
+            if (!target.statusEvents) target.statusEvents = history;
+            target.statusEvents.push({ status: obj.status, date: effectiveDate });
+            target.statusEvents.sort((a,b)=>a.date.localeCompare(b.date));
+            target.statusChangedAt = effectiveDate;
+          }
+        }
         toast('Ficha atualizada.');
       } else {
-        const ns = { ...obj, id: uid() };
+        const ns = { ...obj, id: uid(), statusEvents: [{ status: obj.status, date: obj.joinDate || TODAY_ISO }] };
         db.students.push(ns);
         if (ns.status === 'Ativo') ensureMonthly(MONTH);
         toast(`${ns.name} entrou no dojo.`, { icon: 'checkCircle' });
@@ -5987,7 +6106,7 @@ function paymentForm(id) {
   const p = id ? paymentById(id) : null;
   const s0 = p ? studentById(p.studentId) : activeStudents()[0] || db.students[0];
   const body = `<div class="form-grid">
-    ${fieldHTML({ name: 'studentId', label: 'Aluno', type: 'select', value: s0?.id, options: db.students.map(s => ({ value: s.id, label: s.name })), full: true, required: true })}
+    ${fieldHTML({ name: 'studentId', label: 'Aluno', type: 'select', value: s0?.id, options: db.students.map(s => ({ value: s.id, label: studentDisplayName(s) })), full: true, required: true })}
     ${fieldHTML({ name: 'month', label: 'Mês de referência', type: 'month', value: p?.month || MONTH, required: true })}
     ${fieldHTML({ name: 'amount', label: 'Valor (R$)', type: 'number', value: p?.amount ?? s0?.fee ?? 70, min: 0, step: '0.01', required: true })}
     ${fieldHTML({ name: 'dueDate', label: 'Vencimento', type: 'date', value: p?.dueDate || dueFor(s0 || { dueDay: 10 }, MONTH), required: true })}
@@ -6023,8 +6142,8 @@ function payEditForm(id) {
   const body = `<div class="form-grid">
     <div class="form-field full">
       <div class="pe-head">
-        <span class="avatar">${esc((s?.name || '?').charAt(0))}</span>
-        <div><b>${esc(s?.name || 'Aluno')}</b>
+        <span class="avatar">${esc((s?studentDisplayName(s):'?').charAt(0))}</span>
+        <div><b>${esc(s?studentDisplayName(s):'Aluno')}</b>
         <small>${monthBR(p.month)} · vence ${dateBR(p.dueDate)}</small></div>
         <span class="badge ${paid ? 'badge--ok' : isLatePayment(p) ? 'badge--late' : 'badge--warn'}">${paid ? 'pago' : isLatePayment(p) ? 'atrasado' : 'pendente'}</span>
       </div>
@@ -6100,6 +6219,7 @@ function expenseForm(id) {
     ${fieldHTML({ name: 'date', label: 'Data', type: 'date', value: e?.date || TODAY_ISO, required: true })}
     ${fieldHTML({ name: 'method', label: 'Forma de pagamento', type: 'select', value: e?.method || 'Pix', options: METHODS })}
     ${fieldHTML({ name: 'quantity', label: 'Quantidade (opcional)', type: 'number', value: e?.quantity ?? '', min: 1, placeholder: 'Unidades' })}
+    <label class="switch form-field full"><input type="checkbox" name="fixed" ${e?.fixed?'checked':''}><span class="track"></span>Despesa fixa recorrente</label>
   </div>`;
   openModal({
     title: e ? 'Editar despesa' : 'Lançar despesa',
@@ -6109,7 +6229,7 @@ function expenseForm(id) {
     onSubmit: data => {
       const obj = {
         description: data.description.trim(), category: data.category, amount: Number(data.amount) || 0,
-        date: data.date, method: data.method, quantity: data.quantity ? Number(data.quantity) : null
+        date: data.date, method: data.method, quantity: data.quantity ? Number(data.quantity) : null, fixed: data.fixed === 'on'
       };
       if (e) { Object.assign(e, obj); toast('Despesa atualizada.'); }
       else { db.expenses.push({ ...obj, id: uid() }); toast('Despesa lançada.'); }
@@ -6848,6 +6968,7 @@ function trainingForm(id) {
   const body = `<div class="form-grid">
     ${fieldHTML({ name: 'title', label: 'Tema do treino', value: t?.title || '', required: true, full: true, placeholder: 'Ex.: Saída da montada e recuperação de guarda' })}
     ${fieldHTML({ name: 'date', label: 'Data', type: 'date', value: t?.date || TODAY_ISO, required: true })}
+    <label class="switch form-field full"><input type="checkbox" name="completed" ${t?.completed?'checked':''}><span class="track"></span>Treino realizado</label>
     ${fieldHTML({ name: 'duration', label: 'Duração (min)', type: 'number', value: t?.duration ?? 60, min: 10, max: 240 })}
     ${fieldHTML({ name: 'level', label: 'Nível', type: 'select', value: t?.level || 'Todos os níveis', options: ['Todos os níveis', 'Iniciantes', 'Intermediários', 'Avançados', 'Kids'] })}
     ${fieldHTML({ name: 'format', label: 'Modalidade', type: 'select', value: t?.format || 'Gi', options: ['Gi', 'No-Gi', 'Misto'] })}
@@ -6884,7 +7005,7 @@ function trainingForm(id) {
       if (!data.title.trim()) { toast('Dê um tema ao treino.'); return false; }
       const obj = {
         title: data.title.trim(), date: data.date, duration: Number(data.duration) || 60, level: data.level,
-        format: data.format, warmup: data.warmup.trim(), techniques: data.techniques.trim(),
+        format: data.format, completed: data.completed === 'on', completedAt: data.completed === 'on' ? (t?.completedAt || TODAY_ISO) : '', warmup: data.warmup.trim(), techniques: data.techniques.trim(),
         drills: data.drills.trim(), notes: data.notes.trim(), positions: posDraft.selected.slice()
       };
       if (t) { Object.assign(t, obj); toast('Plano atualizado.'); }
@@ -7519,9 +7640,9 @@ const ACTIONS = {
   },
   'convert-visitor': id => {
     const v = visitorById(id); if (!v) return;
-    studentForm(null, { name: v.name, phone: v.phone, locality: v.locality, classGroup: v.classGroup || 'Adulto' }, () => {
-      db.visitors = db.visitors.filter(x => x.id !== id);
-      save(); render(); toast('Visitante matriculado.', { icon: 'checkCircle' });
+    studentForm(null, { name: v.name, phone: v.phone, locality: v.locality, classGroup: v.classGroup || 'Adulto' }, ns => {
+      v.convertedStudentId = ns.id; v.convertedAt = TODAY_ISO;
+      save(); render(); toast('Visitante matriculado e conversão registrada.', { icon: 'checkCircle' });
     });
   },
   'week-metric': id => { view.weekMetric = id; render(); },
@@ -7556,7 +7677,7 @@ const ACTIONS = {
     const before = { status: p.status, paidAt: p.paidAt, method: p.method };
     p.status = 'Pago'; p.paidAt = TODAY_ISO; p.method = p.method || 'Pix';
     save(); render();
-    toast(`${studentById(p.studentId)?.name || 'Aluno'} — ${money(p.amount)} recebido.`, {
+    toast(`${studentById(p.studentId)?studentDisplayName(studentById(p.studentId)):'Aluno'} — ${money(p.amount)} recebido.`, {
       icon: 'checkCircle', action: 'Desfazer',
       onAction: () => { Object.assign(p, before); save(); render(); }
     });
@@ -7564,7 +7685,7 @@ const ACTIONS = {
   'edit-payment': id => paymentForm(id),
   'del-payment': async id => {
     const p = paymentById(id);
-    const ok = await confirmDialog({ title: 'Excluir mensalidade', message: `Excluir o lançamento de ${studentById(p?.studentId)?.name || 'aluno'} (${money(p?.amount)})?`, confirmText: 'Excluir', danger: true });
+    const ok = await confirmDialog({ title: 'Excluir mensalidade', message: `Excluir o lançamento de ${studentById(p?.studentId)?studentDisplayName(studentById(p.studentId)):'aluno'} (${money(p?.amount)})?`, confirmText: 'Excluir', danger: true });
     if (!ok) return;
     db.payments = db.payments.filter(x => x.id !== id); save(); render(); toast('Lançamento excluído.');
   },
@@ -8507,35 +8628,59 @@ function download(name, content, type = 'application/json') {
   setTimeout(() => URL.revokeObjectURL(a.href), 1000);
 }
 function exportBackup() {
-  download(`arandu-backup-${TODAY_ISO}.json`, JSON.stringify(db, null, 2));
-  registrarLog(`Exportou backup: ${db.students.length} alunos, ${db.payments.length} mensalidades`, 'backup');
+  const stamp = new Date().toLocaleTimeString('pt-BR',{hour:'2-digit',minute:'2-digit',second:'2-digit',hour12:false}).replace(/:/g,'-');
+  const name = `arandu-backup-${TODAY_ISO}-${stamp}.json`;
+  download(name, JSON.stringify(db, null, 2));
+  registrarLog(`Exportou backup ${name}: ${db.students.length} alunos, ${db.payments.length} mensalidades`, 'backup');
   toast('Backup baixado.', { icon: 'download' });
 }
+const BACKUP_MAX_BYTES=10*1024*1024, BACKUP_MAX_ROWS=20000;
+function validateBackup(data) {
+  if(!data||typeof data!=='object'||Array.isArray(data)) throw new Error('o JSON precisa ser um objeto.');
+  const arrays=['students','payments','expenses','trainings','visitors','customPositions','log'];
+  for(const k of arrays) if(data[k]!==undefined&&(!Array.isArray(data[k])||data[k].length>BACKUP_MAX_ROWS)) throw new Error(`campo ${k} inválido ou grande demais.`);
+  if(!Array.isArray(data.students)) throw new Error('lista de alunos ausente.');
+  const ids=new Set();
+  for(const st of data.students){
+    if(!st||typeof st!=='object'||typeof st.id!=='string'||!st.id||typeof st.name!=='string'||!st.name.trim()) throw new Error('há aluno sem ID ou nome válido.');
+    if(ids.has(st.id)) throw new Error('há IDs de aluno duplicados.');ids.add(st.id);
+    if(st.fee!==undefined&&(!Number.isFinite(Number(st.fee))||Number(st.fee)<0)) throw new Error('há mensalidade inválida.');
+  }
+  for(const p of data.payments||[]) if(!p||typeof p.studentId!=='string'||!/^\d{4}-\d{2}$/.test(p.month||'')||!Number.isFinite(Number(p.amount))||Number(p.amount)<0) throw new Error('há mensalidade com dados inválidos.');
+  if(data.attendance!==undefined&&(!data.attendance||typeof data.attendance!=='object'||Array.isArray(data.attendance)||Object.keys(data.attendance).length>4000)) throw new Error('histórico de presença inválido ou grande demais.');
+  return true;
+}
+
 function importBackup() {
   const input = document.createElement('input');
   input.type = 'file';
   input.accept = '.json,application/json';
   input.onchange = () => {
-    const file = input.files[0];
+    const file = input.files && input.files[0];
     if (!file) return;
+    if (file.size > BACKUP_MAX_BYTES) { toast('Backup maior que 10 MB; selecione um arquivo menor.'); return; }
     const reader = new FileReader();
     reader.onload = async () => {
       try {
-        const data = JSON.parse(reader.result);
-        if (!data || !Array.isArray(data.students)) throw new Error('formato');
+        const data = JSON.parse(String(reader.result || ''));
+        validateBackup(data);
         const ok = await confirmDialog({
           title: 'Importar backup', confirmText: 'Importar',
           message: `O arquivo tem ${data.students.length} alunos e ${(data.payments || []).length} mensalidades.\nOs dados atuais serão substituídos.`
         });
         if (!ok) return;
-        db = Object.assign(BLANK(), data);
-        db.trainings ||= []; db.visitors ||= []; db.customPositions ||= [];
-        db.attendance ||= {}; db.attendanceOpen ||= {};
+        const cleaned = Object.assign(BLANK(), data);
+        cleaned.trainings ||= []; cleaned.visitors ||= []; cleaned.customPositions ||= [];
+        cleaned.attendance ||= {}; cleaned.attendanceOpen ||= {};
+        const cleanup = cleanFrequencyTestResidue(cleaned);
+        db = cleaned;
         baseSnapshotMeta('import', file.name, db);
         registrarLog(`Importou backup "${file.name}": ${db.students.length} alunos, ${db.payments.length} mensalidades`, 'backup');
+        if(cleanup.oldDates||cleanup.oldLogs) registrarLog(`Limpou resíduo de teste no backup: ${cleanup.oldDates} chamadas antigas e ${cleanup.oldLogs} eventos antigos; registros desde 23/11 preservados.`, 'backup');
         save(); render(); toast('Backup importado.', { icon: 'checkCircle' });
-      } catch (e) { toast('Arquivo inválido — envie um JSON do Arandu.'); }
+      } catch (e) { toast('Importação não aplicada: ' + (e?.message || 'erro de leitura')); }
     };
+    reader.onerror = () => toast('Não foi possível ler o arquivo selecionado.');
     reader.readAsText(file);
   };
   input.click();
@@ -8593,7 +8738,7 @@ function cmdSources() {
     { label: 'Alternar tema', icon: 'moon', run: () => cycleTheme() }
   ].map(a => ({ ...a, group: 'Ações', hint: '' }));
   const students = db.students.map(s => ({
-    group: 'Alunos', label: s.name, icon: 'users', hint: groupOf(s), run: () => openProfile(s.id)
+    group: 'Alunos', label: studentDisplayName(s), icon: 'users', hint: groupOf(s), run: () => openProfile(s.id)
   }));
   return [...pages, ...actions, ...students];
 }
@@ -8775,6 +8920,7 @@ function boot() {
   detectLowFX();
 
   load();
+migrateFrequencyTestResidue();
   const hash = location.hash.replace('#', '');
   if (PAGES[hash]) view.page = hash;
   applyTheme();
