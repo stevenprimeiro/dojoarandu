@@ -1,6 +1,6 @@
 # Arandu · Sistema do Dojo — versão pública
 
-**Versão:** 2.85 · novembro de 2026
+**Versão:** 2.90.1 · novembro de 2026
 
 Sistema de gestão para dojo de jiu-jitsu: alunos, frequência, treinos, mensalidades, despesas e relatórios. Funciona no navegador em computador e celular. A build pública usa uma base demonstrativa, sem dados reais de alunos.
 
@@ -24,10 +24,10 @@ Também é possível usar o pacote `DojoArandu v2.81p.zip`, que contém os arqui
 
 Esta distribuição pública não contém a base real de alunos: inicia com dados demonstrativos. Dados que você inserir no navegador ficam nesse dispositivo, salvo se configurar um serviço externo. Não publique backups JSON com informações pessoais.
 
-A pasta publicada inclui os ícones e arquivos necessários. O arquivo `DojoArandu v2.85p.html` é uma cópia do `index.html` com nome versionado.
+A pasta publicada inclui os ícones e arquivos necessários. O arquivo `DojoArandu v2.90.1p.html` é uma cópia do `index.html` com nome versionado.
 
 ---
 
 **Criador:** Steven Primeiro  
-**Versão:** 2.85  
+**Versão:** 2.90.1  
 **Disciplina · Respeito · Evolução**
