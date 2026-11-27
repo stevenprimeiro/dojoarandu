@@ -21,7 +21,7 @@
 <meta name="application-name" content="Arandu">
 <style>
 /* ============================================================
-   ARANDU · v2.78 — design system
+   ARANDU · v2.81 — design system
    Papel & tinta: editorial, quente, tátil.
    ============================================================ */
 :root{
@@ -266,6 +266,10 @@ html[data-theme="dark"] .btn--primary{background:var(--ink);color:#151311}
 .btn--quiet{background:transparent;border-color:transparent;color:var(--ink-2);padding:9px 11px}
 .btn--quiet:hover{background:color-mix(in srgb,var(--ink) 6%,transparent);color:var(--ink);box-shadow:none}
 .btn--ghost{background:transparent}
+.btn--neon-a1{background:transparent!important;color:var(--ink)!important;border-color:color-mix(in srgb,var(--vermilion) 42%,var(--line));box-shadow:0 0 0 1px color-mix(in srgb,var(--vermilion) 10%,transparent),0 0 11px color-mix(in srgb,var(--vermilion) 16%,transparent)}
+.btn--neon-a1:hover{border-color:color-mix(in srgb,var(--vermilion) 58%,var(--line));box-shadow:0 0 0 1px color-mix(in srgb,var(--vermilion) 14%,transparent),0 0 14px color-mix(in srgb,var(--vermilion) 22%,transparent)}
+.btn--neon-a2{background:transparent!important;color:var(--ink)!important;border-color:color-mix(in srgb,var(--accent-button) 42%,var(--line));box-shadow:0 0 0 1px color-mix(in srgb,var(--accent-button) 10%,transparent),0 0 11px color-mix(in srgb,var(--accent-button) 16%,transparent)}
+.btn--neon-a2:hover{border-color:color-mix(in srgb,var(--accent-button) 58%,var(--line));box-shadow:0 0 0 1px color-mix(in srgb,var(--accent-button) 14%,transparent),0 0 14px color-mix(in srgb,var(--accent-button) 22%,transparent)}
 .btn--sm{padding:7px 11px;font-size:12.5px;border-radius:9px}
 .btn--sm svg{width:14px;height:14px}
 .btn--danger{color:var(--danger);border-color:color-mix(in srgb,var(--danger) 35%,var(--line))}
@@ -564,13 +568,8 @@ html[data-theme="dark"] .hero{background:linear-gradient(115deg,var(--card) 0%,v
   font-size:12.5px;font-weight:550;transition:.2s var(--ease)
 }
 .chip:hover{border-color:var(--ink-3);color:var(--ink)}
-.chip[aria-pressed="true"]{
-  background:linear-gradient(150deg,color-mix(in srgb,#fff 14%,var(--vermilion)),var(--vermilion));
-  border-color:transparent;color:#fff;
-  box-shadow:0 10px 24px -16px color-mix(in srgb,var(--vermilion) 90%,transparent)
-}
-.chip[aria-pressed="true"] .count{opacity:1;color:color-mix(in srgb,var(--paper) 72%,var(--ink))}
-.chip[aria-pressed="true"]{background:var(--ink);border-color:var(--ink);color:var(--paper)}
+.chip[aria-pressed="true"]{background:color-mix(in srgb,var(--vermilion) 12%,transparent);border-color:color-mix(in srgb,var(--vermilion) 48%,var(--line));color:var(--ink);box-shadow:0 0 10px color-mix(in srgb,var(--vermilion) 16%,transparent)}
+.chip[aria-pressed="true"] .count{opacity:1;color:var(--ink)}
 .chip .count{font:600 10.5px/1 var(--mono);opacity:.6}
 
 /* ---------- form ---------- */
@@ -650,7 +649,7 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
   padding:7px 11px;border-radius:6px;font:750 10.5px/1 var(--cond);letter-spacing:.08em;text-transform:uppercase;color:var(--ink-2);
   transition:.22s var(--ease)
 }
-.seg button[aria-pressed="true"]{background:linear-gradient(160deg,color-mix(in srgb,#fff 14%,var(--accent-button,var(--vermilion))),var(--accent-button,var(--vermilion)));color:#fff;box-shadow:0 8px 20px -12px color-mix(in srgb,var(--accent-button,var(--vermilion)) 80%,transparent)}
+.seg button[aria-pressed="true"]{background:color-mix(in srgb,var(--ink) 11%,transparent);color:var(--ink);box-shadow:inset 0 0 0 1px var(--line)}
 .seg button:hover{color:var(--ink)}
 
 /* toggle switches */
@@ -1106,21 +1105,35 @@ html[data-theme="dark"] .toast .act{color:var(--vermilion-ink)}
 .settings-row h4{font-size:14px;font-weight:650}
 .settings-row p{font-size:12.5px;color:var(--ink-2);margin-top:4px;max-width:60ch}
 .settings-row .acts{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}
+.appearance-options{display:grid;gap:8px}
+.custom-palette-preview{display:flex;flex-direction:column;align-items:center;gap:9px;padding:14px 8px 16px}.custom-palette-swatches{display:flex;width:min(100%,440px);height:52px;overflow:hidden;border-radius:12px;gap:2px;background:var(--line-2);box-shadow:0 4px 16px color-mix(in srgb,var(--ink) 8%,transparent)}.custom-palette-swatches i{display:block;flex:1}.custom-palette-preview>i{width:22px;height:22px;border-radius:50%;box-shadow:0 0 0 1px var(--line)}.custom-palette-preview small{font-size:10.5px;color:var(--ink-3)}.custom-palette-icon{display:grid;place-items:center;color:var(--ink-2)}.custom-color-control{padding:10px 0;border-top:1px solid var(--line-2)}.custom-color-control:first-of-type{border-top:0}.custom-palette-preview>i{width:22px;height:22px;border-radius:50%;box-shadow:0 0 0 1px var(--line)}
+.day-strip .chip[aria-pressed="true"]{background:color-mix(in srgb,var(--vermilion) 12%,transparent)!important;border-color:color-mix(in srgb,var(--vermilion) 45%,var(--line))!important;color:var(--ink)!important;box-shadow:0 0 10px color-mix(in srgb,var(--vermilion) 16%,transparent)}
+.appearance-fold{border:1px solid var(--line-2);border-radius:13px;overflow:hidden;background:color-mix(in srgb,var(--card) 76%,transparent)}
+.appearance-fold-head{width:100%;display:flex;align-items:center;justify-content:space-between;gap:12px;text-align:left;padding:13px 14px;background:transparent;color:var(--ink);border:0;cursor:pointer}
+.appearance-fold-head>span:first-child{min-width:0;display:block}
+.appearance-fold-head b{display:block;font-size:13px;font-weight:700}
+.appearance-fold-head small{display:block;margin-top:3px;color:var(--ink-2);font-size:11.5px;line-height:1.45}
+.appearance-fold-icon{display:grid;place-items:center;flex:none;color:var(--ink-3);transition:transform .2s}
+.appearance-fold.is-open .appearance-fold-icon{transform:rotate(180deg)}
+.appearance-fold-body{padding:0 14px 14px;border-top:1px solid var(--line-2)}
+.appearance-fold-body[hidden]{display:none}
+.appearance-fold-body .settings-row{padding:12px 0 0;border:0}
+.appearance-fold-body .color-slider-wrap{margin-top:4px}
 .theme-grid{display:flex;justify-content:center;gap:14px;flex-wrap:wrap}
-.group-tone--adult{color:var(--adult-class,var(--vermilion))!important}
-.group-tone--kids{color:var(--kids-class,var(--accent-button,var(--vermilion)))!important}
+.group-tone--adult{color:var(--ink)!important}
+.group-tone--kids{color:var(--ink)!important}
 .badge--outline.group-tone--adult{border-color:color-mix(in srgb,var(--adult-class,var(--vermilion)) 48%,var(--line));background:color-mix(in srgb,var(--adult-class,var(--vermilion)) 9%,transparent)}
 .badge--outline.group-tone--kids{border-color:color-mix(in srgb,var(--kids-class,var(--accent-button,var(--vermilion))) 48%,var(--line));background:color-mix(in srgb,var(--kids-class,var(--accent-button,var(--vermilion))) 9%,transparent)}
 .theme-opt{
-  border:2px solid var(--line);border-radius:16px;padding:20px 18px 16px;background:var(--card);
-  text-align:center;transition:.22s var(--ease);display:flex;flex-direction:column;align-items:center;gap:10px;
-  min-width:150px;flex:1;max-width:220px;
+  border:2px solid var(--line);border-radius:12px;padding:10px 9px 8px;background:var(--card);
+  text-align:center;transition:.22s var(--ease);display:flex;flex-direction:column;align-items:center;gap:5px;
+  min-width:75px;flex:1;max-width:110px;
 }
 .theme-opt:hover{border-color:var(--ink-3);transform:translateY(-1px)}
-.theme-opt[aria-pressed="true"]{border-color:var(--vermilion);box-shadow:0 0 0 3px color-mix(in srgb,var(--vermilion) 18%,transparent),0 10px 28px -18px color-mix(in srgb,var(--vermilion) 70%,transparent)}
-.theme-opt b{font-size:15px;font-weight:700;text-transform:none}
+.theme-opt[aria-pressed="true"]{border-color:var(--vermilion);box-shadow:0 0 0 2px color-mix(in srgb,var(--vermilion) 16%,transparent)}
+.theme-opt b{font-size:12px;font-weight:700;text-transform:none}
 .t-icon{display:grid;place-items:center;color:var(--ink)}
-.t-icon svg{width:32px;height:32px;display:block}
+.t-icon svg{width:16px;height:16px;display:block}
 
 /* sliders de cor: carrossel infinito, 7 cores visíveis, selecionada ao meio */
 .color-slider-wrap{position:relative;max-width:360px;margin:6px auto 0}
@@ -1888,6 +1901,8 @@ body.has-demo-banner .main{padding-bottom:74px}
 /* assiduidade */
 .rd-rank{display:flex;flex-direction:column;gap:2px}
 .rd-rank-row{display:flex;align-items:center;gap:8px;padding:6px 4px;border-radius:8px;text-align:left}
+.student-analytics{margin-top:24px}.student-analytics-grid{margin-top:12px}.student-analytics .card-head h3{font-size:14px}.student-analytics .card{min-width:0}.student-analytics .rd-kpi .value{font-size:27px}.student-analytics .rd-ring-row{align-items:center}.student-analytics .rd-ring-side{flex:1;min-width:130px}.student-analytics .rd-alert{margin-top:10px}.student-analytics .rd-rank-row{width:100%;cursor:pointer}.student-analytics .rd-rank-name{flex:1;min-width:0}.student-analytics .rd-rank-track{flex:1;min-width:35px}.student-analytics .rd-belt-track{min-width:35px}
+@media(max-width:700px){.student-analytics .rd-kpis{grid-template-columns:1fr 1fr}.student-analytics-grid>.card{grid-column:span 12!important}.student-analytics .rd-ring-row{gap:12px}.student-analytics .rd-ring{width:96px;height:96px}}
 .rd-rank-row:hover{background:color-mix(in srgb,var(--ink) 4%,transparent)}
 .rd-rank-n{font:600 9.5px var(--mono);color:var(--ink-3);width:16px}
 .rd-rank-name{font-size:11.5px;flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -2179,16 +2194,18 @@ function uid() { return Date.now().toString(36) + Math.random().toString(36).sli
    PALETAS DE COR (padrão de cores escolhido em Ajustes)
    ============================================================ */
 const PALETTES = [
-  { id: 'fogo', name: 'Fogo', accent1: '#EF3340', background: '#F8EFED' },
-  { id: 'agua', name: 'Água', accent1: '#1477FF', background: '#EDF4FC' },
-  { id: 'terra', name: 'Terra', accent1: '#E66A24', background: '#F7F0E8' },
-  { id: 'ar', name: 'Ar', accent1: '#20B9E8', background: '#ECF7F8' },
-  { id: 'metal', name: 'Metal', accent1: '#536DFF', background: '#F0F1F8' },
-  { id: 'madeira', name: 'Madeira', accent1: '#39A94A', accent2: '#A77A50', background: '#EEF4E9' },
-  { id: 'eletricidade', name: 'Eletricidade', accent1: '#F2C400', background: '#FBF6E4' },
-  { id: 'veneno', name: 'Veneno', accent1: '#72B800', background: '#F1F6E6' },
-  { id: 'sombra', name: 'Sombra', accent1: '#5964D9', background: '#F0F0F7' },
-  { id: 'sagrado', name: 'Sagrado', accent1: '#D9A900', background: '#F8F4E5' }
+  { id: 'dojo', name: 'Dojo', accent1: '#EF3340', accent2: '#5891B2', background: '#5964D9' },
+  { id: 'laca', name: 'Laca & Marfim', accent1: '#9A2A2A', accent2: '#1B2A4E', background: '#F4EEE0' },
+  { id: 'iris', name: 'Íris Noturna', accent1: '#75539A', accent2: '#B5A6C9', background: '#F4EEE0' },
+  { id: 'cha', name: 'Chá & Seda', accent1: '#527B67', accent2: '#8DB6A5', background: '#F3EBDA' },
+  { id: 'cedro', name: 'Cedro Queimado', accent1: '#8A6A47', accent2: '#C69A78', background: '#F3EBDA' },
+  { id: 'tinta', name: 'Tinta & Giz', accent1: '#1C3D5A', accent2: '#B5A6C9', background: '#F4EEE0' },
+  { id: 'ameixa', name: 'Ameixa & Névoa', accent1: '#81415D', accent2: '#B5A6C9', background: '#F2ECEA' },
+  { id: 'folha', name: 'Folha Nova', accent1: '#426B4D', accent2: '#9AB98A', background: '#F0F0E3' },
+  { id: 'ambar', name: 'Âmbar & Cinza', accent1: '#B17A2B', accent2: '#8E9188', background: '#F4EEE0' },
+  { id: 'coral', name: 'Coral & Maré', accent1: '#B95648', accent2: '#6C9BA1', background: '#F4EEE0' },
+  { id: 'lavanda', name: 'Lavanda & Índigo', accent1: '#79678F', accent2: '#5D6F91', background: '#F0EDF3' },
+  { id: 'sakura', name: 'Flor & Bambu', accent1: '#B76E7B', accent2: '#64866B', background: '#F6EFE6' }
 ];
 function currentPalette() { return PALETTES.find(p => p.id === prefs.palette) || PALETTES[0]; }
 function mixHex(a, b, t) {
@@ -2319,11 +2336,11 @@ function hexA(hex, a) {
 }
 
 /* prefs de UI */
-const APP_VERSION = '2.78';
+const APP_VERSION = '2.81';
 /* assinatura do modelo de cobrança (fechamento novo + abertura com "outras pendências") */
 const WA_TPL_VER = 2;
 const WA_EMOJI_DEFAULT = '✅';
-let prefs = { theme: 'dark', view: 'table', beltCompact: true, pv: 3, palette: 'agua', accent: null, accent2: null, bg: null, invertHighlights: false,
+let prefs = { theme: 'dark', view: 'table', beltCompact: true, pv: 3, palette: 'dojo', accent: null, accent2: null, bg: null, invertHighlights: false,
   waNumber: '', waTime: '09:00', waTemplate: '', waLate: true, waPix: 'dojoarandu@gmail.com', waTplVer: WA_TPL_VER, waEmoji: WA_EMOJI_DEFAULT,
   hideTopbar: false };
 function savePrefs() { try { localStorage.setItem(COL_KEY, JSON.stringify(prefs)); } catch (e) {} }
@@ -2348,7 +2365,8 @@ function savePrefs() { try { localStorage.setItem(COL_KEY, JSON.stringify(prefs)
   }
 })();
 /* migrates theme/palette preferences from retired palettes and older swatch pools */
-if (!PALETTES.some(p => p.id === prefs.palette)) prefs.palette = 'agua';
+if (!PALETTES.some(p => p.id === prefs.palette)) prefs.palette = 'dojo';
+if (prefs.palette === 'agua' && !prefs.accent && !prefs.accent2 && !prefs.bg) { prefs.palette = 'dojo'; savePrefs(); }
 if (prefs.accent && !ALL_COLORS.some(c => c.toLowerCase() === String(prefs.accent).toLowerCase())) prefs.accent = null;
 if (prefs.accent2 && !ALL_COLORS.some(c => c.toLowerCase() === String(prefs.accent2).toLowerCase())) prefs.accent2 = null;
 if (prefs.bg && !ALL_COLORS.some(c => c.toLowerCase() === String(prefs.bg).toLowerCase())) prefs.bg = null;
@@ -2458,6 +2476,13 @@ function ensureMonthly(month) {
 const degreeOf = s => { const n = Number(s.degrees); return Number.isInteger(n) && n >= 0 && n <= 4 ? n : 0; };
 const beltText = s => `${s.belt || '—'}${degreeOf(s) ? ' ' + degreeOf(s) : ''}`;
 
+function homeOssGreeting() {
+  const h = new Date().getHours();
+  if (h < 12) return 'Oss, bom dia!';
+  if (h < 17) return 'Oss, boa tarde!';
+  if (h < 22) return 'Oss, bom treino!';
+  return 'Oss, bom descanso!';
+}
 function greeting() {
   const h = new Date().getHours();
   if (h < 6) return 'Boa madrugada';
@@ -3295,6 +3320,31 @@ function renderBaseBanner() {
   document.body.classList.toggle('has-demo-banner', demo);
 }
 
+function renderKeepingSettings() {
+  const root = $('#view');
+  const scrollY = window.scrollY;
+  const sections = [...(root?.querySelectorAll('.set-sec') || [])].map(card => ({
+    id: card.dataset.sec, open: !card.querySelector('.set-body')?.hidden,
+    options: [...card.querySelectorAll('.appearance-fold')].map(opt => ({id: opt.dataset.option, open: !opt.querySelector('.appearance-fold-body')?.hidden})),
+    sliders: [...card.querySelectorAll('.color-slider')].map(sl => ({id: sl.dataset.slider, left: sl.scrollLeft}))
+  }));
+  render();
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    sections.forEach(state => {
+      const card = root?.querySelector(`.set-sec[data-sec="${state.id}"]`); if (!card) return;
+      const head = card.querySelector('.set-head'), body = card.querySelector('.set-body');
+      if (body) body.hidden = !state.open;
+      head?.setAttribute('aria-expanded', String(state.open)); card.classList.toggle('is-open', state.open);
+      state.options.forEach(item => {
+        const opt = card.querySelector(`.appearance-fold[data-option="${item.id}"]`); if (!opt) return;
+        const b = opt.querySelector('.appearance-fold-body'), h = opt.querySelector('.appearance-fold-head');
+        if (b) b.hidden = !item.open; h?.setAttribute('aria-expanded', String(item.open)); opt.classList.toggle('is-open', item.open);
+      });
+      state.sliders.forEach(sl => { const el = card.querySelector(`.color-slider[data-slider="${sl.id}"]`); if (el) el.scrollLeft = sl.left; });
+    });
+    window.scrollTo({top: scrollY, behavior: 'instant'});
+  }));
+}
 function render() {
   renderBaseBanner();
   renderNav();
@@ -3313,7 +3363,6 @@ function pageHead({ crumb, title, sub, actions = '' }) {
     <div>
       <div class="crumb eyebrow">${esc(crumb || 'Dojo Arandu')}</div>
       ${title}
-      <div class="page-ver" title="Versão do Arandu">Arandu v${APP_VERSION}</div>
       ${sub ? `<p class="page-sub">${sub}</p>` : ''}
     </div>
     ${actions ? `<div class="page-actions">${actions}</div>` : ''}
@@ -4134,12 +4183,12 @@ function pageHoje() {
   return `
   ${pageHead({
     crumb: todayLong(),
-    title: `<h1 class="page-title">Oss, <em>bom treino</em>.</h1>`,
+    title: `<h1 class="page-title">${homeOssGreeting().replace(/^(Oss, )(.+?)([.!])$/, '$1<em>$2</em>$3')}</h1>`,
     sub: active.length
       ? `<b style="color:var(--ink)">${present}</b> de ${active.length} alunos já passaram pelo tatame hoje${visitorsToday.length ? ` e ${visitorsToday.length} visita${visitorsToday.length > 1 ? 's' : ''} apareceu${visitorsToday.length > 1 ? 'ram' : ''}` : ''}.`
       : 'Cadastre o primeiro aluno para começar a acompanhar o dojo.',
     actions: `<button class="btn" data-act="nav" data-page="frequencia">${icon('check', 15)} Chamada</button>
-      <button class="btn btn--primary" data-act="new-student">${icon('userPlus', 15)} Nova matrícula</button>`
+      <button class="btn btn--ghost btn--neon-a1" data-act="new-student">${icon('userPlus', 15)} Nova matrícula</button>`
   })}
 
   <div class="bento">
@@ -4181,7 +4230,7 @@ function pageHoje() {
                   ? `O treino adulto está rolando agora — ${GROUPS.Adulto.start} às ${GROUPS.Adulto.end}. Abra a chamada e marque quem está no tatame.`
                   : `Nenhuma turma confirmada hoje. Próximo treino adulto: ${nextDay.getTime() === TODAY.getTime() ? 'hoje' : WEEKDAYS_LONG[nextDay.getDay()]}, ${GROUPS.Adulto.start}.`)}</p>
           <div class="hero-actions">
-            <button class="btn btn--seal" data-act="go-att">${icon('check', 15)} ${groupsToday.length ? 'Abrir chamada' : 'Confirmar treino'}</button>
+            <button class="btn btn--ghost btn--neon-a2" data-act="go-att">${icon('check', 15)} ${groupsToday.length ? 'Abrir chamada' : 'Confirmar treino'}</button>
             <button class="btn btn--ghost" data-act="new-training">${icon('layers', 15)} Planejar treino</button>
           </div>
         </div>
@@ -4431,6 +4480,60 @@ function studentRowsHTML(mode) {
   </table></div>`;
 }
 
+function studentAnalyticsHTML(m = MONTH) {
+  const coh = rdCohort(m), freq = rdFrequency(m), belts = rdBelts(), people = rdPeople(m);
+  const mc = monthlyChartData(m, view.monthMetric);
+  const trend = lineChart({
+    labels: mc.labels, pointLabels: mc.pointLabels,
+    series: [
+      { name: 'Adulto', color: 'var(--adult-class,var(--vermilion))', values: mc.adult },
+      { name: 'Kids', color: 'var(--kids-class,var(--accent-button,var(--indigo)))', values: mc.kids }
+    ],
+    max: view.monthMetric === 'percent' ? 100 : Math.max(mc.maxAdult, mc.maxKids, 1),
+    format: v => view.monthMetric === 'percent' ? Math.round(v) + '%' : Math.round(v) + ' presenças',
+    yFormat: v => view.monthMetric === 'percent' ? Math.round(v) + '%' : Math.round(v),
+    xLabelEvery: 2, height: 220, highlight: m === MONTH ? TODAY.getDate() - 1 : -1
+  });
+  const mediaAluno = freq.porGrupo.length ? (freq.porGrupo.reduce((a,g)=>a+g.perAluno,0)/freq.porGrupo.length).toFixed(1).replace('.', ',') : '0,0';
+  const maxBelt = Math.max(1, ...belts.dist.map(b=>b.n));
+  const maxRank = Math.max(1, ...people.ranking.map(r=>r.n));
+  const lowPresence = freq.risco.filter(x=>x.n<=2).slice(0,5);
+  return `<section class="student-analytics" aria-label="Indicadores dos alunos">
+    <div class="card-head" style="margin:22px 0 12px"><div><h2 style="font:700 16px var(--cond);letter-spacing:.08em;text-transform:uppercase">Indicadores dos alunos</h2><div class="sub">${monthBR(m)} · frequência, equipe e graduação</div></div></div>
+    <div class="rd-kpis">
+      ${rdKpi('Alunos ativos',activeStudents().length,`${db.students.length-activeStudents().length} inativos`,'moss','users')}
+      ${rdKpi('Novas matrículas',coh.novos,'neste mês','indigo','userPlus')}
+      ${rdKpi('Retenção',coh.retencao.toFixed(1).replace('.',',')+'%',`${coh.churn} saída${coh.churn===1?'':'s'} no mês`,'gold','chart')}
+      ${rdKpi('Assiduidade',mediaAluno+'×',`${freq.dias} dias com chamada`,'seal','checkCircle')}
+    </div>
+    <div class="bento student-analytics-grid">
+      <div class="card col-12">
+        <div class="card-head"><div><h3>Evolução diária</h3><div class="sub">Presenças por turma ao longo do mês · ${view.monthMetric==='percent'?'percentual dos alunos ativos':'quantidade de presenças'}</div></div><div class="tail"><div class="seg"><button data-act="month-metric" data-id="percent" aria-pressed="${view.monthMetric==='percent'}">%</button><button data-act="month-metric" data-id="count" aria-pressed="${view.monthMetric==='count'}">Nº</button></div></div></div>
+        ${(hasData(mc.adult)||hasData(mc.kids))?trend:chartEmpty('Sem presenças neste mês','Abra uma chamada para começar a acompanhar a evolução diária.')}
+        <div class="legend"><span><i style="background:var(--adult-class,var(--vermilion))"></i>Adulto</span><span><i style="background:var(--kids-class,var(--accent-button,var(--indigo)))"></i>Kids</span></div>
+      </div>
+      <div class="card col-6">
+        <div class="card-head"><div><h3>Assiduidade</h3><div class="sub">Dias com chamada e frequência por grupo</div></div></div>
+        <div class="rd-ring-row"><div class="rd-ring"><svg viewBox="0 0 42 42"><circle cx="21" cy="21" r="17" class="track"/><circle cx="21" cy="21" r="17" class="val" style="stroke-dasharray:${(Math.min(100,freq.ocupacao)*1.068).toFixed(1)} 999"/></svg><div class="rd-ring-txt"><b>${freq.ocupacao}%</b><small>dias com aula</small></div></div><div class="rd-ring-side">${freq.porGrupo.map(g=>`<div class="rd-mini"><span>${esc(g.g)}</span><b>${g.perAluno.toFixed(1).replace('.',',')}×</b><small>${g.total} presenças · ${g.head} alunos</small></div>`).join('')}</div></div>
+        <div class="rd-note">${icon('calendar',13)} ${freq.dias} dias com registro de presença neste mês.</div>
+      </div>
+      <div class="card col-6">
+        <div class="card-head"><div><h3>Faixas e graduação</h3><div class="sub">${belts.total} ativos · média ${belts.mediaGraus.toFixed(1).replace('.',',')} graus</div></div></div>
+        <div class="rd-belts">${belts.dist.map(b=>`<div class="rd-belt"><i style="background:${b.color}"></i><span>${esc(b.name)}</span><span class="rd-belt-track"><b style="width:${Math.round(b.n/maxBelt*100)}%"></b></span><b class="num">${b.n}</b></div>`).join('')||'<div class="empty"><b>Sem faixas registradas</b></div>'}</div>
+        ${belts.aptos.length?`<div class="rd-alert">${icon('award',14)} ${belts.aptos.length} com 4 graus: ${belts.aptos.slice(0,4).map(x=>`<button class="lnk" data-act="open-profile" data-id="${x.s.id}">${esc(x.s.name.split(' ')[0])}</button>`).join(', ')}</div>`:''}
+      </div>
+      <div class="card col-6">
+        <div class="card-head"><div><h3>Resumo da equipe</h3><div class="sub">Mais presenças no mês</div></div></div>
+        <div class="rd-rank">${people.ranking.map((r,i)=>`<button class="rd-rank-row" data-act="open-profile" data-id="${r.s.id}"><span class="rd-rank-n">${pad(i+1)}</span><span class="rd-rank-name">${esc(r.s.name)}</span><span class="rd-rank-track"><i style="width:${Math.round(r.n/maxRank*100)}%"></i></span><b class="num">${r.n}</b></button>`).join('')||'<div class="empty"><b>Sem presenças no mês</b></div>'}</div>
+      </div>
+      <div class="card col-6">
+        <div class="card-head"><div><h3>Atenção à frequência</h3><div class="sub">Alunos ativos com até 2 presenças no mês</div></div></div>
+        <div class="rd-rank">${lowPresence.map(x=>`<button class="rd-rank-row" data-act="open-profile" data-id="${x.s.id}"><span class="rd-rank-name">${esc(x.s.name)}</span><span class="rd-rank-track"><i style="width:${Math.min(100,x.n*25)}%"></i></span><b class="num">${x.n}</b></button>`).join('')||'<div class="empty"><b>Sem alunos com frequência baixa</b></div>'}</div>
+      </div>
+    </div>
+  </section>`;
+}
+
 function pageAlunos() {
   const total = db.students.length, active = activeStudents().length;
   /* no celular a tabela larga força repaint caro: usa a visão em cartões */
@@ -4454,7 +4557,7 @@ function pageAlunos() {
         <button data-act="student-view" data-id="table" aria-pressed="${view.studentsView === 'table'}">${icon('list', 14)}</button>
         <button data-act="student-view" data-id="cards" aria-pressed="${view.studentsView === 'cards'}">${icon('grid', 14)}</button>
       </div>
-      <button class="btn btn--primary" data-act="new-student">${icon('userPlus', 15)} Nova matrícula</button>`
+      <button class="btn btn--ghost btn--neon-a1" data-act="new-student">${icon('userPlus', 15)} Nova matrícula</button>`
   })}
   <div class="card card--flush">
     <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:14px 16px;border-bottom:1px solid var(--line-2)">
@@ -4465,7 +4568,8 @@ function pageAlunos() {
       <div style="display:flex;gap:6px;flex-wrap:wrap">${chips}</div>
     </div>
     <div id="studentsBody">${studentRowsHTML(viewMode)}</div>
-  </div>`;
+  </div>
+  ${studentAnalyticsHTML(MONTH)}`;
 }
 
 /* ============================================================
@@ -4474,14 +4578,14 @@ function pageAlunos() {
 function dayStripHTML(dateStr) {
   const start = weekStart(dateStr);
   const days = Array.from({ length: 7 }, (_, i) => addDays(start, i));
-  return `<div style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px">
+  return `<div class="day-strip" style="display:grid;grid-template-columns:repeat(7,1fr);gap:6px">
     ${days.map(d => {
       const wd = parseD(d).getDay();
       const scheduled = GROUPS.Adulto.days.includes(wd) || GROUPS.Kids.days.includes(wd);
       const has = attendanceOf(d).length > 0, open = openGroups(d).length > 0;
       const on = d === dateStr;
       return `<button class="chip" data-act="set-day" data-id="${d}" aria-pressed="${on}"
-        style="flex-direction:column;gap:2px;padding:9px 4px;border-radius:12px;background:${on ? 'var(--ink)' : 'var(--card)'};border-color:${on ? 'var(--ink)' : scheduled ? 'var(--line)' : 'var(--line-2)'};opacity:${scheduled ? 1 : .55}">
+        style="flex-direction:column;gap:2px;padding:9px 4px;border-radius:12px;border-color:${scheduled ? 'var(--line)' : 'var(--line-2)'};opacity:${scheduled ? 1 : .55}">
         <span style="font:600 9.5px var(--mono);letter-spacing:.1em;text-transform:uppercase;opacity:.7">${WEEKDAYS[wd]}</span>
         <span style="font:500 15px var(--mono)">${parseD(d).getDate()}</span>
         <span style="display:flex;gap:2px;height:5px">${open ? '<i style="width:4px;height:4px;border-radius:50%;background:var(--vermilion)"></i>' : ''}${has && !open ? '<i style="width:4px;height:4px;border-radius:50%;background:var(--moss)"></i>' : ''}${d === TODAY_ISO ? '<i style="width:4px;height:4px;border-radius:50%;background:var(--gold)"></i>' : ''}</span>
@@ -4539,7 +4643,7 @@ function visitorsBlockHTML(dateStr) {
   return `<div class="card">
     <div class="card-head">
       <div><h3>Visitas do dia</h3><div class="sub">${list.length ? `${list.length} pessoa${list.length > 1 ? 's' : ''} de fora treinou com o dojo` : 'Aulas experimentais e visitantes'}</div></div>
-      <div class="tail"><button class="btn btn--sm" data-act="new-visitor" ${groups.length ? '' : 'disabled title="Confirme uma turma primeiro"'}>${icon('plus', 14)} Visita</button></div>
+      <div class="tail"><button class="btn btn--sm btn--ghost btn--neon-a1" data-act="new-visitor" ${groups.length ? '' : 'disabled title="Confirme uma turma primeiro"'}>${icon('plus', 14)} Visita</button></div>
     </div>
     ${list.length ? `<div class="rows">${list.map(v => `<div class="visit-row">
       ${avatarHTML(v.name)}
@@ -4592,7 +4696,7 @@ function monthlyCalendarHTML(month) {
       <span>clique no dia → chamada</span>
     </div>`;
 }
-function monthlyChartData(month) {
+function monthlyChartData(month, metric = view.monthMetric) {
   const n = daysInMonth(month);
   const adultRoster = rosterOf('Adulto'), kidsRoster = rosterOf('Kids');
   const labels = [], pointLabels = [], adult = [], kids = [], visits = [];
@@ -4604,7 +4708,7 @@ function monthlyChartData(month) {
     const calc = (g, roster) => {
       if (!roster.length || !sessionOpen(date, g) || future) return null;
       const k = attendanceOf(date).filter(id => { const s = studentById(id); return s && groupOf(s) === g; }).length;
-      return view.monthMetric === 'percent' ? Math.round((k / roster.length) * 100) : k;
+      return metric === 'percent' ? Math.round((k / roster.length) * 100) : k;
     };
     const a = calc('Adulto', adultRoster), k = calc('Kids', kidsRoster);
     adult.push(a); kids.push(k);
@@ -4651,7 +4755,7 @@ function pageFrequencia() {
     actions: `<button class="btn" data-act="shift-day" data-id="-1" aria-label="Dia anterior">${icon('chevronLeft', 15)}</button>
       <button class="btn" data-act="set-day" data-id="${TODAY_ISO}">Hoje</button>
       <button class="btn" data-act="shift-day" data-id="1" aria-label="Próximo dia">${icon('chevronRight', 15)}</button>
-      <button class="btn btn--primary" data-act="new-visitor">${icon('userPlus', 15)} Visita</button>`
+      <button class="btn btn--ghost btn--neon-a1" data-act="new-visitor">${icon('userPlus', 15)} Visita</button>`
   })}
 
   <div class="card" style="margin-bottom:16px">
@@ -5502,19 +5606,22 @@ function pageAjustes() {
   const themeOpt = (val, label) => `<button class="theme-opt" data-act="set-theme" data-id="${val}" aria-pressed="${prefs.theme === val}">
       <span class="t-icon">${tIcon(val)}</span><b>${label}</b>
     </button>`;
+  const mobileSettings = window.matchMedia && window.matchMedia('(max-width:900px)').matches;
+  const foldOption = (id, label, desc, content) => `<div class="appearance-fold" data-option="${id}">
+    <button type="button" class="appearance-fold-head" data-act="toggle-option" data-id="${id}" aria-expanded="${mobileSettings ? 'false' : 'true'}" aria-controls="appearance-content-${id}">
+      <span><b>${label}</b><small>${desc}</small></span><span class="appearance-fold-icon">${icon('chevronDown', 16)}</span>
+    </button>
+    <div class="appearance-fold-body" id="appearance-content-${id}"${mobileSettings ? ' hidden' : ''}>${content}</div>
+  </div>`;
   const colorSlider = (kind, label, desc, current) => {
     const cur = (current || '').toLowerCase();
     const isOn = c => c.toLowerCase() === cur;
     const oneCopy = ALL_COLORS.map(c => `<button type="button" class="color-dot${isOn(c) ? ' is-on' : ''}" data-act="set-color" data-kind="${kind}" data-id="${c}" style="background:${c}" title="${c}" aria-label="${label} ${c}"></button>`).join('');
-    return `<div class="settings-row" style="display:block">
-      <div class="txt"><h4>${label}</h4><p>${desc}</p></div>
-      <div class="color-slider-wrap">
-        <button type="button" class="color-arrow color-arrow--l" data-act="color-arrow" data-kind="${kind}" data-dir="-1" aria-label="Cor anterior">${icon('chevronLeft', 18)}</button>
-        <div class="color-slider" data-slider="${kind}">${oneCopy}${oneCopy}${oneCopy}</div>
-        <button type="button" class="color-arrow color-arrow--r" data-act="color-arrow" data-kind="${kind}" data-dir="1" aria-label="Próxima cor">${icon('chevronRight', 18)}</button>
-      </div>
-      <div class="color-current"><i style="background:${current}"></i><span>${current.toUpperCase()}${prefs[kind] ? ' · escolhida' : ' · da paleta'}</span></div>
-    </div>`;
+    return `<div class="custom-color-control"><div class="txt"><h4>${label}</h4><p>${desc}</p></div><div class="color-slider-wrap">
+      <button type="button" class="color-arrow color-arrow--l" data-act="color-arrow" data-kind="${kind}" data-dir="-1" aria-label="Cor anterior">${icon('chevronLeft',18)}</button>
+      <div class="color-slider" data-slider="${kind}">${oneCopy}${oneCopy}${oneCopy}</div>
+      <button type="button" class="color-arrow color-arrow--r" data-act="color-arrow" data-kind="${kind}" data-dir="1" aria-label="Próxima cor">${icon('chevronRight',18)}</button>
+    </div><div class="color-current"><i style="background:${current}"></i><span>${current.toUpperCase()}${prefs[kind] ? ' · escolhida' : ' · da paleta'}</span></div></div>`;
   };
 
   const sec = (id, title, sub, body, opts = {}) => `<div class="card set-sec${opts.open ? ' is-open' : ''}${opts.wide ? ' set-wide' : ''}" data-sec="${id}">
@@ -5525,41 +5632,15 @@ function pageAjustes() {
       <div class="set-body"${opts.open ? '' : ' hidden'}>${body}</div>
     </div>`;
 
-  const aparencia = sec('aparencia', 'Aparência', 'Dark é o padrão — Light continua à mão', `
-    <div class="set-pad">
-      <div class="theme-grid">
-        ${themeOpt('dark', 'Dark')}
-        ${themeOpt('light', 'Light')}
-      </div>
-
-      <div class="settings-row" style="border-top:1px solid var(--line-2);margin-top:18px;display:block">
-        <div class="txt"><h4>Padrão de cores</h4><p>Cada paleta usa 3 cores: Destaque 1, Destaque 2 complementar e Fundo. Ajuste cada cor individualmente nos sliders.</p></div>
-        <div class="pal-grid">
-          ${PALETTES.map(p => `<button type="button" class="pal-opt pal-opt-small" data-act="set-palette" data-id="${p.id}" aria-pressed="${(prefs.palette || 'violet') === p.id}">
-            <span class="pal-glass">${(prefs.invertHighlights ? [paletteColors(p)[1], paletteColors(p)[0], paletteColors(p)[2]] : paletteColors(p)).map(c => `<i style="background:${c}" title="${c}"></i>`).join('')}</span>
-            <b>${p.name}</b>
-            ${(prefs.palette || 'violet') === p.id ? `<span class="pal-on">✓</span>` : ''}
-          </button>`).join('')}
-        </div>
-      </div>
-      <div class="settings-row" style="padding-top:12px;border-bottom:1px solid var(--line-2)">
-        <div class="txt"><h4>Inverter os destaques</h4><p>Troca as funções das duas cores: Destaque 1 passa para Destaque 2 e Destaque 2 passa para Destaque 1.</p></div>
-        <label class="switch"><input type="checkbox" data-on="toggle-highlight-invert" ${prefs.invertHighlights ? 'checked' : ''}><span class="track"></span></label>
-      </div>
-      ${colorSlider('accent', 'Destaque 1', 'Cor dos textos de destaque e da turma Adulto. Mostra 7 cores; role, arraste ou use as setas.', effectiveAccent())}
-      ${colorSlider('accent2', 'Destaque 2 complementar', 'Cor dos botões e da turma Kids. Tom secundário mais suave da paleta; você pode escolher outra cor.', effectiveAccent2())}
-      ${colorSlider('bg', 'Cor do fundo', 'O tom do fundo do app (mantém escuro no Dark e claro no Light). Role, arraste ou use as setas.', effectiveBg())}
-      <div class="settings-row" style="display:block;padding-bottom:0">
-        <div class="color-reset"><button class="btn btn--sm" data-act="reset-colors">${icon('rotate', 14)} Restaurar cores da paleta</button></div>
-      </div>
-      <div class="settings-row" style="margin-top:4px">
-        <div class="txt"><h4>Faixa compacta</h4><p>Na lista de alunos, mostrar apenas a barra colorida e os graus, sem o nome da cor. Padrão do sistema.</p></div>
-        <label class="switch"><input type="checkbox" data-on="toggle-belt-compact" ${prefs.beltCompact ? 'checked' : ''}><span class="track"></span></label>
-      </div>
-      <div class="settings-row">
-        <div class="txt"><h4>Esconder a barra ao rolar</h4><p>No celular, a barra do app sai de cena quando você desce e volta ao chegar no topo.</p></div>
-        <label class="switch"><input type="checkbox" data-on="toggle-hide-topbar" ${prefs.hideTopbar !== false ? 'checked' : ''}><span class="track"></span></label>
-      </div>
+  const aparencia = sec('aparencia', 'Aparência', 'Tema, paletas e cores do app', `
+    <div class="set-pad appearance-options">
+      <div class="theme-always"><div class="settings-row" style="display:block;padding:0 0 10px"><div class="txt"><h4>Tema</h4><p>Escolha entre o modo escuro e claro.</p></div></div><div class="theme-grid">${themeOpt('dark', 'Dark')}${themeOpt('light', 'Light')}</div></div>
+      <div class="settings-row"><div class="txt"><h4>Faixa compacta</h4><p>Na lista de alunos, mostrar apenas a barra colorida e os graus.</p></div><label class="switch"><input type="checkbox" data-on="toggle-belt-compact" ${prefs.beltCompact?'checked':''}><span class="track"></span></label></div>
+      <div class="settings-row"><div class="txt"><h4>Esconder a barra ao rolar</h4><p>No celular, a barra sai de cena ao descer e volta ao chegar no topo.</p></div><label class="switch"><input type="checkbox" data-on="toggle-hide-topbar" ${prefs.hideTopbar!==false?'checked':''}><span class="track"></span></label></div>
+      ${foldOption('palette', 'Paleta', 'Escolha a combinação-base de destaques e fundo.', `<div class="pal-grid">${PALETTES.map(p => `<button type="button" class="pal-opt pal-opt-small" data-act="set-palette" data-id="${p.id}" aria-pressed="${prefs.palette === p.id}"><span class="pal-glass">${(prefs.invertHighlights ? [paletteColors(p)[1],paletteColors(p)[0],paletteColors(p)[2]] : paletteColors(p)).map(c=>`<i style="background:${c}" title="${c}"></i>`).join('')}</span><b>${p.name}</b>${prefs.palette===p.id?'<span class="pal-on">✓</span>':''}</button>`).join('')}</div>`)}
+      <div class="settings-row"><div class="txt"><h4>Inverter os destaques</h4><p>Troca as funções do Destaque 1 e do Destaque 2.</p></div><label class="switch"><input type="checkbox" data-on="toggle-highlight-invert" ${prefs.invertHighlights?'checked':''}><span class="track"></span></label></div>
+      ${foldOption('custom-colors', 'Cores personalizadas', 'Ajuste os destaques e o fundo; a amostra acompanha as cores ativas.', `<div class="custom-palette-preview" aria-label="Cores ativas"><span class="custom-palette-icon">${icon('palette',18)}</span><div class="custom-palette-swatches"><i style="background:${effectiveAccent()}" title="Destaque 1 ${effectiveAccent()}"></i><i style="background:${effectiveAccent2()}" title="Destaque 2 ${effectiveAccent2()}"></i><i style="background:${effectiveBg()}" title="Fundo ${effectiveBg()}"></i></div><small>Paleta ativa · os tons acompanham os sliders</small></div>${colorSlider('accent','Destaque 1','Cor principal dos destaques e da turma Adulto.',effectiveAccent())}${colorSlider('accent2','Destaque 2','Cor de apoio dos botões e da turma Kids.',effectiveAccent2())}${colorSlider('bg','Cor de fundo','Fundo principal do app.',effectiveBg())}`)}
+      <div class="settings-row"><div class="txt"><h4>Restaurar cores da paleta</h4><p>Volta aos tons definidos pela paleta selecionada.</p></div><button class="btn btn--sm" data-act="reset-colors">${icon('rotate',14)} Restaurar</button></div>
     </div>`, { wide: true });
 
   const quemTela = ehMobile()
@@ -7511,10 +7592,10 @@ const ACTIONS = {
     if (btn && pop) { const aberto = !pop.hidden; if (aberto) menuBuild();
       btn.setAttribute('aria-expanded', String(aberto)); } },
   'rd-print': () => exportResumoGerencial(),
-  'set-palette': id => { prefs.palette = id; prefs.accent = null; prefs.accent2 = null; prefs.bg = null; savePrefs(); applyTheme(); render(); toast('Paleta: ' + currentPalette().name, { icon: 'spark' }); },
-  'set-color': (id, el) => { const kind = el.dataset.kind; const key = kind === 'accent' ? (prefs.invertHighlights ? 'accent2' : 'accent') : kind === 'accent2' ? (prefs.invertHighlights ? 'accent' : 'accent2') : kind; prefs[key] = id; savePrefs(); applyTheme(); updateColorSlider(kind); if (prefs.invertHighlights && (kind === 'accent' || kind === 'accent2')) updateColorSlider(kind === 'accent' ? 'accent2' : 'accent'); },
+  'set-palette': id => { prefs.palette = id; prefs.accent = null; prefs.accent2 = null; prefs.bg = null; savePrefs(); applyTheme(); renderKeepingSettings(); toast('Paleta: ' + currentPalette().name, { icon: 'spark' }); },
+  'set-color': (id, el) => { const kind = el.dataset.kind; const key = kind === 'accent' ? (prefs.invertHighlights ? 'accent2' : 'accent') : kind === 'accent2' ? (prefs.invertHighlights ? 'accent' : 'accent2') : kind; prefs[key] = id; savePrefs(); applyTheme(); updateColorSlider(kind); if (view.page === 'ajustes') renderKeepingSettings(); if (prefs.invertHighlights && (kind === 'accent' || kind === 'accent2')) updateColorSlider(kind === 'accent' ? 'accent2' : 'accent'); },
   'color-arrow': (id, el) => { const s = document.querySelector(`.color-slider[data-slider="${el.dataset.kind}"]`); if (s) s.scrollBy({ left: Number(el.dataset.dir) * sliderColorStep(s), behavior: 'smooth' }); },
-  'reset-colors': () => { prefs.accent = null; prefs.accent2 = null; prefs.bg = null; savePrefs(); applyTheme(); render(); toast('Cores restauradas da paleta.', { icon: 'check' }); },
+  'reset-colors': () => { prefs.accent = null; prefs.accent2 = null; prefs.bg = null; savePrefs(); applyTheme(); renderKeepingSettings(); toast('Cores restauradas da paleta.', { icon: 'check' }); },
   'export-backup': () => exportBackup(),
   'import-backup': () => importBackup(),
   'export-csv': () => exportCSV(),
@@ -7531,6 +7612,14 @@ const ACTIONS = {
     }
     /* voltando para online: pergunta qual base vale como principal */
     await escolherDBPrincipalAoVoltarOnline();
+  },
+  'toggle-option': (id, el) => {
+    const card = el.closest('.appearance-fold');
+    const body = card && card.querySelector('.appearance-fold-body');
+    if (!body) return;
+    const open = body.hidden; body.hidden = !open;
+    el.setAttribute('aria-expanded', String(open));
+    card.classList.toggle('is-open', open);
   },
   'toggle-sec': id => {
     const card = document.querySelector(`.set-sec[data-sec="${id}"]`);
