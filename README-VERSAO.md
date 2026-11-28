@@ -1,17 +1,16 @@
-# Arandu — versão 2.90.16
+# Arandu — versão 2.90.17
 
 **Tipo:** versão pública cloud-only  
-**App:** `dojo_arandu_v2-90-16.html`  
-**Pacote público:** `DojoArandu v2.90.16p.zip`
+**App:** `dojo_arandu_v2-90-17.html`  
+**Pacote público:** `DojoArandu v2.90.17p.zip`
 
 ## Resumo deste deploy
 
-- Configurações da lista aplicadas imediatamente ao tocar na opção, sem botões Aplicar ou Cancelar.
-- Ordenação por apelido, nome ou graduação, com direção crescente/decrescente. Faixas usam a sequência de cor com graus como segundo critério: branca → azul → roxa → marrom → preta; dentro de cada faixa, sem grau → 4 graus.
-- Exibição dos cartões por apelido ou nome completo.
-- Textura de carbono mais visível no fundo, ainda sobreposta ao degradê.
-- Novo card de despesas parceladas, listando compras, o valor correspondente à parcela do mês e a ação de confirmar pagamento.
-- Despesa no cartão parcelada em 10 vezes de R$ 500, por exemplo, registra R$ 50 por mês; apenas parcelas confirmadas entram no somatório pago daquele mês.
+- Textura de carbono mantida visível também em celulares e dispositivos com perfil de baixo efeito visual.
+- Na faixa semanal da Frequência, cada bolinha verde indica uma turma confirmada. Adulto e Kids têm indicadores separados; não há ponto sem confirmação.
+- Na versão web, o menu da lista de alunos voltou a permitir mostrar/ocultar colunas. Essas opções não aparecem na interface móvel.
+- Ordenação da tabela usa cor da faixa antes dos graus: branca, azul, roxa, marrom e preta; 0 a 4 graus dentro de cada cor.
+- Limpeza preparada a partir do backup enviado: conservar somente as chamadas a partir de 23/11/2026, inclusive. Original arquivado e conteúdo preservado verificado. **A limpeza no Supabase remoto ainda exige executar a consulta SQL, após revisar a prévia e fazer backup atual.**
 
 ## Documentação que acompanha cada deploy
 

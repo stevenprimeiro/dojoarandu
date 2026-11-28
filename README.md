@@ -17,10 +17,10 @@ O Arandu ajuda a organizar a operação diária do dojo: manter o cadastro dos a
 
 - **Visão geral:** consultar um resumo da operação, com informações de alunos, frequência, pendências financeiras e próximos treinos.
 - **Alunos:** cadastrar e editar perfis, pesquisar e filtrar registros, acompanhar faixa e graus, situação, plano e histórico relacionado.
-- **Frequência:** escolher a data, organizar a chamada por turma, registrar presença e visitas e consultar o histórico de frequência.
+- **Frequência:** escolher a data, organizar a chamada por turma, registrar presença e visitas e consultar o histórico de frequência. Na faixa semanal, cada bolinha verde corresponde a uma turma cujo treino foi confirmado naquele dia.
 - **Treinos:** planejar e acompanhar as aulas, organizar sessões por turma e consultar conteúdos de apoio ao treino.
 - **Financeiro:** acompanhar mensalidades e pagamentos, registrar despesas e visualizar valores em aberto e movimentações. Despesas no cartão de crédito podem ser divididas em parcelas mensais; cada parcela é confirmada individualmente e só as confirmadas entram no somatório pago.
-- **Ajustes da lista de alunos:** ao lado da busca, escolha imediatamente a ordenação por apelido, nome ou graduação, crescente/decrescente, e se a lista deve exibir apelido ou nome completo. Para graduação, a ordem compara primeiro a cor (branca, azul, roxa, marrom, preta) e depois os graus (sem grau a 4 graus).
+- **Ajustes da lista de alunos:** ao lado da busca, escolha imediatamente a ordenação por apelido, nome ou graduação, crescente/decrescente, e se a lista deve exibir apelido ou nome completo. Para graduação, a ordem compara primeiro a cor (branca, azul, roxa, marrom, preta) e depois os graus (sem grau a 4 graus). Na versão web, também é possível mostrar ou ocultar colunas.
 - **Despesas parceladas:** um card lista as compras parceladas e permite confirmar a parcela do mês. Cada parcela tem seu próprio valor mensal; somente parcelas confirmadas entram no somatório pago.
 - **Relatórios:** consultar indicadores de frequência, alunos, retenção e finanças e exportar resumos para análise.
 - **Preferências:** ajustar aparência, tema e cores; acessar opções de dados, backup e configurações disponíveis na instalação.
