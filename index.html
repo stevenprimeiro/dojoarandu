@@ -21,7 +21,7 @@
 <meta name="application-name" content="Arandu">
 <style>
 /* ============================================================
-   ARANDU · v2.90.9 — design system
+   ARANDU · v2.90.11 — design system
    Papel & tinta: editorial, quente, tátil.
    ============================================================ */
 :root{
@@ -118,9 +118,9 @@ body{
 }
 body::before{
   content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
-  background:var(--noise);opacity:.05;
+  background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.035) 0 1px,transparent 1px 5px),repeating-linear-gradient(-45deg,rgba(0,0,0,.08) 0 1px,transparent 1px 5px);background-size:7px 7px;opacity:.32;mix-blend-mode:overlay;
 }
-html[data-theme="dark"] body::before{opacity:.06}
+html[data-theme="dark"] body::before{opacity:.36}
 html[data-theme="dark"] body{background:
   radial-gradient(1100px 600px at 88% -10%, color-mix(in srgb,var(--vermilion) 34%,transparent), transparent 66%),
   radial-gradient(900px 520px at -8% 6%, color-mix(in srgb,var(--pal-2) 26%,transparent), transparent 64%),
@@ -238,7 +238,7 @@ img,svg{display:block;max-width:100%}
   font-family:var(--cond);font-weight:800;text-transform:uppercase;
   font-size:clamp(32px,4.4vw,48px);letter-spacing:-.015em;line-height:.94
 }
-.page-title em{font-family:var(--serif);font-style:italic;font-weight:500;text-transform:none;letter-spacing:-.02em;color:var(--vermilion-ink)}
+.page-title em{font-family:var(--serif);font-style:italic;font-weight:500;text-transform:none;letter-spacing:-.02em;color:var(--accent)}
 .page-sub{color:var(--ink-2);font-size:14px;margin-top:8px;max-width:56ch}
 .page-actions{margin-left:auto;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
 .crumb{display:flex;align-items:center;gap:8px;margin-bottom:10px}
@@ -480,7 +480,7 @@ html[data-theme="dark"] .card--ink{background:#232019;color:var(--ink);border-co
   font-family:var(--cond);font-weight:800;text-transform:uppercase;
   font-size:clamp(30px,3.7vw,45px);line-height:.94;letter-spacing:-.012em
 }
-.hero h2 em{font-family:var(--serif);font-style:italic;text-transform:none;font-weight:500;letter-spacing:-.025em;color:var(--vermilion-ink)}
+.hero h2 em{font-family:var(--serif);font-style:italic;text-transform:none;font-weight:500;letter-spacing:-.025em;color:var(--accent)}
 .hero p{color:var(--ink-2);font-size:13.5px;max-width:46ch}
 
 /* faixa de placar no topo do hero */
@@ -1614,6 +1614,7 @@ body.has-demo-banner .toasts{bottom:78px}
 body.has-demo-banner .main{padding-bottom:74px}
 /* dentro da cortina .lock-screen o wrap é só um contêiner neutro */
 .lock-screen .lock-wrap{display:block}
+.login-cloud{display:flex;align-items:center;justify-content:center;gap:6px;margin:0 auto 12px;color:var(--ink-2)}.login-cloud i{width:7px;height:7px;border-radius:50%;background:var(--ink-3);box-shadow:0 0 0 3px color-mix(in srgb,var(--ink-3) 15%,transparent)}.login-cloud[data-estado="ok"] i{background:var(--moss)}.login-cloud[data-estado="enviando"] i,.login-cloud[data-estado="recebendo"] i{background:var(--gold)}.login-cloud[data-estado="erro"] i{background:var(--vermilion)}
 .lock-screen{position:fixed;inset:0;z-index:200;display:grid;place-items:center;padding:20px;
   background:radial-gradient(120% 100% at 50% 0%,color-mix(in srgb,var(--accent) 18%,var(--paper)),var(--paper) 70%);
   backdrop-filter:blur(6px)}
@@ -1911,6 +1912,7 @@ body.has-demo-banner .main{padding-bottom:74px}
   font-size:11.5px;color:var(--vermilion-ink);background:var(--vermilion-soft);border:1px solid color-mix(in srgb,var(--vermilion) 26%,transparent)}
 .rd-alert--soft{color:var(--gold);background:var(--gold-soft);border-color:color-mix(in srgb,var(--gold) 28%,transparent)}
 .rd-alert .lnk{color:inherit;text-decoration:underline;font-size:11.5px}
+.rd-alert--aptos{display:grid;grid-template-columns:auto 1fr;align-items:start;gap:8px 10px}.rd-alert--aptos .aptos-list{grid-column:1/-1;display:grid;grid-template-columns:repeat(auto-fit,minmax(min(100%,150px),1fr));gap:6px}.rd-alert--aptos .aptos-list .lnk{text-align:left;padding:7px 9px;border-radius:8px;background:color-mix(in srgb,var(--paper) 34%,transparent);text-decoration:none;overflow-wrap:anywhere}
 
 /* assiduidade */
 .rd-rank{display:flex;flex-direction:column;gap:2px}
@@ -2225,19 +2227,19 @@ function uid() { return Date.now().toString(36) + Math.random().toString(36).sli
    ============================================================ */
 const PALETTES = [
   { id: 'dojo', name: 'Dojo', accent1: '#EF3340', accent2: '#5891B2', background: '#5964D9' },
-  { id: 'cha', name: 'Chá & Seda', accent1: '#527B67', accent2: '#8DB6A5', background: '#F3EBDA' },
-  { id: 'tinta', name: 'Tinta & Giz', accent1: '#1C3D5A', accent2: '#B5A6C9', background: '#F4EEE0' },
-  { id: 'ameixa', name: 'Ameixa & Névoa', accent1: '#81415D', accent2: '#B5A6C9', background: '#F2ECEA' },
-  { id: 'folha', name: 'Folha Nova', accent1: '#426B4D', accent2: '#9AB98A', background: '#F0F0E3' },
-  { id: 'lavanda', name: 'Lavanda & Índigo', accent1: '#79678F', accent2: '#5D6F91', background: '#F0EDF3' },
-  { id: 'sakura', name: 'Flor & Bambu', accent1: '#B76E7B', accent2: '#64866B', background: '#F6EFE6' },
-  { id: 'neon-lime', name: 'Neon Lima', accent1: '#C6FF00', accent2: '#00E5FF', background: '#DFF7E7' },
-  { id: 'neon-pulse', name: 'Neon Pulse', accent1: '#FF2BD6', accent2: '#7C4DFF', background: '#F8DFF2' },
-  { id: 'cyber-blue', name: 'Cyber Azul', accent1: '#00D9FF', accent2: '#FF3D81', background: '#DDEBFA' },
-  { id: 'ultraviolet', name: 'Ultravioleta', accent1: '#B84DFF', accent2: '#00FFC6', background: '#E9E0FA' },
-  { id: 'acid-sun', name: 'Acid Sun', accent1: '#FFEA00', accent2: '#FF4D4D', background: '#F5E9D4' },
+  { id: 'cha', name: 'Chá & Seda', accent1: '#527B67', accent2: '#8DB6A5', background: '#9B8060' },
+  { id: 'tinta', name: 'Tinta & Giz', accent1: '#1C3D5A', accent2: '#B5A6C9', background: '#73879A' },
+  { id: 'ameixa', name: 'Ameixa & Névoa', accent1: '#81415D', accent2: '#B5A6C9', background: '#9D6879' },
+  { id: 'folha', name: 'Folha Nova', accent1: '#426B4D', accent2: '#9AB98A', background: '#6C8B60' },
+  { id: 'lavanda', name: 'Lavanda & Índigo', accent1: '#79678F', accent2: '#5D6F91', background: '#756A96' },
+  { id: 'sakura', name: 'Flor & Bambu', accent1: '#B76E7B', accent2: '#64866B', background: '#B37B6A' },
+  { id: 'neon-lime', name: 'Neon Lima', accent1: '#C6FF00', accent2: '#00E5FF', background: '#3B8F77' },
+  { id: 'neon-pulse', name: 'Neon Pulse', accent1: '#FF2BD6', accent2: '#7C4DFF', background: '#AA4E91' },
+  { id: 'cyber-blue', name: 'Cyber Azul', accent1: '#00D9FF', accent2: '#FF3D81', background: '#357D9A' },
+  { id: 'ultraviolet', name: 'Ultravioleta', accent1: '#B84DFF', accent2: '#00FFC6', background: '#7350A0' },
+  { id: 'acid-sun', name: 'Acid Sun', accent1: '#FFEA00', accent2: '#FF4D4D', background: '#C28432' },
   { id: 'neon-night', name: 'Neon Noturna', accent1: '#39FF14', accent2: '#FF2BD6', background: '#20183D' },
-  { id: 'arctic-cyan', name: 'Ártico Elétrico', accent1: '#00E5FF', accent2: '#3D5AFE', background: '#D6F8FF' },
+  { id: 'arctic-cyan', name: 'Ártico Elétrico', accent1: '#00E5FF', accent2: '#3D5AFE', background: '#278C9D' },
   { id: 'electric-orange', name: 'Laranja Elétrico', accent1: '#FF6D00', accent2: '#E1FF00', background: '#18202D' }
 ];
 function currentPalette() { return PALETTES.find(p => p.id === prefs.palette) || PALETTES[0]; }
@@ -2387,7 +2389,7 @@ function hexA(hex, a) {
 }
 
 /* prefs de UI */
-const APP_VERSION = '2.90.9';
+const APP_VERSION = '2.90.11';
 /* assinatura do modelo de cobrança (fechamento novo + abertura com "outras pendências") */
 const WA_TPL_VER = 2;
 const WA_EMOJI_DEFAULT = '✅';
@@ -2502,6 +2504,9 @@ const sessionOpen = (d, g) => !!(db.attendanceOpen[d] && db.attendanceOpen[d][g]
 const openGroups = d => Object.keys(GROUPS).filter(g => sessionOpen(d, g));
 const paymentsOf = m => db.payments.filter(p => p.month === m);
 const expensesOf = m => db.expenses.filter(e => (e.date || '').startsWith(m));
+const expenseValue = e => e.installmentGroup ? (e.installmentPaid ? Number(e.amount)||0 : 0) : Number(e.amount)||0;
+const expenseGroup = id => db.expenses.filter(x=>x.installmentGroup===id).sort((a,b)=>a.installmentIndex-b.installmentIndex);
+const installmentDate = (date,n) => { const d=parseD(date); const target=monthShift(date.slice(0,7),n); return `${target}-${pad(Math.min(d.getDate(),daysInMonth(target)))}`; };
 const dueFor = (s, m) => `${m}-${pad(Math.min(Number(s.dueDay) || 10, 28))}`;
 const studentById = id => db.students.find(s => s.id === id);
 const paymentById = id => db.payments.find(p => p.id === id);
@@ -3225,6 +3230,7 @@ const view = { baseModo: '',
   q: '',
   filter: 'Ativos',
   studentsView: prefs.view || 'table',
+  studentSort: prefs.studentSort || 'name', studentSortDir: prefs.studentSortDir || 1, studentShowFullName: !!prefs.studentShowFullName,
   sortStudents: { key: 'name', dir: 1 },
   sortPay: { key: 'student', dir: 1 },
   sortExp: { key: 'date', dir: -1 },
@@ -4264,7 +4270,7 @@ function pageHoje() {
       ? `<b style="color:var(--ink)">Último treino:</b> ${last.present} presença${last.present===1?'':'s'} · ${dateBR(last.date)} · ${last.groups.map(esc).join(' + ')}`
       : 'Ainda não há chamada registrada para mostrar o último treino.'; })(),
     actions: `<button class="btn" data-act="nav" data-page="frequencia">${icon('check', 15)} Chamada</button>
-      <button class="btn btn--ghost btn--neon-a1" data-act="new-student">${icon('userPlus', 15)} Nova matrícula</button>`
+      <button class="btn btn--ghost btn--neon-a1" data-act="students-table-settings" aria-label="Configurações da tabela" title="Configurações da tabela">${icon('settings',15)}</button><button class="btn btn--ghost btn--neon-a1" data-act="new-student">${icon('userPlus', 15)} Nova matrícula</button>`
   })}
 
   <div class="bento">
@@ -4492,12 +4498,13 @@ function filteredStudents() {
   });
 }
 const SORT_GET = {
-  name: s => studentDisplayName(s), belt: s => beltRank(s.belt), classGroup: s => groupOf(s), locality: s => s.locality || '',
+  name: s => (view.studentShowFullName ? s.name : studentDisplayName(s)), belt: s => beltRank(s.belt), classGroup: s => groupOf(s), locality: s => s.locality || '',
   freqWeek: s => freqCount(s.id, 'week'), freqMonth: s => freqCount(s.id, 'month'), freqYear: s => freqCount(s.id, 'year'),
   fee: s => Number(s.fee) || 0, status: s => s.status || '', age: s => Number(s.age) || 0
 };
 function sortedStudents() {
   const arr = filteredStudents();
+  if (view.studentSort) { view.sortStudents.key = view.studentSort; view.sortStudents.dir = view.studentSortDir || 1; }
   const { key, dir } = view.sortStudents;
   return arr.sort((a, b) => cmp((SORT_GET[key] || SORT_GET.name)(a), (SORT_GET[key] || SORT_GET.name)(b)) * dir);
 }
@@ -4596,7 +4603,7 @@ function studentAnalyticsHTML(m = MONTH) {
       <div class="card col-6">
         <div class="card-head"><div><h3>Faixas e graduação</h3><div class="sub">${belts.total} ativos · média ${belts.mediaGraus.toFixed(1).replace('.',',')} graus</div></div></div>
         <div class="rd-belts">${belts.dist.map(b=>`<div class="rd-belt"><i style="background:${b.color}"></i><span>${esc(b.name)}</span><span class="rd-belt-track"><b style="width:${Math.round(b.n/maxBelt*100)}%"></b></span><b class="num">${b.n}</b></div>`).join('')||'<div class="empty"><b>Sem faixas registradas</b></div>'}</div>
-        ${belts.aptos.length?`<div class="rd-alert">${icon('award',14)} ${belts.aptos.length} para revisar (limite configurado): ${belts.aptos.slice(0,4).map(x=>`<button class="lnk" data-act="open-profile" data-id="${x.s.id}">${esc(studentDisplayName(x.s))}</button>`).join(', ')}</div>`:''}
+        ${belts.aptos.length?`<div class="rd-alert rd-alert--aptos"><span>${icon('award',14)}</span><b>${belts.aptos.length} para revisar</b><div class="aptos-list">${belts.aptos.slice(0,8).map(x=>`<button class="lnk" data-act="open-profile" data-id="${x.s.id}">${esc(studentDisplayName(x.s))}</button>`).join('')}</div></div>`:''}
       </div>
       <div class="card col-6">
         <div class="card-head"><div><h3>Resumo da equipe</h3><div class="sub">Mais presenças no mês</div></div></div>
@@ -4633,7 +4640,7 @@ function pageAlunos() {
         <button data-act="student-view" data-id="table" aria-pressed="${view.studentsView === 'table'}">${icon('list', 14)}</button>
         <button data-act="student-view" data-id="cards" aria-pressed="${view.studentsView === 'cards'}">${icon('grid', 14)}</button>
       </div>
-      <button class="btn btn--ghost btn--neon-a1" data-act="new-student">${icon('userPlus', 15)} Nova matrícula</button>`
+      <button class="btn btn--ghost btn--neon-a1" data-act="students-table-settings" aria-label="Configurações da tabela" title="Configurações da tabela">${icon('settings',15)}</button><button class="btn btn--ghost btn--neon-a1" data-act="new-student">${icon('userPlus', 15)} Nova matrícula</button>`
   })}
   <div class="card card--flush">
     <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:14px 16px;border-bottom:1px solid var(--line-2)">
@@ -5167,12 +5174,12 @@ function despesasView() {
   const get = { description: e => e.description || '', category: e => e.category || '', date: e => e.date || '', amount: e => Number(e.amount) || 0 };
   const { key, dir } = view.sortExp;
   list.sort((a, b) => cmp((get[key] || get.date)(a), (get[key] || get.date)(b)) * dir);
-  const total = sum(list, e => e.amount);
+  const total = sum(list, expenseValue);
   const revenue = sum(paymentsOf(m).filter(p => p.status === 'Pago'), p => p.amount);
   const net = revenue - total;
   const th = (k, l) => `<th ${key === k ? `aria-sort="${dir === 1 ? 'ascending' : 'descending'}"` : ''}><button data-act="sort-exp" data-id="${k}">${l}<span class="arrow">${key === k ? (dir === 1 ? '↑' : '↓') : '↕'}</span></button></th>`;
   const byCat = {};
-  list.forEach(e => { byCat[e.category || 'Outros'] = (byCat[e.category || 'Outros'] || 0) + Number(e.amount || 0); });
+  list.forEach(e => { byCat[e.category || 'Outros'] = (byCat[e.category || 'Outros'] || 0) + expenseValue(e); });
   const cats = Object.entries(byCat).sort((a, b) => b[1] - a[1]);
   const catItems = cats.map(([label, value]) => ({ label, value, color: EXPENSE_COLORS[label] || 'var(--ink-3)' }));
   const maxCat = Math.max(1, ...cats.map(c => c[1]));
@@ -5230,11 +5237,11 @@ function despesasView() {
     <div class="table-wrap"><table class="data" style="min-width:640px">
       <thead><tr>${th('description', 'Descrição')}${th('category', 'Categoria')}${th('date', 'Data')}<th>Forma</th>${th('amount', 'Valor')}<th style="width:76px"></th></tr></thead>
       <tbody>${list.length ? list.map(e => `<tr>
-        <td><button type="button" class="expense-description" data-act="edit-expense" data-id="${e.id}" aria-label="Editar despesa: ${esc(e.description)}"><b style="font-weight:600;font-size:13px">${esc(e.description)}</b>${e.quantity ? `<span class="meta dim">${esc(e.quantity)} un.</span>` : ''}</button></td>
+        <td><button type="button" class="expense-description" data-act="edit-expense" data-id="${e.id}" aria-label="Editar despesa: ${esc(e.description)}"><b style="font-weight:600;font-size:13px">${esc(e.description)}</b>${e.quantity ? `<span class="meta dim">${esc(e.quantity)} un.</span>` : ''}${e.installmentGroup ? `<span class="meta dim">Parcela ${e.installmentIndex}/${e.installmentCount} · ${expenseGroup(e.installmentGroup).filter(x=>x.installmentPaid).length} pagas de ${e.installmentCount}</span>` : ''}</button></td>
         <td><span class="badge" style="background:color-mix(in srgb,${EXPENSE_COLORS[e.category] || 'var(--ink-3)'} 14%,transparent);color:${EXPENSE_COLORS[e.category] || 'var(--ink-3)'}">${esc(e.category || 'Outros')}</span></td>
         <td class="small num">${dateBR(e.date)}</td>
-        <td class="small" style="color:var(--ink-2)">${esc(e.method || '—')}</td>
-        <td class="amount num money-neg">${money(e.amount)}</td>
+        <td class="small" style="color:var(--ink-2)">${esc(e.method || '—')} ${e.installmentGroup?`<button class="badge ${e.installmentPaid?'badge--ok':'badge--warn'}" data-act="expense-installment-paid" data-id="${e.id}" aria-label="${e.installmentPaid?'Desmarcar parcela paga':'Confirmar parcela paga'}">${e.installmentPaid?'Paga':'Marcar paga'}</button>`:''}</td>
+        <td class="amount num money-neg">${money(e.amount)}${e.installmentGroup&&!e.installmentPaid?'<div class="meta">aguardando confirmação</div>':''}</td>
         <td><div class="td-actions">
           <button class="mini-btn" data-act="edit-expense" data-id="${e.id}" title="Editar">${icon('edit', 15)}</button>
           <button class="mini-btn mini-btn--danger" data-act="del-expense" data-id="${e.id}" title="Excluir">${icon('trash', 15)}</button>
@@ -5370,14 +5377,14 @@ function rdBelts() {
 function rdCash(m) {
   const months=lastMonths(6,m), dayEnd=m===MONTH?TODAY.getDate():daysInMonth(m), days=daysInMonth(m);
   const income=(mm,through=daysInMonth(mm))=>sum(db.payments.filter(p=>p.status==='Pago'&&String(p.paidAt||p.month||'').startsWith(mm)&&(!p.paidAt||p.paidAt.slice(8,10)<=pad(through))),p=>p.amount);
-  const expense=mm=>sum(expensesOf(mm),e=>e.amount);
+  const expense=mm=>sum(expensesOf(mm),expenseValue);
   const rows=months.map(mm=>{const rev=income(mm,mm===m?dayEnd:daysInMonth(mm)),exp=expense(mm);return {m:mm,rev,exp,net:rev-exp};});
   const allMonths=months.map(mm=>income(mm,daysInMonth(mm)));
   const média=allMonths.length?allMonths.reduce((a,b)=>a+b,0)/allMonths.length:0;
   const ultimo=rows[rows.length-1]||{rev:0,exp:0,net:0},mesAtual=rows.find(r=>r.m===m)||ultimo;
   const previous=monthShift(m,-1),prevIncome=income(previous,Math.min(dayEnd,daysInMonth(previous)));
   const variacao=prevIncome>0?Math.round((mesAtual.rev-prevIncome)/prevIncome*1000)/10:null;
-  const fixasMeses=months.map(mm=>sum(expensesOf(mm).filter(e=>e.fixed===true||['Salário','Aluguel','Energia'].includes(e.category)),e=>e.amount));
+  const fixasMeses=months.map(mm=>sum(expensesOf(mm).filter(e=>e.fixed===true||['Salário','Aluguel','Energia'].includes(e.category)),expenseValue));
   const valoresFixos=fixasMeses.filter(v=>v>0),fixaMédia=valoresFixos.length?Math.round(valoresFixos.reduce((a,b)=>a+b,0)/valoresFixos.length):0;
   const runRate=dayEnd?Math.round(mesAtual.rev/dayEnd*days):0;
   return {rows,média:Math.round(média),ultimo,mesAtual,variacao,fixas:fixasMeses[fixasMeses.length-1]||0,fixaMédia,projecao:runRate-fixaMédia,runRate,parcial:m===MONTH&&dayEnd<days};
@@ -5537,7 +5544,7 @@ function relatoriosGerenciais(cur) {
         <b class="num">${b.n}</b>
       </div>`).join('')}
     </div>
-    ${belts.aptos.length ? `<div class="rd-alert">${icon('alert', 14)} <b>${belts.aptos.length}</b> aluno${belts.aptos.length > 1 ? 's' : ''} no limite de revisão (configurável): ${belts.aptos.slice(0, 4).map(x => `<button class="lnk" data-act="open-profile" data-id="${x.s.id}">${esc(studentDisplayName(x.s))}</button>`).join(', ')}${belts.aptos.length > 4 ? '…' : ''}</div>` : ''}
+    ${belts.aptos.length ? `<div class="rd-alert rd-alert--aptos"><span>${icon('alert',14)}</span><b>${belts.aptos.length} para revisar</b><div class="aptos-list">${belts.aptos.slice(0,8).map(x=>`<button class="lnk" data-act="open-profile" data-id="${x.s.id}">${esc(studentDisplayName(x.s))}</button>`).join('')}</div></div>` : ''}
     ${belts.semGrau ? `<div class="rd-note">${icon('spark', 13)} ${belts.semGrau} aluno${belts.semGrau > 1 ? 's' : ''} sem grau registrado.</div>` : ''}
   </div>`;
 
@@ -5586,7 +5593,7 @@ function relatoriosView() {
   const months = lastMonths(12, view.repMonth);
   const data = months.map(m => {
     const rev = sum(paymentsOf(m).filter(p => p.status === 'Pago'), p => p.amount);
-    const exp = sum(expensesOf(m), e => e.amount);
+    const exp = sum(expensesOf(m), expenseValue);
     const freq = Object.keys(db.attendance).filter(d => d.startsWith(m)).reduce((a, d) => a + attendanceOf(d).length + dayVisitors(d).length, 0);
     return { m, rev, exp, net: rev - exp, freq };
   });
@@ -5606,10 +5613,10 @@ function relatoriosView() {
   });
   const cur = view.repMonth;
   const rev = sum(paymentsOf(cur).filter(p => p.status === 'Pago'), p => p.amount);
-  const exp = sum(expensesOf(cur), e => e.amount);
+  const exp = sum(expensesOf(cur), expenseValue);
   const freq = Object.keys(db.attendance).filter(d => d.startsWith(cur)).reduce((a, d) => a + attendanceOf(d).length + dayVisitors(d).length, 0);
   const byCat = {};
-  expensesOf(cur).forEach(e => { byCat[e.category || 'Outros'] = (byCat[e.category || 'Outros'] || 0) + Number(e.amount || 0); });
+  expensesOf(cur).forEach(e => { byCat[e.category || 'Outros'] = (byCat[e.category || 'Outros'] || 0) + expenseValue(e); });
   const cats = Object.entries(byCat).sort((a, b) => b[1] - a[1]);
   const maxCat = Math.max(1, ...cats.map(c => c[1]));
   const active = activeStudents().length, inactive = db.students.length - active;
@@ -6228,69 +6235,39 @@ function expenseForm(id) {
   const e = id ? expenseById(id) : null;
   const descriptionSuggestions = [
     { text: 'Garrafão de água, 20 litros', category: 'Água 20L', unit: 'garrafão' },
-    { text: 'Conta de água', category: 'Água 20L' },
-    { text: 'Conta de energia elétrica', category: 'Energia' },
-    { text: 'Aluguel do espaço', category: 'Aluguel' },
-    { text: 'Salário', category: 'Salário' },
-    { text: 'Compra de equipamentos', category: 'Equipamentos' },
-    { text: 'Faixas e graus', category: 'Faixas e graus' }
+    { text: 'Conta de água', category: 'Água 20L' }, { text: 'Conta de energia elétrica', category: 'Energia' },
+    { text: 'Aluguel do espaço', category: 'Aluguel' }, { text: 'Salário', category: 'Salário' },
+    { text: 'Compra de equipamentos', category: 'Equipamentos' }, { text: 'Faixas e graus', category: 'Faixas e graus' }
   ];
-  const descriptionField = fieldHTML({ name: 'description', label: 'Descrição', value: e?.description || '', required: true, full: true, placeholder: 'Ex.: água, aluguel, energia…' })
-    .replace('id="f_description" name="description"', 'id="f_description" name="description" list="expenseDescriptionOptions" autocomplete="off"');
+  const descriptionField = fieldHTML({ name: 'description', label: 'Descrição', value: e?.description || '', required: true, full: true, placeholder: 'Ex.: água, aluguel, energia…' }).replace('id="f_description" name="description"', 'id="f_description" name="description" list="expenseDescriptionOptions" autocomplete="off"');
   const waterSelected = (e?.category || '') === 'Água 20L';
+  const isCredit = e?.method === 'Cartão de crédito';
   const body = `<div class="form-grid">
     ${descriptionField}<datalist id="expenseDescriptionOptions">${descriptionSuggestions.map(x=>`<option value="${esc(x.text)}"></option>`).join('')}</datalist>
     ${fieldHTML({ name: 'category', label: 'Categoria', type: 'select', value: e?.category || 'Outros', options: EXPENSE_CATS })}
-    <div class="form-field" id="expenseQuantityField" ${waterSelected ? '' : 'hidden'}>
-      <label class="lbl" for="f_quantity" id="expenseQuantityLabel">${waterSelected ? 'Quantidade de garrafões' : 'Quantidade (opcional)'}</label>
-      <input class="field" id="f_quantity" name="quantity" type="number" value="${esc(e?.quantity ?? '')}" min="1" step="1" placeholder="Número de garrafões" ${waterSelected ? 'required' : ''}>
-    </div>
-    ${fieldHTML({ name: 'amount', label: 'Valor (R$)', type: 'number', value: e?.amount ?? '', min: 0, step: '0.01', required: true })}
-    ${fieldHTML({ name: 'date', label: 'Data', type: 'date', value: e?.date || TODAY_ISO, required: true })}
+    <div class="form-field" id="expenseQuantityField" ${waterSelected ? '' : 'hidden'}><label class="lbl" for="f_quantity" id="expenseQuantityLabel">${waterSelected ? 'Quantidade de garrafões' : 'Quantidade (opcional)'}</label><input class="field" id="f_quantity" name="quantity" type="number" value="${esc(e?.quantity ?? '')}" min="1" step="1" placeholder="Número de garrafões" ${waterSelected ? 'required' : ''}></div>
+    ${fieldHTML({ name: 'amount', label: 'Valor total (R$)', type: 'number', value: e?.installmentGroup ? (Number(e.amount)*Number(e.installmentCount)) : e?.amount ?? '', min: 0, step: '0.01', required: true })}
+    ${fieldHTML({ name: 'date', label: 'Data / primeira parcela', type: 'date', value: e?.date || TODAY_ISO, required: true })}
     ${fieldHTML({ name: 'method', label: 'Forma de pagamento', type: 'select', value: e?.method || 'Pix', options: METHODS })}
+    <div class="form-field" id="expenseInstallmentsField" ${isCredit?'':'hidden'}><label class="lbl" for="f_installmentCount">Quantidade de parcelas</label><input class="field" id="f_installmentCount" name="installmentCount" type="number" min="1" max="60" step="1" value="${e?.installmentCount||1}" placeholder="Ex.: 10"><div class="field-note" id="installmentPreview"></div></div>
+    ${e?.installmentGroup ? `<div class="form-field full"><div class="field-note">Acompanhamento: ${expenseGroup(e.installmentGroup).filter(x=>x.installmentPaid).length} de ${e.installmentCount} parcelas pagas. Use “Marcar paga” na linha de cada parcela.</div></div>` : ''}
     <label class="switch form-field full"><input type="checkbox" name="fixed" ${e?.fixed?'checked':''}><span class="track"></span>Despesa fixa recorrente</label>
   </div>`;
-  openModal({
-    title: e ? 'Editar despesa' : 'Lançar despesa',
-    eyebrow: 'Caixa do dojo',
-    body,
-    submitText: e ? 'Salvar' : 'Lançar',
-    onMount: root => {
-      const category = root.querySelector('#f_category');
-      const quantityField = root.querySelector('#expenseQuantityField');
-      const quantity = root.querySelector('#f_quantity');
-      const quantityLabel = root.querySelector('#expenseQuantityLabel');
-      const description = root.querySelector('#f_description');
-      const applyDescriptionPreset = () => {
-        const normalized = description.value.trim().toLocaleLowerCase('pt-BR');
-        const preset = descriptionSuggestions.find(x => x.text.toLocaleLowerCase('pt-BR') === normalized);
-        if (preset) { category.value = preset.category; category.dispatchEvent(new Event('change', { bubbles: true })); }
-      };
-      const syncQuantity = () => {
-        const water = category.value === 'Água 20L';
-        quantityField.hidden = !water;
-        quantity.required = water;
-        quantityLabel.textContent = water ? 'Quantidade de garrafões' : 'Quantidade (opcional)';
-        quantity.placeholder = water ? 'Número de garrafões' : 'Unidades';
-        if (!water && !e) quantity.value = '';
-      };
-      description.addEventListener('change', applyDescriptionPreset);
-      description.addEventListener('input', applyDescriptionPreset);
-      category.addEventListener('change', syncQuantity);
-      syncQuantity();
-    },
-    onSubmit: data => {
-      if (data.category === 'Água 20L' && (!Number.isInteger(Number(data.quantity)) || Number(data.quantity) < 1)) { toast('Informe a quantidade de garrafões.'); return false; }
-      const obj = {
-        description: data.description.trim(), category: data.category, amount: Number(data.amount) || 0,
-        date: data.date, method: data.method, quantity: data.quantity ? Number(data.quantity) : null, fixed: data.fixed === 'on'
-      };
-      if (e) { Object.assign(e, obj); toast('Despesa atualizada.'); }
-      else { db.expenses.push({ ...obj, id: uid() }); toast('Despesa lançada.'); }
-      view.expMonth = (obj.date || '').slice(0, 7);
-      save(); render();
-    }
-  });
+  openModal({title:e?'Editar despesa':'Lançar despesa',eyebrow:'Caixa do dojo',body,submitText:e?'Salvar':'Lançar',onMount:root=>{
+    const category=root.querySelector('#f_category'), quantityField=root.querySelector('#expenseQuantityField'), quantity=root.querySelector('#f_quantity'), quantityLabel=root.querySelector('#expenseQuantityLabel'), description=root.querySelector('#f_description'), method=root.querySelector('#f_method'), installmentsField=root.querySelector('#expenseInstallmentsField'), installments=root.querySelector('#f_installmentCount'), amount=root.querySelector('#f_amount'), preview=root.querySelector('#installmentPreview');
+    const applyPreset=()=>{const preset=descriptionSuggestions.find(x=>x.text.toLocaleLowerCase('pt-BR')===description.value.trim().toLocaleLowerCase('pt-BR'));if(preset){category.value=preset.category;category.dispatchEvent(new Event('change',{bubbles:true}));}};
+    const sync=()=>{const water=category.value==='Água 20L',credit=method.value==='Cartão de crédito';quantityField.hidden=!water;quantity.required=water;quantityLabel.textContent=water?'Quantidade de garrafões':'Quantidade (opcional)';quantity.placeholder=water?'Número de garrafões':'Unidades';installmentsField.hidden=!credit;if(preview){const n=Math.max(1,Number(installments.value)||1),v=(Number(amount.value)||0)/n;preview.textContent=`${n} × ${money(v)} por mês`;}};
+    description.addEventListener('change',applyPreset);description.addEventListener('input',applyPreset);category.addEventListener('change',sync);method.addEventListener('change',sync);installments.addEventListener('input',sync);amount.addEventListener('input',sync);sync();
+  },onSubmit:data=>{
+    if(data.category==='Água 20L'&&(!Number.isInteger(Number(data.quantity))||Number(data.quantity)<1)){toast('Informe a quantidade de garrafões.');return false;}
+    const n=data.method==='Cartão de crédito'?Math.max(1,Math.min(60,Number(data.installmentCount)||1)):1,total=Math.round((Number(data.amount)||0)*100),base=Math.floor(total/n),remainder=total-base*n;
+    const common={description:data.description.trim(),category:data.category,method:data.method,quantity:data.quantity?Number(data.quantity):null,fixed:data.fixed==='on'};
+    if(e?.installmentGroup){const siblings=expenseGroup(e.installmentGroup),cents=Math.round((Number(data.amount)||0)*100),each=Math.floor(cents/siblings.length),rem=cents-each*siblings.length;siblings.forEach((x,i)=>{x.description=common.description;x.category=common.category;x.method=common.method;x.quantity=common.quantity;x.fixed=common.fixed;x.amount=(each+(i<rem?1:0))/100;x.date=installmentDate(data.date,i);});toast('Compra atualizada; histórico de parcelas preservado.');}
+    else if(e){Object.assign(e,{...common,amount:Number(data.amount)||0,date:data.date});toast('Despesa atualizada.');}
+    else if(n>1){const group=uid();for(let i=0;i<n;i++)db.expenses.push({...common,id:uid(),installmentGroup:group,installmentIndex:i+1,installmentCount:n,installmentPaid:false,amount:(base+(i<remainder?1:0))/100,date:installmentDate(data.date,i)});toast(`Compra parcelada em ${n} vezes; confirme cada parcela quando paga.`);}
+    else db.expenses.push({...common,id:uid(),amount:Number(data.amount)||0,date:data.date});
+    const d=e?.date||data.date;view.expMonth=(d||'').slice(0,7);save();render();
+  }});
 }
 
 function visitorForm(prefill) {
@@ -7653,8 +7630,9 @@ const ACTIONS = {
   'sort-students': key => {
     const st = view.sortStudents;
     st.dir = st.key === key ? st.dir * -1 : 1; st.key = key;
-    $('#studentsBody').innerHTML = studentRowsHTML();
+    view.studentSort=key;view.studentSortDir=st.dir;savePrefs();$('#studentsBody').innerHTML = studentRowsHTML();
   },
+  'students-table-settings': () => openModal({title:'Configurações da tabela',eyebrow:'Alunos',body:`<div class="form-grid">${fieldHTML({name:'studentSort',label:'Ordenar por',type:'select',value:view.studentSort||'name',options:[{value:'name',label:'Nome / apelido (A–Z)'},{value:'belt',label:'Graduação — maior para menor'}]})}${fieldHTML({name:'studentSortDir',label:'Ordem',type:'select',value:String(view.studentSortDir||1),options:[{value:'1',label:'Crescente'},{value:'-1',label:'Decrescente'}]})}${fieldHTML({name:'studentShowFullName',label:'Exibir nome',type:'select',value:view.studentShowFullName?'full':'nickname',options:[{value:'nickname',label:'Apelido'},{value:'full',label:'Nome completo'}],full:true})}</div>`,onSubmit:d=>{view.studentSort=d.studentSort;view.sortStudents.key=d.studentSort;view.studentSortDir=Number(d.studentSortDir)||1;view.sortStudents.dir=view.studentSortDir;view.studentShowFullName=d.studentShowFullName==='full';Object.assign(prefs,{studentSort:view.studentSort,studentSortDir:view.studentSortDir,studentShowFullName:view.studentShowFullName});savePrefs();render();}}),
   'toggle-session': g => {
     const date = view.attDate;
     db.attendanceOpen[date] ||= {};
@@ -7749,11 +7727,12 @@ const ACTIONS = {
   },
   'new-expense': () => expenseForm(),
   'edit-expense': id => expenseForm(id),
+  'expense-installment-paid': async id => { const e=expenseById(id);if(!e?.installmentGroup)return;const before=!!e.installmentPaid;e.installmentPaid=!before;e.installmentPaidAt=e.installmentPaid?TODAY_ISO:'';save();render();toast(e.installmentPaid?`Parcela ${e.installmentIndex}/${e.installmentCount} confirmada; incluída no somatório.`:`Parcela ${e.installmentIndex} desmarcada.`); },
   'del-expense': async id => {
     const e = expenseById(id);
-    const ok = await confirmDialog({ title: 'Excluir despesa', message: `Excluir “${e?.description || 'despesa'}”?`, confirmText: 'Excluir', danger: true });
+    const ok = await confirmDialog({ title: 'Excluir despesa', message: `Excluir “${e?.description || 'despesa'}”${e?.installmentGroup?' e todas as parcelas desta compra':''}?`, confirmText: 'Excluir', danger: true });
     if (!ok) return;
-    db.expenses = db.expenses.filter(x => x.id !== id); save(); render(); toast('Despesa excluída.');
+    db.expenses = db.expenses.filter(x => e?.installmentGroup ? x.installmentGroup !== e.installmentGroup : x.id !== id); save(); render(); toast('Despesa excluída.');
   },
   'rep-metric': id => { view.repMetric = id; render(); },
   /* o menu fica aberto (para conferir o tema); sem fechar, o próximo toque
@@ -8287,7 +8266,8 @@ async function abrirGate() {
 function cloudLoginHTML() {
   return `<div class="lock-wrap" id="cloudLogin">
     <div class="lock-card" style="max-width:360px">
-      <span class="brand-seal" style="width:54px;height:54px;margin:0 auto 14px">道</span>
+      <span class="brand-seal" style="width:54px;height:54px;margin:0 auto 8px">道</span>
+      <span class="login-cloud" id="loginCloudDot" data-estado="offline" aria-label="Estado da conexão com a nuvem">${icon('cloud',18)}<i></i></span>
       <div class="eyebrow" style="text-align:center">Arandu · Dojo compartilhado</div>
       <h2 class="lock-title">Quem está entrando?</h2>
       <p class="small dim" style="text-align:center;margin-bottom:16px">Toque no seu nome e digite a senha do dojo.</p>
@@ -8346,6 +8326,7 @@ function cloudPintar() {
   else if (CLOUD.ultimo) { estado = 'ok'; rotulo = 'Tudo salvo na nuvem · último envio ' + new Date(CLOUD.ultimo).toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }); }
   else { estado = 'ok'; rotulo = 'Conectado ao banco compartilhado.'; }
   el.dataset.estado = estado;
+  const loginDot=$('#loginCloudDot'); if(loginDot){loginDot.dataset.estado=estado;loginDot.title=rotulo;loginDot.setAttribute('aria-label','Nuvem: '+rotulo);}
   el.title = rotulo;
   el.setAttribute('aria-label', 'Nuvem: ' + rotulo);
 }
@@ -8611,7 +8592,7 @@ function exportCSV() {
     rows.push(['Mês', 'Receita', 'Despesas', 'Saldo', 'Presenças']);
     lastMonths(12, view.repMonth).forEach(m => {
       const rev = sum(paymentsOf(m).filter(p => p.status === 'Pago'), p => p.amount);
-      const exp = sum(expensesOf(m), e => e.amount);
+      const exp = sum(expensesOf(m), expenseValue);
       const freq = Object.keys(db.attendance).filter(d => d.startsWith(m)).reduce((a, d) => a + attendanceOf(d).length, 0);
       rows.push([m, String(rev).replace('.', ','), String(exp).replace('.', ','), String(rev - exp).replace('.', ','), freq]);
     });
