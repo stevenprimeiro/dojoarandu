@@ -21,7 +21,7 @@
 <meta name="application-name" content="Arandu">
 <style>
 /* ============================================================
-   ARANDU · v2.90.11 — design system
+   ARANDU · v2.90.13 — design system
    Papel & tinta: editorial, quente, tátil.
    ============================================================ */
 :root{
@@ -666,6 +666,8 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
 .switch input:checked + .track{background:var(--accent-button,var(--vermilion))}
 .switch input:checked + .track::after{transform:translateX(16px)}
 
+.student-table-settings{width:38px;height:38px;flex:0 0 38px;border-radius:11px}
+.table-setting-group{display:grid;gap:8px;margin:0 0 18px}.table-setting-group h3{font:700 10px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}.table-setting-choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:7px}.table-setting-choice{min-height:43px;padding:9px 10px;border:1px solid var(--line);border-radius:11px;background:color-mix(in srgb,var(--paper) 40%,transparent);font-size:12px;font-weight:650;text-align:center;color:var(--ink-2)}.table-setting-choice[aria-pressed="true"]{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,transparent);color:var(--ink)}
 /* ---------- tabela ---------- */
 .expense-description{appearance:none;border:0;background:transparent;color:inherit;font:inherit;text-align:left;padding:4px 6px;margin:-4px -6px;min-height:38px;width:100%;cursor:pointer;border-radius:7px}.expense-description:hover,.expense-description:focus-visible{background:var(--card-2);outline:2px solid color-mix(in srgb,var(--indigo) 45%,transparent);outline-offset:1px}.expense-description b{display:block}.expense-description .meta{display:block;font-size:10.5px;margin-top:2px}
 .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
@@ -1614,7 +1616,7 @@ body.has-demo-banner .toasts{bottom:78px}
 body.has-demo-banner .main{padding-bottom:74px}
 /* dentro da cortina .lock-screen o wrap é só um contêiner neutro */
 .lock-screen .lock-wrap{display:block}
-.login-cloud{display:flex;align-items:center;justify-content:center;gap:6px;margin:0 auto 12px;color:var(--ink-2)}.login-cloud i{width:7px;height:7px;border-radius:50%;background:var(--ink-3);box-shadow:0 0 0 3px color-mix(in srgb,var(--ink-3) 15%,transparent)}.login-cloud[data-estado="ok"] i{background:var(--moss)}.login-cloud[data-estado="enviando"] i,.login-cloud[data-estado="recebendo"] i{background:var(--gold)}.login-cloud[data-estado="erro"] i{background:var(--vermilion)}
+.login-cloud{display:flex;align-items:center;justify-content:center;gap:6px;margin:0 auto 12px;color:var(--ink-2)}.lock-card--login{position:relative}.lock-card--login .login-cloud{position:absolute;top:15px;right:15px;margin:0}.login-cloud i{width:7px;height:7px;border-radius:50%;background:var(--ink-3);box-shadow:0 0 0 3px color-mix(in srgb,var(--ink-3) 15%,transparent)}.login-cloud[data-estado="ok"] i{background:var(--moss)}.login-cloud[data-estado="enviando"] i,.login-cloud[data-estado="recebendo"] i{background:var(--gold)}.login-cloud[data-estado="erro"] i{background:var(--vermilion)}
 .lock-screen{position:fixed;inset:0;z-index:200;display:grid;place-items:center;padding:20px;
   background:radial-gradient(120% 100% at 50% 0%,color-mix(in srgb,var(--accent) 18%,var(--paper)),var(--paper) 70%);
   backdrop-filter:blur(6px)}
@@ -2389,7 +2391,7 @@ function hexA(hex, a) {
 }
 
 /* prefs de UI */
-const APP_VERSION = '2.90.11';
+const APP_VERSION = '2.90.13';
 /* assinatura do modelo de cobrança (fechamento novo + abertura com "outras pendências") */
 const WA_TPL_VER = 2;
 const WA_EMOJI_DEFAULT = '✅';
@@ -4270,7 +4272,7 @@ function pageHoje() {
       ? `<b style="color:var(--ink)">Último treino:</b> ${last.present} presença${last.present===1?'':'s'} · ${dateBR(last.date)} · ${last.groups.map(esc).join(' + ')}`
       : 'Ainda não há chamada registrada para mostrar o último treino.'; })(),
     actions: `<button class="btn" data-act="nav" data-page="frequencia">${icon('check', 15)} Chamada</button>
-      <button class="btn btn--ghost btn--neon-a1" data-act="students-table-settings" aria-label="Configurações da tabela" title="Configurações da tabela">${icon('settings',15)}</button><button class="btn btn--ghost btn--neon-a1" data-act="new-student">${icon('userPlus', 15)} Nova matrícula</button>`
+      <button class="btn btn--ghost btn--neon-a1" data-act="new-student">${icon('userPlus', 15)} Nova matrícula</button>`
   })}
 
   <div class="bento">
@@ -4640,7 +4642,7 @@ function pageAlunos() {
         <button data-act="student-view" data-id="table" aria-pressed="${view.studentsView === 'table'}">${icon('list', 14)}</button>
         <button data-act="student-view" data-id="cards" aria-pressed="${view.studentsView === 'cards'}">${icon('grid', 14)}</button>
       </div>
-      <button class="btn btn--ghost btn--neon-a1" data-act="students-table-settings" aria-label="Configurações da tabela" title="Configurações da tabela">${icon('settings',15)}</button><button class="btn btn--ghost btn--neon-a1" data-act="new-student">${icon('userPlus', 15)} Nova matrícula</button>`
+      <button class="btn btn--ghost btn--neon-a1" data-act="new-student">${icon('userPlus', 15)} Nova matrícula</button>`
   })}
   <div class="card card--flush">
     <div style="display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:14px 16px;border-bottom:1px solid var(--line-2)">
@@ -4648,6 +4650,7 @@ function pageAlunos() {
         <span style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--ink-3)">${icon('search', 15)}</span>
         <input class="field" style="padding-left:36px" placeholder="Buscar por nome, telefone, faixa ou bairro…" value="${esc(view.q)}" data-on="student-search" aria-label="Buscar aluno">
       </div>
+      <button class="mini-btn student-table-settings" data-act="students-table-settings" aria-label="Configurações da tabela" title="Configurações da tabela">${icon('settings',16)}</button>
       <div style="display:flex;gap:6px;flex-wrap:wrap">${chips}</div>
     </div>
     <div id="studentsBody">${studentRowsHTML(viewMode)}</div>
@@ -7632,7 +7635,30 @@ const ACTIONS = {
     st.dir = st.key === key ? st.dir * -1 : 1; st.key = key;
     view.studentSort=key;view.studentSortDir=st.dir;savePrefs();$('#studentsBody').innerHTML = studentRowsHTML();
   },
-  'students-table-settings': () => openModal({title:'Configurações da tabela',eyebrow:'Alunos',body:`<div class="form-grid">${fieldHTML({name:'studentSort',label:'Ordenar por',type:'select',value:view.studentSort||'name',options:[{value:'name',label:'Nome / apelido (A–Z)'},{value:'belt',label:'Graduação — maior para menor'}]})}${fieldHTML({name:'studentSortDir',label:'Ordem',type:'select',value:String(view.studentSortDir||1),options:[{value:'1',label:'Crescente'},{value:'-1',label:'Decrescente'}]})}${fieldHTML({name:'studentShowFullName',label:'Exibir nome',type:'select',value:view.studentShowFullName?'full':'nickname',options:[{value:'nickname',label:'Apelido'},{value:'full',label:'Nome completo'}],full:true})}</div>`,onSubmit:d=>{view.studentSort=d.studentSort;view.sortStudents.key=d.studentSort;view.studentSortDir=Number(d.studentSortDir)||1;view.sortStudents.dir=view.studentSortDir;view.studentShowFullName=d.studentShowFullName==='full';Object.assign(prefs,{studentSort:view.studentSort,studentSortDir:view.studentSortDir,studentShowFullName:view.studentShowFullName});savePrefs();render();}}),
+  'students-table-settings': () => {
+    const sort = view.studentSort==='belt' ? (Number(view.studentSortDir)===1?'belt-asc':'belt-desc') : 'name';
+    const display = view.studentShowFullName?'full':'nickname';
+    openModal({title:'Lista de alunos',eyebrow:'Preferências',body:`
+      <div class="table-setting-group"><h3>Ordenar lista</h3><div class="table-setting-choices" role="group" aria-label="Ordenação">
+        <button type="button" class="table-setting-choice" data-table-sort="name" aria-pressed="${sort==='name'}">Apelido · A–Z</button>
+        <button type="button" class="table-setting-choice" data-table-sort="belt-desc" aria-pressed="${sort==='belt-desc'}">Graduação · maior primeiro</button>
+        <button type="button" class="table-setting-choice" data-table-sort="belt-asc" aria-pressed="${sort==='belt-asc'}">Graduação · menor primeiro</button>
+      </div></div>
+      <div class="table-setting-group"><h3>Nome nos cartões</h3><div class="table-setting-choices" role="group" aria-label="Exibição do nome">
+        <button type="button" class="table-setting-choice" data-table-display="nickname" aria-pressed="${display==='nickname'}">Apelido</button>
+        <button type="button" class="table-setting-choice" data-table-display="full" aria-pressed="${display==='full'}">Nome completo</button>
+      </div></div>
+      <input type="hidden" name="tableSort" value="${sort}"><input type="hidden" name="tableDisplay" value="${display}">`,
+      submitText:'Aplicar',onMount:root=>{
+        const sortInput=root.querySelector('[name="tableSort"]'),displayInput=root.querySelector('[name="tableDisplay"]');
+        root.querySelectorAll('[data-table-sort]').forEach(btn=>btn.addEventListener('click',()=>{sortInput.value=btn.dataset.tableSort;root.querySelectorAll('[data-table-sort]').forEach(x=>x.setAttribute('aria-pressed',String(x===btn)));}));
+        root.querySelectorAll('[data-table-display]').forEach(btn=>btn.addEventListener('click',()=>{displayInput.value=btn.dataset.tableDisplay;root.querySelectorAll('[data-table-display]').forEach(x=>x.setAttribute('aria-pressed',String(x===btn)));}));
+      },onSubmit:data=>{
+        const isBelt=data.tableSort.startsWith('belt');view.studentSort=isBelt?'belt':'name';view.sortStudents.key=view.studentSort;
+        view.studentSortDir=data.tableSort==='belt-asc'?1:-1;view.sortStudents.dir=view.studentSortDir;view.studentShowFullName=data.tableDisplay==='full';
+        Object.assign(prefs,{studentSort:view.studentSort,studentSortDir:view.studentSortDir,studentShowFullName:view.studentShowFullName});savePrefs();render();
+      }});
+  },
   'toggle-session': g => {
     const date = view.attDate;
     db.attendanceOpen[date] ||= {};
@@ -8265,7 +8291,7 @@ async function abrirGate() {
 
 function cloudLoginHTML() {
   return `<div class="lock-wrap" id="cloudLogin">
-    <div class="lock-card" style="max-width:360px">
+    <div class="lock-card lock-card--login" style="max-width:360px">
       <span class="brand-seal" style="width:54px;height:54px;margin:0 auto 8px">道</span>
       <span class="login-cloud" id="loginCloudDot" data-estado="offline" aria-label="Estado da conexão com a nuvem">${icon('cloud',18)}<i></i></span>
       <div class="eyebrow" style="text-align:center">Arandu · Dojo compartilhado</div>

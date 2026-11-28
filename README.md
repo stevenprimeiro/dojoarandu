@@ -19,7 +19,8 @@ O Arandu ajuda a organizar a operação diária do dojo: manter o cadastro dos a
 - **Alunos:** cadastrar e editar perfis, pesquisar e filtrar registros, acompanhar faixa e graus, situação, plano e histórico relacionado.
 - **Frequência:** escolher a data, organizar a chamada por turma, registrar presença e visitas e consultar o histórico de frequência.
 - **Treinos:** planejar e acompanhar as aulas, organizar sessões por turma e consultar conteúdos de apoio ao treino.
-- **Financeiro:** acompanhar mensalidades e pagamentos, registrar despesas e visualizar valores em aberto e movimentações.
+- **Financeiro:** acompanhar mensalidades e pagamentos, registrar despesas e visualizar valores em aberto e movimentações. Despesas no cartão de crédito podem ser divididas em parcelas mensais; cada parcela é confirmada individualmente e só as confirmadas entram no somatório pago.
+- **Ajustes da lista de alunos:** ao lado da busca, escolha a ordenação por apelido ou graduação e se a lista deve exibir apelido ou nome completo.
 - **Relatórios:** consultar indicadores de frequência, alunos, retenção e finanças e exportar resumos para análise.
 - **Preferências:** ajustar aparência, tema e cores; acessar opções de dados, backup e configurações disponíveis na instalação.
 
