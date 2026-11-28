@@ -21,7 +21,7 @@
 <meta name="application-name" content="Arandu">
 <style>
 /* ============================================================
-   ARANDU · v2.90.13 — design system
+   ARANDU · v2.90.16 — design system
    Papel & tinta: editorial, quente, tátil.
    ============================================================ */
 :root{
@@ -118,9 +118,9 @@ body{
 }
 body::before{
   content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
-  background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.035) 0 1px,transparent 1px 5px),repeating-linear-gradient(-45deg,rgba(0,0,0,.08) 0 1px,transparent 1px 5px);background-size:7px 7px;opacity:.32;mix-blend-mode:overlay;
+  background-image:repeating-linear-gradient(45deg,rgba(255,255,255,.10) 0 1px,transparent 1px 4px),repeating-linear-gradient(-45deg,rgba(0,0,0,.16) 0 1px,transparent 1px 4px);background-size:6px 6px;opacity:.62;mix-blend-mode:overlay;
 }
-html[data-theme="dark"] body::before{opacity:.36}
+html[data-theme="dark"] body::before{opacity:.66}
 html[data-theme="dark"] body{background:
   radial-gradient(1100px 600px at 88% -10%, color-mix(in srgb,var(--vermilion) 34%,transparent), transparent 66%),
   radial-gradient(900px 520px at -8% 6%, color-mix(in srgb,var(--pal-2) 26%,transparent), transparent 64%),
@@ -667,7 +667,7 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
 .switch input:checked + .track::after{transform:translateX(16px)}
 
 .student-table-settings{width:38px;height:38px;flex:0 0 38px;border-radius:11px}
-.table-setting-group{display:grid;gap:8px;margin:0 0 18px}.table-setting-group h3{font:700 10px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}.table-setting-choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:7px}.table-setting-choice{min-height:43px;padding:9px 10px;border:1px solid var(--line);border-radius:11px;background:color-mix(in srgb,var(--paper) 40%,transparent);font-size:12px;font-weight:650;text-align:center;color:var(--ink-2)}.table-setting-choice[aria-pressed="true"]{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,transparent);color:var(--ink)}
+.table-setting-group{display:grid;gap:8px;margin:0 0 18px}.table-setting-group h3{font:700 10px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--ink-3)}.table-setting-choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(125px,1fr));gap:7px}.table-setting-choice{min-height:43px;padding:9px 10px;border:1px solid var(--line);border-radius:11px;background:color-mix(in srgb,var(--paper) 40%,transparent);font-size:12px;font-weight:650;text-align:center;color:var(--ink-2)}.table-setting-choice[aria-pressed="true"]{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 14%,transparent);color:var(--ink)}.installment-list{display:grid;gap:8px}.installment-item{display:grid;grid-template-columns:minmax(0,1fr) auto;align-items:center;gap:8px;padding:10px 12px;border:1px solid var(--line-2);border-radius:12px;background:color-mix(in srgb,var(--paper) 38%,transparent)}.installment-item b{display:block;font-size:13px}.installment-item small{display:block;color:var(--ink-3);font-size:11px;margin-top:2px}.installment-item .badge{white-space:nowrap}.installment-empty{padding:16px;border:1px dashed var(--line);border-radius:12px;color:var(--ink-3);font-size:12px}
 /* ---------- tabela ---------- */
 .expense-description{appearance:none;border:0;background:transparent;color:inherit;font:inherit;text-align:left;padding:4px 6px;margin:-4px -6px;min-height:38px;width:100%;cursor:pointer;border-radius:7px}.expense-description:hover,.expense-description:focus-visible{background:var(--card-2);outline:2px solid color-mix(in srgb,var(--indigo) 45%,transparent);outline-offset:1px}.expense-description b{display:block}.expense-description .meta{display:block;font-size:10.5px;margin-top:2px}
 .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
@@ -2391,7 +2391,7 @@ function hexA(hex, a) {
 }
 
 /* prefs de UI */
-const APP_VERSION = '2.90.13';
+const APP_VERSION = '2.90.16';
 /* assinatura do modelo de cobrança (fechamento novo + abertura com "outras pendências") */
 const WA_TPL_VER = 2;
 const WA_EMOJI_DEFAULT = '✅';
@@ -3232,7 +3232,7 @@ const view = { baseModo: '',
   q: '',
   filter: 'Ativos',
   studentsView: prefs.view || 'table',
-  studentSort: prefs.studentSort || 'name', studentSortDir: prefs.studentSortDir || 1, studentShowFullName: !!prefs.studentShowFullName,
+  studentSort: prefs.studentSort || 'nickname', studentSortDir: prefs.studentSortDir || 1, studentShowFullName: !!prefs.studentShowFullName,
   sortStudents: { key: 'name', dir: 1 },
   sortPay: { key: 'student', dir: 1 },
   sortExp: { key: 'date', dir: -1 },
@@ -4500,7 +4500,7 @@ function filteredStudents() {
   });
 }
 const SORT_GET = {
-  name: s => (view.studentShowFullName ? s.name : studentDisplayName(s)), belt: s => beltRank(s.belt), classGroup: s => groupOf(s), locality: s => s.locality || '',
+  nickname: s => studentDisplayName(s), name: s => s.name || '', belt: s => ({'Branca':0,'Cinza':5,'Amarela':10,'Laranja':15,'Verde':20,'Azul':25,'Roxa':30,'Marrom':35,'Preta':40}[s.belt] ?? 99) + Math.min(4,Math.max(0,Number(s.degrees)||0)), classGroup: s => groupOf(s), locality: s => s.locality || '',
   freqWeek: s => freqCount(s.id, 'week'), freqMonth: s => freqCount(s.id, 'month'), freqYear: s => freqCount(s.id, 'year'),
   fee: s => Number(s.fee) || 0, status: s => s.status || '', age: s => Number(s.age) || 0
 };
@@ -4513,14 +4513,15 @@ function sortedStudents() {
 function studentRowsHTML(mode) {
   const arr = sortedStudents();
   const sk = view.sortStudents.key;
+  const listName = s => view.studentShowFullName ? (s.name || studentDisplayName(s)) : studentDisplayName(s);
   const th = (key, label, extra = '') => `<th ${sk === key ? `aria-sort="${view.sortStudents.dir === 1 ? 'ascending' : 'descending'}"` : ''} ${extra}>
     <button data-act="sort-students" data-id="${key}">${label}<span class="arrow">${sk === key ? (view.sortStudents.dir === 1 ? '↑' : '↓') : '↕'}</span></button></th>`;
   if ((mode || view.studentsView) === 'cards') {
     return `<div style="padding:14px">
       ${arr.length ? `<div class="grid-3 student-cards">${arr.map(s => `<button class="card card--paper student-card" style="text-align:left;padding:16px;border-radius:18px" data-act="open-profile" data-id="${s.id}">
         <div class="card-top" style="display:flex;align-items:center;gap:11px;min-width:0">
-          ${avatarHTML(studentDisplayName(s))}
-          <div style="min-width:0;flex:1"><div style="font-weight:650;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(studentDisplayName(s))}${s.role ? ` <span class="badge badge--role">${esc(s.role)}</span>` : ''}${s.bolsa ? ` <span class="badge badge--seal">Bolsista</span>` : ''}</div>
+          ${avatarHTML(listName(s))}
+          <div style="min-width:0;flex:1"><div style="font-weight:650;font-size:13.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(listName(s))}${s.role ? ` <span class="badge badge--role">${esc(s.role)}</span>` : ''}${s.bolsa ? ` <span class="badge badge--seal">Bolsista</span>` : ''}</div>
           <div class="small dim ${groupTone(groupOf(s))}">${esc(groupOf(s))}${s.age ? ' · ' + esc(s.age) + ' anos' : ''}</div></div>
           <div style="margin-left:auto;flex:none">${statusBadge(s.status)}</div>
         </div>
@@ -4547,8 +4548,8 @@ function studentRowsHTML(mode) {
     </tr></thead>
     <tbody>${arr.length ? arr.map(s => `<tr>
       <td><div class="identity">
-        <button class="avatar avatar--btn" data-act="open-profile" data-id="${s.id}" aria-label="Ver perfil de ${esc(studentDisplayName(s))}">${esc((studentDisplayName(s) || '?').charAt(0).toUpperCase())}</button>
-        <div style="min-width:0"><b>${esc(studentDisplayName(s))}</b><div class="meta">${s.age ? esc(s.age) + ' anos' : '—'}${s.phone ? ' · ' + esc(s.phone) : ''}</div></div>
+        <button class="avatar avatar--btn" data-act="open-profile" data-id="${s.id}" aria-label="Ver perfil de ${esc(listName(s))}">${esc((studentDisplayName(s) || '?').charAt(0).toUpperCase())}</button>
+        <div style="min-width:0"><b>${esc(listName(s))}</b><div class="meta">${s.age ? esc(s.age) + ' anos' : '—'}${s.phone ? ' · ' + esc(s.phone) : ''}</div></div>
       </div></td>
       <td>${beltHTML(s)}</td>
       <td>${groupBadge(groupOf(s))}</td>
@@ -5210,6 +5211,8 @@ function despesasView() {
       <div class="foot"><span class="badge ${net >= 0 ? 'badge--ok' : 'badge--late'}">${net >= 0 ? 'positivo' : 'negativo'}</span> ${revenue ? Math.round((total / revenue) * 100) : 0}% da receita comprometida</div></div>
     </div>
   </div>
+
+  ${(()=>{const ids=[...new Set(db.expenses.filter(x=>x.installmentGroup).map(x=>x.installmentGroup))];const groups=ids.map(id=>({id,all:expenseGroup(id)})).filter(g=>g.all.length).sort((a,b)=>(a.all[0].description||'').localeCompare(b.all[0].description||'','pt-BR'));return `<div class="card" style="margin-bottom:16px"><div class="card-head"><div><h3>Despesas parceladas</h3><div class="sub">Parcelas de ${monthBR(m)} · confirme cada pagamento para incluí-lo no somatório do mês</div></div><span class="badge badge--outline">${groups.length} compra${groups.length===1?'':'s'}</span></div><div class="installment-list">${groups.length?groups.map(g=>{const paid=g.all.filter(x=>x.installmentPaid).length,cur=g.all.find(x=>(x.date||'').startsWith(m));return `<div class="installment-item"><div><b>${esc(g.all[0].description)}</b><small>${paid} de ${g.all[0].installmentCount} pagas · ${cur?`parcela ${cur.installmentIndex}/${cur.installmentCount} neste mês · ${money(cur.amount)}`:`sem parcela neste mês`}</small></div>${cur?`<button class="badge ${cur.installmentPaid?'badge--ok':'badge--warn'}" data-act="expense-installment-paid" data-id="${cur.id}">${cur.installmentPaid?'Paga · desfazer':'Confirmar paga'}</button>`:`<span class="badge badge--outline">${paid}/${g.all[0].installmentCount}</span>`}</div>`}).join(''):'<div class="installment-empty">Ainda não há despesas parceladas registradas.</div>'}</div></div>`})()}
 
   <div class="bento" style="margin-bottom:16px">
     <div class="card col-5">
@@ -7636,27 +7639,30 @@ const ACTIONS = {
     view.studentSort=key;view.studentSortDir=st.dir;savePrefs();$('#studentsBody').innerHTML = studentRowsHTML();
   },
   'students-table-settings': () => {
-    const sort = view.studentSort==='belt' ? (Number(view.studentSortDir)===1?'belt-asc':'belt-desc') : 'name';
-    const display = view.studentShowFullName?'full':'nickname';
-    openModal({title:'Lista de alunos',eyebrow:'Preferências',body:`
-      <div class="table-setting-group"><h3>Ordenar lista</h3><div class="table-setting-choices" role="group" aria-label="Ordenação">
-        <button type="button" class="table-setting-choice" data-table-sort="name" aria-pressed="${sort==='name'}">Apelido · A–Z</button>
-        <button type="button" class="table-setting-choice" data-table-sort="belt-desc" aria-pressed="${sort==='belt-desc'}">Graduação · maior primeiro</button>
-        <button type="button" class="table-setting-choice" data-table-sort="belt-asc" aria-pressed="${sort==='belt-asc'}">Graduação · menor primeiro</button>
+    const orderKey=view.studentSort==='belt'?'belt':view.studentSort==='name'?'name':'nickname';
+    openModal({title:'Lista de alunos',eyebrow:'Preferências',submitText:'',hideCancel:true,body:`
+      <div class="table-setting-group"><h3>Ordem da lista</h3><div class="table-setting-choices" role="group" aria-label="Ordem da lista">
+        <button type="button" class="table-setting-choice" data-table-sort="nickname" aria-pressed="${orderKey==='nickname'}">Apelido</button>
+        <button type="button" class="table-setting-choice" data-table-sort="name" aria-pressed="${orderKey==='name'}">Nome</button>
+        <button type="button" class="table-setting-choice" data-table-sort="belt" aria-pressed="${orderKey==='belt'}">Graduação</button>
       </div></div>
-      <div class="table-setting-group"><h3>Nome nos cartões</h3><div class="table-setting-choices" role="group" aria-label="Exibição do nome">
-        <button type="button" class="table-setting-choice" data-table-display="nickname" aria-pressed="${display==='nickname'}">Apelido</button>
-        <button type="button" class="table-setting-choice" data-table-display="full" aria-pressed="${display==='full'}">Nome completo</button>
+      <div class="table-setting-group"><h3>Direção</h3><div class="table-setting-choices" role="group" aria-label="Direção da ordem">
+        <button type="button" class="table-setting-choice" data-table-dir="1" aria-pressed="${Number(view.studentSortDir)===1}">Crescente</button>
+        <button type="button" class="table-setting-choice" data-table-dir="-1" aria-pressed="${Number(view.studentSortDir)!==1}">Decrescente</button>
       </div></div>
-      <input type="hidden" name="tableSort" value="${sort}"><input type="hidden" name="tableDisplay" value="${display}">`,
-      submitText:'Aplicar',onMount:root=>{
-        const sortInput=root.querySelector('[name="tableSort"]'),displayInput=root.querySelector('[name="tableDisplay"]');
-        root.querySelectorAll('[data-table-sort]').forEach(btn=>btn.addEventListener('click',()=>{sortInput.value=btn.dataset.tableSort;root.querySelectorAll('[data-table-sort]').forEach(x=>x.setAttribute('aria-pressed',String(x===btn)));}));
-        root.querySelectorAll('[data-table-display]').forEach(btn=>btn.addEventListener('click',()=>{displayInput.value=btn.dataset.tableDisplay;root.querySelectorAll('[data-table-display]').forEach(x=>x.setAttribute('aria-pressed',String(x===btn)));}));
-      },onSubmit:data=>{
-        const isBelt=data.tableSort.startsWith('belt');view.studentSort=isBelt?'belt':'name';view.sortStudents.key=view.studentSort;
-        view.studentSortDir=data.tableSort==='belt-asc'?1:-1;view.sortStudents.dir=view.studentSortDir;view.studentShowFullName=data.tableDisplay==='full';
-        Object.assign(prefs,{studentSort:view.studentSort,studentSortDir:view.studentSortDir,studentShowFullName:view.studentShowFullName});savePrefs();render();
+      <div class="table-setting-group"><h3>Nome nos cartões</h3><div class="table-setting-choices" role="group" aria-label="Nome exibido">
+        <button type="button" class="table-setting-choice" data-table-display="nickname" aria-pressed="${!view.studentShowFullName}">Apelido</button>
+        <button type="button" class="table-setting-choice" data-table-display="full" aria-pressed="${view.studentShowFullName}">Nome completo</button>
+      </div></div>`,
+      onMount:root=>{
+        const apply=()=>{view.sortStudents.key=view.studentSort;view.sortStudents.dir=view.studentSortDir;Object.assign(prefs,{studentSort:view.studentSort,studentSortDir:view.studentSortDir,studentShowFullName:view.studentShowFullName});savePrefs();render();
+          root.querySelectorAll('[data-table-sort]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.tableSort===view.studentSort)));
+          root.querySelectorAll('[data-table-dir]').forEach(b=>b.setAttribute('aria-pressed',String(Number(b.dataset.tableDir)===view.studentSortDir)));
+          root.querySelectorAll('[data-table-display]').forEach(b=>b.setAttribute('aria-pressed',String((b.dataset.tableDisplay==='full')===view.studentShowFullName)));
+        };
+        root.querySelectorAll('[data-table-sort]').forEach(b=>b.addEventListener('click',()=>{view.studentSort=b.dataset.tableSort;apply();}));
+        root.querySelectorAll('[data-table-dir]').forEach(b=>b.addEventListener('click',()=>{view.studentSortDir=Number(b.dataset.tableDir);apply();}));
+        root.querySelectorAll('[data-table-display]').forEach(b=>b.addEventListener('click',()=>{view.studentShowFullName=b.dataset.tableDisplay==='full';apply();}));
       }});
   },
   'toggle-session': g => {
