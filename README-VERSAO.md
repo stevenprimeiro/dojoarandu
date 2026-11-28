@@ -1,16 +1,14 @@
-# Arandu — versão 2.90.17
+# Arandu — versão 2.90.18
 
 **Tipo:** versão pública cloud-only  
-**App:** `dojo_arandu_v2-90-17.html`  
-**Pacote público:** `DojoArandu v2.90.17p.zip`
+**App:** `dojo_arandu_v2-90-18.html`  
+**Pacote público:** `DojoArandu v2.90.18p.zip`
 
 ## Resumo deste deploy
 
-- Textura de carbono mantida visível também em celulares e dispositivos com perfil de baixo efeito visual.
-- Na faixa semanal da Frequência, cada bolinha verde indica uma turma confirmada. Adulto e Kids têm indicadores separados; não há ponto sem confirmação.
-- Na versão web, o menu da lista de alunos voltou a permitir mostrar/ocultar colunas. Essas opções não aparecem na interface móvel.
-- Ordenação da tabela usa cor da faixa antes dos graus: branca, azul, roxa, marrom e preta; 0 a 4 graus dentro de cada cor.
-- Limpeza preparada a partir do backup enviado: conservar somente as chamadas a partir de 23/11/2026, inclusive. Original arquivado e conteúdo preservado verificado. **A limpeza no Supabase remoto ainda exige executar a consulta SQL, após revisar a prévia e fazer backup atual.**
+- Corrige o custo visual associado à textura de carbono: a camada deixou de usar dois gradientes CSS repetidos, blend mode e posição fixed no perfil móvel. Agora usa um microtile SVG estático, sem mistura de camadas, e se desloca junto com a página em telas pequenas.
+- A textura continua visível no celular e no desktop. O teste de regressão confirma camada visível, `position:absolute` e `mix-blend-mode:normal` no viewport móvel.
+- Playwright e auditorias locais passaram. No benchmark de Chromium headless em viewport 390×844, o RAF marcou 60 FPS nos dois arquivos; essa simulação não reproduz o hardware do celular da usuária, mas não mostrou regressão na build corrigida.
 
 ## Documentação que acompanha cada deploy
 
