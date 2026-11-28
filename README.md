@@ -8,10 +8,10 @@ O Arandu ajuda a organizar a operação diária do dojo: manter o cadastro dos a
 
 ## Como começar
 
-1. Abra o Arandu no navegador. Esta versão pública inicia com **dados demonstrativos**, para que você possa conhecer as telas sem receber dados reais de alunos.
-2. Use o menu principal para explorar as áreas do sistema. No celular, abra o menu de páginas pelo botão de menu.
-3. Para experimentar os fluxos, cadastre ou edite registros de exemplo e navegue entre as telas. A busca e os filtros ajudam a localizar alunos e informações.
-4. Antes de usar com dados reais, verifique onde eles serão armazenados e configure a sincronização, se necessária. Faça exportações de backup regularmente e mantenha os arquivos protegidos.
+1. Abra o Arandu no navegador e entre com uma conta autorizada da academia.
+2. O sistema só libera as páginas depois que a autenticação e a conexão com o banco compartilhado forem confirmadas.
+3. Use o menu principal para acessar alunos, frequência, treinos, financeiro, relatórios e ajustes. No celular, abra o menu pelo botão no topo.
+4. Faça exportações de backup regularmente e mantenha os arquivos protegidos.
 
 ## O que você pode fazer
 
@@ -32,13 +32,13 @@ O Arandu ajuda a organizar a operação diária do dojo: manter o cadastro dos a
 
 ## Armazenamento e privacidade
 
-Esta distribuição pública vem com registros fictícios e não inclui a base real do dojo. Em uma instalação local, os dados ficam no armazenamento do navegador/dispositivo utilizado, salvo quando a sincronização externa estiver configurada. A sincronização em nuvem é opcional e depende da configuração do responsável pela instalação.
+A aplicação não inclui base de demonstração nem usa a cópia local antiga do navegador como fonte de dados. Os registros operacionais são carregados e gravados no banco compartilhado do Supabase após autenticação. Sem internet, sessão válida, perfil autorizado ou acesso ao banco, a interface permanece bloqueada. Preferências visuais e a sessão de autenticação podem ser mantidas localmente pelo navegador; os registros de alunos, presença e finanças não são salvos ali.
 
-O armazenamento local não substitui um backup: limpar os dados do navegador, trocar de dispositivo ou perder acesso ao perfil pode tornar os registros indisponíveis. Proteja o dispositivo, faça cópias de segurança e não publique arquivos de backup com dados pessoais.
+A cópia local legada não é apagada automaticamente, mas é ignorada. Faça e proteja backups da base compartilhada. Não publique arquivos de backup com dados pessoais.
 
 ## Acesso em celular e funcionamento offline
 
-A interface se adapta a telas pequenas e grandes. Quando o Arandu é disponibilizado em hospedagem compatível, pode ser instalado como atalho/PWA e alguns recursos podem funcionar offline. O funcionamento offline e a sincronização dependem do navegador, da instalação e da configuração do serviço.
+A interface se adapta a telas pequenas e grandes e pode ser instalada como atalho/PWA em navegadores compatíveis. O uso operacional exige internet e conexão com o banco; sem acesso à nuvem, o aplicativo fica bloqueado.
 
 ---
 

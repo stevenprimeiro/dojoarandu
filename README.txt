@@ -1,29 +1,25 @@
 ARANDU · SISTEMA DO DOJO
 
-Gestão prática para academias e dojos de jiu-jitsu. O Arandu organiza alunos, chamadas, treinos, mensalidades, despesas e relatórios em uma interface para computador e celular.
+Gestão online para academias e dojos de jiu-jitsu. O Arandu organiza alunos, chamadas, treinos, mensalidades, despesas e relatórios em computador e celular.
 
-PROPÓSITO
-Ajudar a organizar a rotina do dojo, reunir informações importantes e facilitar o acompanhamento da frequência, da situação dos alunos e das finanças.
-
-COMO COMEÇAR
-1. Abra o Arandu no navegador. Esta versão pública começa com dados demonstrativos, não com a base real do dojo.
-2. Explore as páginas pelo menu principal. Em telas pequenas, use o botão de menu para acessar as páginas.
-3. Experimente a busca, os filtros e os registros demonstrativos para conhecer os fluxos.
-4. Antes de usar com dados reais, confirme como os dados serão armazenados e se a sincronização externa foi configurada. Faça backups regulares e proteja-os.
+ACESSO
+- Entre com uma conta Supabase autorizada da academia.
+- O sistema só libera as páginas após confirmar autenticação, perfil e conexão com o banco compartilhado.
+- Sem internet ou acesso válido ao banco, o app permanece bloqueado. Não há modo local nem base de demonstração.
 
 RECURSOS
 - Visão geral da operação, frequência, pendências e próximos treinos.
-- Cadastro, edição, busca, filtros e fichas de alunos; acompanhamento de faixa, graus e situação.
-- Chamada por turma e data, registro de presenças e visitas, consulta ao histórico.
-- Planejamento e acompanhamento de treinos por turma e conteúdos de apoio.
-- Controle de mensalidades, pagamentos, despesas e valores em aberto.
-- Relatórios e indicadores de frequência, alunos, retenção e finanças; exportação de resumos.
-- Preferências de tema, cores e opções disponíveis para dados e backup.
+- Cadastro, busca, filtros e fichas de alunos; acompanhamento de faixas, graus e situação.
+- Chamada por turma e data, registro de presenças e visitas e histórico.
+- Planejamento e acompanhamento de treinos.
+- Mensalidades, pagamentos, despesas e valores em aberto.
+- Indicadores e relatórios; exportação de backups da base compartilhada.
+- Tema claro/escuro e paletas personalizáveis.
 
-ARMAZENAMENTO E PRIVACIDADE
-A build pública usa registros fictícios e não inclui a base real de alunos. Em uso local, os dados ficam no armazenamento do navegador/dispositivo, exceto se houver sincronização externa configurada. A sincronização em nuvem é opcional. O armazenamento local não substitui backups; limpar os dados do navegador ou trocar de dispositivo pode tornar os registros indisponíveis. Backups podem conter informações pessoais e financeiras: não os compartilhe publicamente.
+DADOS E PRIVACIDADE
+Os dados operacionais são carregados e gravados no Supabase depois do login. O aplicativo não lê nem grava a base operacional no armazenamento local do navegador. Uma cópia local legada pode permanecer no dispositivo, mas é ignorada e não será enviada à nuvem. Preferências visuais e a sessão de autenticação podem ser guardadas pelo navegador. Faça backups regulares e proteja os arquivos exportados, que podem conter dados pessoais.
 
-CELULAR E MODO OFFLINE
-A interface se adapta a telas pequenas e grandes. Em hospedagem e navegadores compatíveis, pode ser instalada como atalho/PWA e alguns recursos podem funcionar offline. A disponibilidade depende da instalação e configuração do serviço.
+CELULAR
+Interface responsiva. A instalação como atalho/PWA depende do navegador e da hospedagem.
 
 Arandu · Disciplina · Respeito · Evolução

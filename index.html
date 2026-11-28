@@ -21,7 +21,7 @@
 <meta name="application-name" content="Arandu">
 <style>
 /* ============================================================
-   ARANDU · v2.90.1 — design system
+   ARANDU · v2.90.9 — design system
    Papel & tinta: editorial, quente, tátil.
    ============================================================ */
 :root{
@@ -39,7 +39,7 @@
   --card-2:rgba(255,255,255,.5);
   --ink:#121429;
   --ink-2:#4a5170;
-  --ink-3:#616982;
+  --ink-3:#5c647e;
   --line:rgba(20,24,60,.10);
   --line-2:rgba(20,24,60,.06);
 
@@ -667,6 +667,7 @@ input[type=number]::-webkit-outer-spin-button,input[type=number]::-webkit-inner-
 .switch input:checked + .track::after{transform:translateX(16px)}
 
 /* ---------- tabela ---------- */
+.expense-description{appearance:none;border:0;background:transparent;color:inherit;font:inherit;text-align:left;padding:4px 6px;margin:-4px -6px;min-height:38px;width:100%;cursor:pointer;border-radius:7px}.expense-description:hover,.expense-description:focus-visible{background:var(--card-2);outline:2px solid color-mix(in srgb,var(--indigo) 45%,transparent);outline-offset:1px}.expense-description b{display:block}.expense-description .meta{display:block;font-size:10.5px;margin-top:2px}
 .table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
 table.data{width:100%;border-collapse:separate;border-spacing:0;font-size:13.5px;min-width:720px}
 table.data th{
@@ -807,7 +808,18 @@ tr:hover .td-actions{opacity:1}
 .check .box svg{width:11px;height:11px;opacity:0;transform:scale(.5);transition:.22s var(--spring);color:#fff}
 .check .who{min-width:0;flex:1;text-align:left}
 .check .who b{display:block;font-size:12.8px;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.check .who small{display:block;padding-left:10px;font-size:10.5px;color:var(--ink-3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.check .who small{display:block;padding-left:10px;font-size:10.5px;color:var(--ink-3);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.belt-mobile-icon{display:none}
+@media(max-width:900px){.check .who small{height:12px;line-height:12px}.belt-mobile-icon{display:inline-flex;vertical-align:top}.belt-mobile-icon .belt{height:10px}.belt-mobile-icon .belt-bar{width:34px;height:9px;border-radius:3px;padding-right:2px;gap:1px}.belt-mobile-icon .belt-bar i{width:2px;height:7px}.belt-label{display:none}}
+/* Tablets / celulares largos: nome e faixa lado a lado, centralizados no espaço do cartão.
+   Em celulares estreitos (até 620 px), preserva a composição empilhada já existente. */
+@media (min-width:621px) and (max-width:900px){
+  .check .who{display:flex;align-items:center;justify-content:center;gap:12px;text-align:center}
+  .check .who b{display:block;max-width:calc(100% - 72px);text-align:center}
+  .check .who small{display:inline-flex;align-items:center;justify-content:center;width:auto;height:18px;line-height:18px;margin:0;padding:0;overflow:visible}
+  .belt-mobile-icon .belt{height:16px}
+  .belt-mobile-icon .belt-bar{width:56px;height:16px;border-radius:4px;padding-right:4px;gap:2px}
+  .belt-mobile-icon .belt-bar i{width:3px;height:13px}
+}
 .check[data-on="true"]{
   background:linear-gradient(140deg,color-mix(in srgb,var(--vermilion) 40%,transparent),color-mix(in srgb,var(--indigo) 16%,transparent));
   border-color:color-mix(in srgb,var(--vermilion) 55%,transparent);
@@ -936,6 +948,7 @@ html[data-theme="dark"] .chart-tip{background:#f3ede3;color:#151311}
 .heat .cell .val b.k{color:var(--indigo)}
 .heat-key{display:flex;gap:12px;flex-wrap:wrap;font-size:11px;color:var(--ink-3);margin-top:10px}
 
+html.cloud-locked body>*:not(#cloudGate){visibility:hidden!important;pointer-events:none!important}
 /* ---------- drawer / modal ---------- */
 .scrim{
   position:fixed;inset:0;z-index:80;background:color-mix(in srgb,#121110 55%,transparent);
@@ -955,6 +968,7 @@ html[data-theme="dark"] .chart-tip{background:#f3ede3;color:#151311}
   display:flex;align-items:flex-start;gap:12px;padding:20px 22px;border-bottom:1px solid var(--line-2);
   position:sticky;top:0;background:color-mix(in srgb,var(--paper) 92%,transparent);backdrop-filter:blur(12px);z-index:2
 }
+@media(max-width:900px){.drawer-head--profile{padding-top:max(36px,calc(20px + env(safe-area-inset-top,0px)))}}
 .drawer-body{padding:22px;overflow-y:auto;flex:1}
 .drawer-foot{padding:14px 22px;border-top:1px solid var(--line-2);display:flex;gap:8px;flex-wrap:wrap;background:var(--card)}
 .close-x{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;color:var(--ink-2);margin-left:auto;transition:.2s}
@@ -2064,6 +2078,7 @@ html.lowfx .view-anim>*{animation:none !important}
 <div class="chart-tip" id="chartTip" role="status"></div>
 
 <script>
+document.documentElement.classList.add('cloud-locked');
 /* ============================================================
    1. DADOS
    ============================================================ */
@@ -2101,9 +2116,9 @@ const monthBRCap = m => cap(monthBR(m));
    Backup importado em 24/11/2026 — é a base que abre no primeiro acesso
    e o "restaurar base inicial" em Ajustes.
    ============================================================ */
-const SEED_BACKUP_NAME = 'arandu-backup-2026-11-26-limpo.json';
-const SEED_BACKUP_LABEL = 'Base atualizada · 26/11/2026 (frequências reais desde 23/11)';
-const SEED_DATA = {"students":[{"id":"demo-a0","name":"Aluno Exemplo","age":30,"locality":"Centro","belt":"Branca","degrees":0,"plan":"Mensal","fee":70,"dueDay":10,"joinDate":"2026-01-10","status":"Ativo","classGroup":"Adulto","phone":"(00) 00000-0000","role":"","guardian":""},{"id":"demo-k0","name":"Criança Exemplo","age":9,"locality":"Centro","belt":"Branca","degrees":0,"plan":"Mensal","fee":70,"dueDay":10,"joinDate":"2026-02-01","status":"Ativo","classGroup":"Kids","phone":"(00) 00000-0000","guardian":"Responsável Exemplo","role":""}],"payments":[{"id":"demo-p1","studentId":"demo-a0","month":"2026-11","dueDate":"2026-11-10","amount":70,"status":"Pendente","paidAt":"","method":""},{"id":"demo-p2","studentId":"demo-k0","month":"2026-11","dueDate":"2026-11-10","amount":70,"status":"Pago","paidAt":"2026-11-08","method":"Pix"}],"expenses":[],"attendance":{},"attendanceOpen":{},"trainings":[],"visitors":[],"customPositions":[]}
+const SEED_BACKUP_NAME = 'cloud-only-no-local-seed.json';
+const SEED_BACKUP_LABEL = 'Base exclusiva do banco compartilhado';
+const SEED_DATA = {"students":[],"payments":[],"expenses":[],"attendance":{},"attendanceOpen":{},"trainings":[],"visitors":[],"customPositions":[],"log":[]}
 const seedData = () => JSON.parse(JSON.stringify(SEED_DATA));
 
 const MONTH = TODAY_ISO.slice(0, 7);
@@ -2183,49 +2198,24 @@ function cleanFrequencyTestResidue(data) {
 }
 
 function load() {
-  let data = null;
-  try { data = JSON.parse(localStorage.getItem(KEY) || 'null'); } catch (e) { data = null; }
-  if (!data || typeof data !== 'object') {
-    /* O arquivo PÚBLICO carrega só dados de exemplo: num aparelho com banco, ele
-       não deve mostrar nem esses por um instante — a base do dojo vem do login.
-       Já o arquivo de desenvolvimento traz a base real embutida e segue abrindo
-       com ela (é a cópia de trabalho do Steven). */
-    const seedEhExemplo = SEED_BACKUP_NAME === 'base-exemplo.json';
-    data = (seedEhExemplo && cloudTemConfig()) ? BLANK() : seedData();
-    BASE.origin = 'seed';
-  }
-  const base = BLANK();
-  db = Object.assign(base, data);
-  db.trainings ||= []; db.visitors ||= []; db.customPositions ||= []; db.log ||= [];
-  db.attendance ||= {}; db.attendanceOpen ||= {};
-  /* metadados da base ativa (persistidos entre sessões) */
-  let meta = null;
-  try { meta = JSON.parse(localStorage.getItem(BASE_KEY) || 'null'); } catch (e) { meta = null; }
-  if (meta && meta.origin) Object.assign(BASE, meta);
-  /* log: usa o que já estava salvo e tira a foto inicial da base */
-  try { const lg = JSON.parse(localStorage.getItem(LOG_KEY) || 'null'); if (Array.isArray(lg) && (!db.log || !db.log.length)) db.log = lg; } catch (e) {}
+  /* Cloud-only: nunca lê a base de alunos, financeiro ou presença do aparelho.
+     A cópia legada permanece intacta no armazenamento local, mas não é montada. */
+  db = BLANK();
+  BASE.origin = 'cloud'; BASE.file = ''; BASE.label = 'Aguardando banco compartilhado';
   logPreparar();
 }
-function migrateFrequencyTestResidue() {
-  if(SEED_BACKUP_NAME==='base-exemplo.json') return;
-  const key='arandu-frequency-clean-v1';
-  try { if(localStorage.getItem(key)==='1') return; } catch(e) {}
-  const stats=cleanFrequencyTestResidue(db);
-  if(stats.oldDates||stats.oldLogs){
-    registrarLog(`Limpou resíduos de teste da frequência: ${stats.oldDates} chamadas antigas fechadas/removidas e ${stats.oldLogs} eventos antigos removidos; frequências desde 23/11 preservadas.`,'backup');
-    save({log:false,local:true});
-  }
-  try { localStorage.setItem(key,'1'); } catch(e) {}
-}
+function migrateFrequencyTestResidue() { /* migração local desativada no modo exclusivo de nuvem */ }
 function save(opts = {}) {
-  /* antes de gravar: narra no log tudo o que mudou desde a última gravação */
+  if (CLOUD.conflict) { toast('Gravações pausadas por conflito. Exporte a alteração pendente antes de atualizar ou sair.', {icon:'alert',ms:8000}); return false; }
   if (opts.log !== false) { try { logAnotar(); } catch (e) {} }
   if (LOG_ANTES === null) { try { logPreparar(); } catch (e) {} }
-  try { localStorage.setItem(KEY, JSON.stringify(db)); }
-  catch (e) { toast('Não foi possível salvar: o armazenamento está cheio.'); }
-  guardarBoa(db);   /* cópia de segurança para a trava da nuvem */
-  /* nuvem: cada gravação local também vai para o banco compartilhado */
-  if (CLOUD.ativo && !opts.local) cloudPush();
+  if (!CLOUD.ativo || CLOUD.offline || !navigator.onLine) {
+    CLOUD.erro = 'Sem conexão autenticada: alteração não salva.';
+    cloudPintar();
+    return false;
+  }
+  if (!opts.local) cloudPush();
+  return true;
 }
 function uid() { return Date.now().toString(36) + Math.random().toString(36).slice(2, 7); }
 
@@ -2235,17 +2225,20 @@ function uid() { return Date.now().toString(36) + Math.random().toString(36).sli
    ============================================================ */
 const PALETTES = [
   { id: 'dojo', name: 'Dojo', accent1: '#EF3340', accent2: '#5891B2', background: '#5964D9' },
-  { id: 'laca', name: 'Laca & Marfim', accent1: '#9A2A2A', accent2: '#1B2A4E', background: '#F4EEE0' },
-  { id: 'iris', name: 'Íris Noturna', accent1: '#75539A', accent2: '#B5A6C9', background: '#F4EEE0' },
   { id: 'cha', name: 'Chá & Seda', accent1: '#527B67', accent2: '#8DB6A5', background: '#F3EBDA' },
-  { id: 'cedro', name: 'Cedro Queimado', accent1: '#8A6A47', accent2: '#C69A78', background: '#F3EBDA' },
   { id: 'tinta', name: 'Tinta & Giz', accent1: '#1C3D5A', accent2: '#B5A6C9', background: '#F4EEE0' },
   { id: 'ameixa', name: 'Ameixa & Névoa', accent1: '#81415D', accent2: '#B5A6C9', background: '#F2ECEA' },
   { id: 'folha', name: 'Folha Nova', accent1: '#426B4D', accent2: '#9AB98A', background: '#F0F0E3' },
-  { id: 'ambar', name: 'Âmbar & Cinza', accent1: '#B17A2B', accent2: '#8E9188', background: '#F4EEE0' },
-  { id: 'coral', name: 'Coral & Maré', accent1: '#B95648', accent2: '#6C9BA1', background: '#F4EEE0' },
   { id: 'lavanda', name: 'Lavanda & Índigo', accent1: '#79678F', accent2: '#5D6F91', background: '#F0EDF3' },
-  { id: 'sakura', name: 'Flor & Bambu', accent1: '#B76E7B', accent2: '#64866B', background: '#F6EFE6' }
+  { id: 'sakura', name: 'Flor & Bambu', accent1: '#B76E7B', accent2: '#64866B', background: '#F6EFE6' },
+  { id: 'neon-lime', name: 'Neon Lima', accent1: '#C6FF00', accent2: '#00E5FF', background: '#DFF7E7' },
+  { id: 'neon-pulse', name: 'Neon Pulse', accent1: '#FF2BD6', accent2: '#7C4DFF', background: '#F8DFF2' },
+  { id: 'cyber-blue', name: 'Cyber Azul', accent1: '#00D9FF', accent2: '#FF3D81', background: '#DDEBFA' },
+  { id: 'ultraviolet', name: 'Ultravioleta', accent1: '#B84DFF', accent2: '#00FFC6', background: '#E9E0FA' },
+  { id: 'acid-sun', name: 'Acid Sun', accent1: '#FFEA00', accent2: '#FF4D4D', background: '#F5E9D4' },
+  { id: 'neon-night', name: 'Neon Noturna', accent1: '#39FF14', accent2: '#FF2BD6', background: '#20183D' },
+  { id: 'arctic-cyan', name: 'Ártico Elétrico', accent1: '#00E5FF', accent2: '#3D5AFE', background: '#D6F8FF' },
+  { id: 'electric-orange', name: 'Laranja Elétrico', accent1: '#FF6D00', accent2: '#E1FF00', background: '#18202D' }
 ];
 function currentPalette() { return PALETTES.find(p => p.id === prefs.palette) || PALETTES[0]; }
 function mixHex(a, b, t) {
@@ -2293,23 +2286,41 @@ function baseAccent2() { return prefs.accent2 || (!prefs.accent ? currentPalette
 function effectiveAccent() { return prefs.invertHighlights ? baseAccent2() : baseAccent1(); }
 function effectiveAccent2() { return prefs.invertHighlights ? baseAccent1() : baseAccent2(); }
 function effectiveBg() { return prefs.bg || currentPalette().background; }
+function hexLuminance(color) {
+  const raw=String(color||'').replace('#','');
+  const full=raw.length===3?[...raw].map(x=>x+x).join(''):raw;
+  if(!/^[0-9a-f]{6}$/i.test(full)) return 0;
+  const c=[0,2,4].map(i=>parseInt(full.slice(i,i+2),16)/255).map(x=>x<=.04045?x/12.92:((x+.055)/1.055)**2.4);
+  return .2126*c[0]+.7152*c[1]+.0722*c[2];
+}
+function contrastInk(color, background, dark) {
+  const bg=hexLuminance(background), toward=dark?'#ffffff':'#000000';
+  for(let step=0;step<=100;step++) {
+    const candidate=mixHex(color,toward,step/100), lum=hexLuminance(candidate);
+    if((Math.max(lum,bg)+.05)/(Math.min(lum,bg)+.05)>=4.5) return candidate;
+  }
+  return toward;
+}
 function applyPalette() {
   const pal = currentPalette();
   const dark = document.documentElement.getAttribute('data-theme') === 'dark';
   const root = document.documentElement.style;
   const base = effectiveAccent();
   const accent2 = effectiveAccent2();
+  const bgHue = prefs.bg || pal.background;
+  const paperSurface = mixHex(dark ? '#070810' : '#f1f2fb', bgHue, dark ? .08 : .05);
   root.setProperty('--vermilion', base);
+  root.setProperty('--accent', base); /* alias used by home, selection states and interactive highlights */
+  root.setProperty('--accent-2', accent2);
   root.setProperty('--adult-class', base);
   root.setProperty('--accent-button', accent2);
   root.setProperty('--kids-class', accent2);
   root.setProperty('--accent-button-ink', dark ? mixHex(accent2, '#ffffff', .40) : mixHex(accent2, '#000000', .28));
-  root.setProperty('--vermilion-ink', dark ? mixHex(base, '#ffffff', .40) : mixHex(base, '#000000', .28));
+  root.setProperty('--vermilion-ink', contrastInk(base, paperSurface, dark));
   root.setProperty('--vermilion-soft', hexA(base, dark ? .18 : .13));
-  const bgHue = prefs.bg || pal.background;
   root.setProperty('--pal-2', accent2);
   root.setProperty('--pal-3', bgHue);
-  root.setProperty('--paper', mixHex(dark ? '#070810' : '#f1f2fb', bgHue, dark ? .08 : .05));
+  root.setProperty('--paper', paperSurface);
   root.setProperty('--paper-deep', mixHex(dark ? '#0a0b16' : '#e7e9f6', bgHue, dark ? .10 : .06));
 }
 function centerSliderEl(slider, smooth = false) {
@@ -2376,7 +2387,7 @@ function hexA(hex, a) {
 }
 
 /* prefs de UI */
-const APP_VERSION = '2.90.1';
+const APP_VERSION = '2.90.9';
 /* assinatura do modelo de cobrança (fechamento novo + abertura com "outras pendências") */
 const WA_TPL_VER = 2;
 const WA_EMOJI_DEFAULT = '✅';
@@ -4102,8 +4113,8 @@ function waSettings() {
       const pix = root.querySelector('#f_waPix');
       const prev = root.querySelector('#waPreview');
       const paint = () => {
-        /* aluno-exemplo: o de teste, ou o primeiro com mensalidade em aberto */
-        const st = db.students.find(x => x.name === 'Aluno Exemplo') || activeStudents()[0] || { name: 'Aluno', dueDay: 10 };
+        /* usa um aluno ativo da base compartilhada apenas para montar a prévia */
+        const st = activeStudents()[0] || { name: 'Aluno', dueDay: 10 };
         const open = waOpenMonths(st.id).length ? waOpenMonths(st.id)
           : [{ month: MONTH, dueDate: dueFor(st, MONTH), amount: st.fee || 70, status: 'Pendente' }];
         const snapshot = prefs.waEmoji;
@@ -4696,7 +4707,7 @@ function sessionCardHTML(g, dateStr) {
             </div>`
           : `<div class="roster">${roster.map(s => `<button class="check" role="checkbox" aria-checked="${marked.includes(s.id)}" data-on="${marked.includes(s.id)}" data-act="toggle-att" data-id="${s.id}">
               <span class="box">${icon('check', 11)}</span>
-              <span class="who"><b>${esc(studentDisplayName(s))}</b><small>${esc(beltText(s))}${degreeOf(s) ? ' graus' : ''}</small></span>
+              <span class="who"><b>${esc(studentDisplayName(s))}</b><small><span class="belt-mobile-icon">${beltHTML(s, { compact: true })}</span><span class="belt-label">${esc(beltText(s))}${degreeOf(s) ? ' graus' : ''}</span></small></span>
             </button>`).join('')}</div>`}
     </div>
   </div>`;
@@ -5219,7 +5230,7 @@ function despesasView() {
     <div class="table-wrap"><table class="data" style="min-width:640px">
       <thead><tr>${th('description', 'Descrição')}${th('category', 'Categoria')}${th('date', 'Data')}<th>Forma</th>${th('amount', 'Valor')}<th style="width:76px"></th></tr></thead>
       <tbody>${list.length ? list.map(e => `<tr>
-        <td><b style="font-weight:600;font-size:13px">${esc(e.description)}</b>${e.quantity ? `<div class="meta dim">${esc(e.quantity)} un.</div>` : ''}</td>
+        <td><button type="button" class="expense-description" data-act="edit-expense" data-id="${e.id}" aria-label="Editar despesa: ${esc(e.description)}"><b style="font-weight:600;font-size:13px">${esc(e.description)}</b>${e.quantity ? `<span class="meta dim">${esc(e.quantity)} un.</span>` : ''}</button></td>
         <td><span class="badge" style="background:color-mix(in srgb,${EXPENSE_COLORS[e.category] || 'var(--ink-3)'} 14%,transparent);color:${EXPENSE_COLORS[e.category] || 'var(--ink-3)'}">${esc(e.category || 'Outros')}</span></td>
         <td class="small num">${dateBR(e.date)}</td>
         <td class="small" style="color:var(--ink-2)">${esc(e.method || '—')}</td>
@@ -5767,13 +5778,12 @@ function pageAjustes() {
           </div>
           <div class="acts" style="margin-top:12px">
             <button class="btn btn--sm" data-act="cloud-sync">${icon('download', 14)} Buscar do banco</button>
-            <button class="btn btn--sm" data-act="cloud-enviar-tudo">${icon('arrowUpRight', 14)} Enviar esta base</button>
             <button class="btn btn--sm btn--danger" data-act="cloud-sair">${icon('x', 14)} Sair da conta</button>
           </div>` : `
-          <p>Com o banco compartilhado, você e os professores usam a <b>mesma base</b>: o que um marca aparece nos outros. Cada pessoa entra com a própria conta e as regras ficam no banco (RLS), não nesta página.</p>
+          <p>O Arandu funciona somente conectado à base compartilhada do Supabase. Não existe modo local nem base de demonstração.</p>
           <div class="sec-facts" style="margin-top:10px">
-            <div><b>Sem configurar</b><span>O app continua funcionando só neste aparelho, como sempre.</span></div>
-            <div><b>Configurar</b><span>Cole a URL do projeto e a chave <b>publishable/anon</b> do Supabase. Nunca a chave <b>service_role</b>.</span></div>
+            <div><b>Sem conexão/autenticação</b><span>O app permanece bloqueado; os dados locais antigos não são lidos nem enviados.</span></div>
+            <div><b>Segurança</b><span>Acesso exige conta Supabase ativa, perfil autorizado, RLS e a migração de gravação segura.</span></div>
           </div>
           <div class="acts" style="margin-top:12px">
             <button class="btn btn--sm btn--primary" data-act="cloud-config">${icon('settings', 14)} Configurar banco</button>
@@ -5781,16 +5791,6 @@ function pageAjustes() {
           </div>
           <div class="field-note" style="margin-top:10px">Arquivo de apoio com o SQL e o passo a passo: <b>SUPABASE.md</b>.</div>`}
           ${CLOUD.ultimoLogNuvem ? `<p class="small dim" style="margin-top:8px">Última entrada no log da nuvem: <b>${new Date(CLOUD.ultimoLogNuvem).toLocaleString('pt-BR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })}</b>.</p>` : ''}
-          <div class="settings-row" style="margin-top:14px;border-top:1px solid var(--line-2)">
-            <div class="txt" style="width:100%">
-              <h4>Nuvem — online / offline</h4>
-              <p>Quando está <b>offline</b>, o app para de enviar arquivos para o banco compartilhado e fica só neste aparelho.</p>
-              <div class="acts" style="margin-top:10px">
-                <label class="switch"><input type="checkbox" data-act="toggle-nuvem-offline" ${CLOUD.offline ? '' : 'checked'}><span class="track"></span></label>
-                <span class="tail small num" style="font-weight:600">${CLOUD.offline ? 'Desligado (só neste aparelho)' : 'Ligado (compartilhado)'}</span>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </div>
@@ -5811,15 +5811,15 @@ function pageAjustes() {
       <div class="settings-row" style="padding-top:0;border-bottom:0">
         <div class="txt" style="width:100%">
           <h4>Base em uso</h4>
-          <p>É a base que está aberta agora neste navegador. Importar um backup substitui a base ativa.</p>
+          <p>Base compartilhada do Supabase. O app não abre nem atualiza a cópia legada deste aparelho.</p>
           <div class="base-active">
             <div class="base-active-head">
               <span class="base-ico">${icon('download', 16)}</span>
               <div style="min-width:0">
-                <div class="eyebrow" style="margin-bottom:3px">Backup ativado</div>
-                <div class="base-file" title="${esc(BASE.file || '')}">${esc(BASE.file || '—')}</div>
+                <div class="eyebrow" style="margin-bottom:3px">Fonte exclusiva</div>
+                <div class="base-file" title="${esc(BASE.file || '')}">${esc(CLOUD.ativo ? 'Banco compartilhado (Supabase)' : 'Aguardando autenticação')}</div>
               </div>
-              <span class="badge ${BASE.origin === 'seed' ? 'badge--ok' : BASE.origin === 'empty' ? 'badge--late' : 'badge--warn'}" style="margin-left:auto">${esc(BASE.origin === 'seed' ? 'Base inicial do dojo' : BASE.origin === 'empty' ? 'Base vazia' : 'Backup importado')}</span>
+              <span class="badge ${BASE.origin === 'seed' ? 'badge--ok' : BASE.origin === 'empty' ? 'badge--late' : 'badge--warn'}" style="margin-left:auto">${esc(BASE.origin === 'cloud' ? 'Base oficial do Supabase' : BASE.origin === 'empty' ? 'Base vazia' : 'Backup importado')}</span>
             </div>
             <div class="base-grid">
               <div><span>Alunos</span><b>${BASE.counts?.students ?? db.students.length}</b></div>
@@ -5828,7 +5828,7 @@ function pageAjustes() {
               <div><span>Ativado em</span><b>${BASE.importedAt ? dateBR(BASE.importedAt) : dateBR(TODAY_ISO)}</b></div>
             </div>
             <div class="base-acts">
-              <button class="btn btn--sm" data-act="restore-seed">${icon('rotate', 13)} Restaurar base inicial</button>
+              
               <span class="small dim">${BASE.origin === 'seed' ? 'Você está na base oficial.' : 'A base oficial é a ' + esc(SEED_BACKUP_NAME) + '.'}</span>
             </div>
           </div>
@@ -5837,19 +5837,11 @@ function pageAjustes() {
       <div class="settings-row" style="border-bottom:0">
         <div class="txt" style="width:100%">
           <h4>Backup completo</h4>
-          <p>Baixe um JSON com alunos, frequências, mensalidades, despesas e treinos. Importe para restaurar ou migrar de aparelho.</p>
+          <p>Exporte uma cópia de segurança da base compartilhada. A importação local foi desativada para evitar divergência entre aparelhos.</p>
           <div class="acts">
             <button class="btn btn--sm btn--primary" data-act="export-backup">${icon('download', 14)} Baixar</button>
-            <button class="btn btn--sm" data-act="import-backup">${icon('upload', 14)} Importar</button>
             <button class="btn btn--sm" data-act="export-csv">${icon('list', 14)} CSV</button>
           </div>
-        </div>
-      </div>
-      <div class="settings-row" style="border-bottom:0">
-        <div class="txt">
-          <h4 style="color:var(--danger)">Limpar base</h4>
-          <p>Apaga todos os registros deste navegador. A ação é irreversível — baixe um backup antes.</p>
-          <div class="acts"><button class="btn btn--sm btn--danger" data-act="clear-db">${icon('trash', 14)} Limpar tudo</button></div>
         </div>
       </div>
     </div>
@@ -5859,7 +5851,7 @@ function pageAjustes() {
         <div style="height:100%;width:${pctStorage}%;background:var(--vermilion);border-radius:99px;transition:width .6s var(--ease)"></div>
       </div>
       <div class="row" style="border:0;padding-top:10px"><span class="small dim">Estimativa sobre ~5 MB disponíveis</span><span class="tail small num">${kb} KB</span></div>
-      <p class="small dim" style="margin-top:6px">Os dados vivem apenas neste navegador. Limpar cache/cookies do site apaga tudo — mantenha backups.</p>
+      <p class="small dim" style="margin-top:6px">Os registros vivem no banco compartilhado. A cópia legada do dispositivo é preservada, mas ignorada.</p>
     </div>
   `, { wide: true });
 
@@ -5878,7 +5870,7 @@ function pageAjustes() {
     <span class="brand-seal" style="width:56px;height:56px;font-size:29px">道</span>
     <div style="flex:1;min-width:220px">
       <div style="font-family:var(--serif);font-size:18px">Arandu · Sistema do Dojo <span class="badge badge--outline" style="margin-left:6px">v${APP_VERSION}</span></div>
-      <p class="small dim" style="margin-top:4px">Disciplina · Respeito · Evolução. Feito para o dia a dia de quem ensina e treina — offline, no seu navegador.</p>
+      <p class="small dim" style="margin-top:4px">Disciplina · Respeito · Evolução. Gestão online compartilhada, após autenticação no banco do dojo.</p>
     </div>
     <div class="small dim" style="text-align:right">${db.students.length} alunos · ${db.payments.length} mensalidades · ${Object.keys(db.attendance).length} dias de chamada</div>
   </div>`;
@@ -6234,13 +6226,28 @@ function payEditForm(id) {
 
 function expenseForm(id) {
   const e = id ? expenseById(id) : null;
+  const descriptionSuggestions = [
+    { text: 'Garrafão de água, 20 litros', category: 'Água 20L', unit: 'garrafão' },
+    { text: 'Conta de água', category: 'Água 20L' },
+    { text: 'Conta de energia elétrica', category: 'Energia' },
+    { text: 'Aluguel do espaço', category: 'Aluguel' },
+    { text: 'Salário', category: 'Salário' },
+    { text: 'Compra de equipamentos', category: 'Equipamentos' },
+    { text: 'Faixas e graus', category: 'Faixas e graus' }
+  ];
+  const descriptionField = fieldHTML({ name: 'description', label: 'Descrição', value: e?.description || '', required: true, full: true, placeholder: 'Ex.: água, aluguel, energia…' })
+    .replace('id="f_description" name="description"', 'id="f_description" name="description" list="expenseDescriptionOptions" autocomplete="off"');
+  const waterSelected = (e?.category || '') === 'Água 20L';
   const body = `<div class="form-grid">
-    ${fieldHTML({ name: 'description', label: 'Descrição', value: e?.description || '', required: true, full: true, placeholder: 'Ex.: Garrafões de água mineral 20L' })}
+    ${descriptionField}<datalist id="expenseDescriptionOptions">${descriptionSuggestions.map(x=>`<option value="${esc(x.text)}"></option>`).join('')}</datalist>
     ${fieldHTML({ name: 'category', label: 'Categoria', type: 'select', value: e?.category || 'Outros', options: EXPENSE_CATS })}
+    <div class="form-field" id="expenseQuantityField" ${waterSelected ? '' : 'hidden'}>
+      <label class="lbl" for="f_quantity" id="expenseQuantityLabel">${waterSelected ? 'Quantidade de garrafões' : 'Quantidade (opcional)'}</label>
+      <input class="field" id="f_quantity" name="quantity" type="number" value="${esc(e?.quantity ?? '')}" min="1" step="1" placeholder="Número de garrafões" ${waterSelected ? 'required' : ''}>
+    </div>
     ${fieldHTML({ name: 'amount', label: 'Valor (R$)', type: 'number', value: e?.amount ?? '', min: 0, step: '0.01', required: true })}
     ${fieldHTML({ name: 'date', label: 'Data', type: 'date', value: e?.date || TODAY_ISO, required: true })}
     ${fieldHTML({ name: 'method', label: 'Forma de pagamento', type: 'select', value: e?.method || 'Pix', options: METHODS })}
-    ${fieldHTML({ name: 'quantity', label: 'Quantidade (opcional)', type: 'number', value: e?.quantity ?? '', min: 1, placeholder: 'Unidades' })}
     <label class="switch form-field full"><input type="checkbox" name="fixed" ${e?.fixed?'checked':''}><span class="track"></span>Despesa fixa recorrente</label>
   </div>`;
   openModal({
@@ -6248,7 +6255,32 @@ function expenseForm(id) {
     eyebrow: 'Caixa do dojo',
     body,
     submitText: e ? 'Salvar' : 'Lançar',
+    onMount: root => {
+      const category = root.querySelector('#f_category');
+      const quantityField = root.querySelector('#expenseQuantityField');
+      const quantity = root.querySelector('#f_quantity');
+      const quantityLabel = root.querySelector('#expenseQuantityLabel');
+      const description = root.querySelector('#f_description');
+      const applyDescriptionPreset = () => {
+        const normalized = description.value.trim().toLocaleLowerCase('pt-BR');
+        const preset = descriptionSuggestions.find(x => x.text.toLocaleLowerCase('pt-BR') === normalized);
+        if (preset) { category.value = preset.category; category.dispatchEvent(new Event('change', { bubbles: true })); }
+      };
+      const syncQuantity = () => {
+        const water = category.value === 'Água 20L';
+        quantityField.hidden = !water;
+        quantity.required = water;
+        quantityLabel.textContent = water ? 'Quantidade de garrafões' : 'Quantidade (opcional)';
+        quantity.placeholder = water ? 'Número de garrafões' : 'Unidades';
+        if (!water && !e) quantity.value = '';
+      };
+      description.addEventListener('change', applyDescriptionPreset);
+      description.addEventListener('input', applyDescriptionPreset);
+      category.addEventListener('change', syncQuantity);
+      syncQuantity();
+    },
     onSubmit: data => {
+      if (data.category === 'Água 20L' && (!Number.isInteger(Number(data.quantity)) || Number(data.quantity) < 1)) { toast('Informe a quantidade de garrafões.'); return false; }
       const obj = {
         description: data.description.trim(), category: data.category, amount: Number(data.amount) || 0,
         date: data.date, method: data.method, quantity: data.quantity ? Number(data.quantity) : null, fixed: data.fixed === 'on'
@@ -7251,7 +7283,7 @@ function profileHTML(s) {
   const pays = db.payments.filter(p => p.studentId === s.id).sort((a, b) => (b.month || '').localeCompare(a.month || '')).slice(0, 6);
   const calMonth = view.profileCal || MONTH;
   const canCheckin = sessionOpen(TODAY_ISO, groupOf(s)) && s.status === 'Ativo';
-  return `<div class="drawer-head">
+  return `<div class="drawer-head drawer-head--profile">
     <div style="display:flex;gap:14px;align-items:center;min-width:0">
       <span class="avatar" style="width:52px;height:52px;font-size:23px">${esc((s.name || '?').charAt(0))}</span>
       <div style="min-width:0">
@@ -7576,7 +7608,6 @@ function logAnotar(extra = '') {
     db.log.push({ id: lote + '-' + i, t: it.t, txt: it.txt, quem, hora, ts: agora.getTime(), forte: !!it.forte });
   });
   if (db.log.length > LOG_MAX) db.log = db.log.slice(-LOG_MAX);
-  try { localStorage.setItem(LOG_KEY, JSON.stringify(db.log)); } catch (e) {}
   refazerFoto();
   return itens.length;
 }
@@ -7587,7 +7618,6 @@ function registrarLog(txt, tipo = 'sistema') {
   const agora = new Date();
   db.log.push({ id: Math.random().toString(36).slice(2, 9), t: tipo, txt, quem: logQuem(), hora: logHora(agora), ts: agora.getTime() });
   if (db.log.length > LOG_MAX) db.log = db.log.slice(-LOG_MAX);
-  try { localStorage.setItem(LOG_KEY, JSON.stringify(db.log)); } catch (e) {}
 }
 
 const ACTIONS = {
@@ -7740,22 +7770,9 @@ const ACTIONS = {
   'color-arrow': (id, el) => { const s = document.querySelector(`.color-slider[data-slider="${el.dataset.kind}"]`); if (s) s.scrollBy({ left: Number(el.dataset.dir) * sliderColorStep(s), behavior: 'smooth' }); },
   'reset-colors': () => { prefs.accent = null; prefs.accent2 = null; prefs.bg = null; savePrefs(); applyTheme(); renderKeepingSettings(); toast('Cores restauradas da paleta.', { icon: 'check' }); },
   'export-backup': () => exportBackup(),
-  'import-backup': () => importBackup(),
   'export-csv': () => exportCSV(),
 
   /* liga/desliga o modo offline da nuvem */
-  'toggle-nuvem-offline': async el => {
-    const ligando = !CLOUD.offline;
-    CLOUD.offline = ligando;
-    savePrefs();
-    cloudPintar();
-    if (!ligando) {
-      toast('Nuvem desligada: este aparelho parou de enviar arquivos para o banco compartilhado.', { icon: 'shield', ms: 5000 });
-      return;
-    }
-    /* voltando para online: pergunta qual base vale como principal */
-    await escolherDBPrincipalAoVoltarOnline();
-  },
   'toggle-option': (id, el) => {
     const card = el.closest('.appearance-fold');
     const body = card && card.querySelector('.appearance-fold-body');
@@ -7804,10 +7821,9 @@ const ACTIONS = {
     if (btn) { btn.disabled = true; btn.textContent = 'Entrando…'; }
     try {
       await cloudLogin(email, senha);
-      hideCloudLogin();
-      /* o aparelho agora tem conta: a base oficial é a do banco */
-      try { localStorage.removeItem('arandu-cloud-local'); } catch (e) {}
       await cloudPrimeiroContato();
+      hideCloudLogin();
+      document.documentElement.classList.remove('cloud-locked');
       cloudPoll();
       render();
       cloudPintar();
@@ -7817,22 +7833,12 @@ const ACTIONS = {
       if (erro) erro.textContent = /invalid login|credentials/i.test(m)
         ? 'Senha incorreta. Tente de novo.'
         : (/network|failed to fetch/i.test(m) ? 'Sem conexão com o banco. Verifique a internet.' : 'Não foi possível entrar: ' + m);
-      /* com banco configurado não existe "seguir sem entrar": sem a conta,
-         o aparelho mostraria a base de demonstração, não a do dojo */
+      /* sem autenticação, o app permanece bloqueado e nenhum dado local é carregado */
       if (!/network|failed to fetch/i.test(m)) {
         const cd = $('#cloudSenhaBox'); if (cd) cd.hidden = false;
       }
       if (btn) { btn.disabled = false; btn.textContent = 'Entrar'; }
     }
-  },
-  'cloud-modo-local': () => {
-    hideCloudLogin();
-    /* lembra a escolha: na próxima abertura não pergunta de novo
-       (quem quiser entrar depois vai em Ajustes → Nuvem) */
-    try { localStorage.setItem('arandu-cloud-local', '1'); } catch (e) {}
-    view.baseModo = 'real';
-    toast('Modo local: a base fica só neste aparelho. Para entrar na nuvem, Ajustes → Nuvem.', { icon: 'checkCircle' });
-    render();
   },
   'cloud-sair': () => cloudSair(),
   'cloud-relerm-perfil': async () => {
@@ -7848,6 +7854,7 @@ const ACTIONS = {
   },
   'cloud-sync': async () => {
     if (!CLOUD.ativo) return;
+    if (CLOUD.conflict || CLOUD.pendente) { toast('Há uma alteração local ainda não confirmada; exporte os dados em memória antes de recarregar.', {icon:'alert'}); return; }
     try { await cloudPull(); render(); toast('Base atualizada a partir do banco.', { icon: 'checkCircle' }); }
     catch (e) { toast('Não foi possível buscar: ' + e.message, { icon: 'alert' }); }
   },
@@ -7878,16 +7885,6 @@ const ACTIONS = {
     });
   },
   'cloud-entrar-agora': () => { if (cloudConfigurado()) showCloudLogin(); else toast('Configure o banco primeiro.', { icon: 'alert' }); },
-  'cloud-enviar-tudo': async () => {
-    if (!CLOUD.ativo) return;
-    const alunos = (db.students || []).length;
-    if (!alunos) {
-      toast('A base aberta está vazia — não há o que enviar. Abra a base real antes.', { icon: 'alert' });
-      return;
-    }
-    CLOUD.pendente = true; await cloudPushAgora(); render();
-    toast(CLOUD.erro ? 'Falha ao enviar: ' + CLOUD.erro : `Base enviada para o banco (${alunos} alunos).`, { icon: CLOUD.erro ? 'alert' : 'checkCircle' });
-  },
   'go-log': () => go('log'),
   'log-voltar': () => go(view.logVoltaDe || 'ajustes'),
   'log-tipo': id => { view.logTipo = id; view.logBusca = view.logBusca || ''; render(); },
@@ -7907,24 +7904,6 @@ const ACTIONS = {
     try { await navigator.clipboard.writeText(url); toast('Endereço copiado.', { icon: 'copy' }); }
     catch (e) { toast('Copie manualmente: ' + url, { icon: 'copy' }); }
   },
-  'restore-seed': async () => {
-    const ok = await confirmDialog({
-      title: 'Restaurar base inicial', confirmText: 'Restaurar',
-      message: `A base real do dojo (${SEED_BACKUP_NAME}) será recarregada e os dados atuais deste navegador serão substituídos.\nBaixe um backup antes se quiser conservá-los.`
-    });
-    if (!ok) return;
-    db = seedData(); baseSnapshotMeta('seed', SEED_BACKUP_NAME, db); save(); render();
-    toast('Base inicial restaurada.', { icon: 'checkCircle' });
-  },
-  'clear-db': async () => {
-    const ok = await confirmDialog({
-      title: 'Limpar base de dados', danger: true, confirmText: 'Limpar tudo',
-      message: 'Alunos, frequências, mensalidades, despesas, visitas e treinos serão apagados deste navegador.\nEsta ação não pode ser desfeita.'
-    });
-    if (!ok) return;
-    db = BLANK(); baseSnapshotMeta('empty', 'base vazia', db); save(); render(); toast('Base limpa.');
-    registrarLog('Esvaziou base de dados (limpar tudo)', 'backup');
-  }
 };
 
 const INPUTS = {
@@ -7987,7 +7966,9 @@ const CLOUD = {
   pendente: false,
   ultimo: 0,
   ultimoLogNuvem: null, /* data/hora do último log gravado na nuvem */
-  canal: null
+  canal: null,
+  docVersions: {},
+  conflict: false
 };
 /* Quem entra no dojo. A tela de login mostra só estes nomes — o e-mail de
    autenticação é montado a partir do nome (nick@dojoarandu.local etc.). */
@@ -8036,6 +8017,11 @@ async function cloudFetch(path, opts = {}) {
   return body;
 }
 
+async function cloudVerificarMigracao() {
+  const r = await cloudFetch('/rest/v1/rpc/arandu_save_docs', { method: 'POST', prefer: '', body: JSON.stringify({ p_docs: [] }) });
+  if (!r || r.status !== 'ok') throw new Error('Migração de gravação segura ausente; aplique SUPABASE-CAS-v2.90.6.sql.');
+  return true;
+}
 async function cloudLogin(email, senha) {
   const r = await cloudFetch('/auth/v1/token?grant_type=password', {
     method: 'POST',
@@ -8048,6 +8034,7 @@ async function cloudLogin(email, senha) {
     refresh: r.refresh_token, expira: Date.now() + (r.expires_in || 3600) * 1000
   };
   await cloudCarregarPerfil();
+  await cloudVerificarMigracao();
   try { localStorage.setItem(cloudSessionKey, JSON.stringify(CLOUD.user)); } catch (e) {}
   CLOUD.ativo = true;
   return CLOUD.user;
@@ -8116,9 +8103,9 @@ async function cloudSessaoSalva() {
     });
     CLOUD.user = { ...salvo, token: r.access_token, refresh: r.refresh_token, expira: Date.now() + (r.expires_in || 3600) * 1000 };
     await cloudCarregarPerfil();
+    await cloudVerificarMigracao();
     CLOUD.ativo = true;
     try { localStorage.setItem(cloudSessionKey, JSON.stringify(CLOUD.user)); } catch (e) {}
-    hideCloudLogin();                    /* sessão boa: cortina de login sai da frente */
     return true;
   } catch (e) { return false; }
 }
@@ -8128,32 +8115,8 @@ async function cloudSessaoSalva() {
    Banco com dados                      → traz do banco.
    Nada nos dois lados                   → segue vazio, sem drama. */
 async function cloudPrimeiroContato() {
-  const antes = {
-    students: (db.students || []).length,
-    payments: (db.payments || []).length,
-    trainings: (db.trainings || []).length
-  };
-  const temLocal = antes.students > 0 || antes.payments > 0 || antes.trainings > 0;
-
-  /* PERGUNTA ao banco antes de tocar na base: ler e trocar são coisas diferentes */
-  const linhas = await cloudFetch('/rest/v1/dojo_docs?select=doc_id');
-  const vazio = !Array.isArray(linhas) || linhas.length === 0;
-
-  if (vazio && temLocal) {
-    /* banco de estreia: sobe a base deste aparelho, sem passar por cima de nada */
-    CLOUD.pendente = true;
-    await cloudPushAgora();
-    if (CLOUD.erro) { toast('Banco vazio, mas o envio falhou: ' + CLOUD.erro + '. A base deste aparelho continua intacta.', { icon: 'alert' }); return; }
-    toast(`Banco vazio — subi a base deste aparelho (${antes.students} alunos).`, { icon: 'checkCircle' });
-    return;
-  }
-  if (vazio && !temLocal) return;                /* nada dos dois lados */
-
-  /* o banco tem dados: aí sim ele manda */
+  /* Cloud-only: a cópia local legada nunca é usada para inicializar/sobrescrever a nuvem. */
   await cloudPull();
-  if (antes.students > (db.students || []).length) {
-    toast('A base do banco entrou no lugar da local. Se quiser voltar a sua, use "Enviar esta base".', { icon: 'alert' });
-  }
 }
 
 /* ---- leitura: junta os documentos do banco num único objeto db ---- */
@@ -8180,21 +8143,17 @@ async function cloudPull() {
   novo.attendance = etapa;
   novo.attendanceOpen = aberto;
   const vazio = !linhas.length;
-  /* ---- log: nunca apaga. Mescla o que veio do banco com o que já está aqui ---- */
-  const logLocal = (db && db.log) || [];
   const logDoc = linhas.find(l => l.doc_id === 'log');
-  const logNuvem = logDoc && Array.isArray(logDoc.data.lista) ? logDoc.data.lista : [];
-  const idsLog = new Set(logLocal.map(x => x.id));
-  logNuvem.forEach(x => { if (x && x.id && !idsLog.has(x.id)) { logLocal.push(x); idsLog.add(x.id); } });
-  if (logLocal.length > LOG_MAX) logLocal = logLocal.slice(-LOG_MAX);
-  novo.log = logLocal;
+  novo.log = logDoc && Array.isArray(logDoc.data?.lista) ? logDoc.data.lista.slice(-LOG_MAX) : [];
+  CLOUD.docVersions = Object.fromEntries(linhas.map(l => [l.doc_id, Number(l.versao) || 0]));
 
   db = novo;
   /* o que veio do banco é a base do dojo: tira a faixa de demonstração */
-  view.baseModo = 'real';
+  view.baseModo = 'cloud';
+  BASE.origin = 'cloud';
   BASE.label = 'Base do banco compartilhado';
-  /* guarda local como cópia de segurança (e para abrir offline) */
-  save({ local: true });
+  BASE.file = '';
+  BASE.counts = {students:novo.students.length,payments:novo.payments.length,days:Object.keys(novo.attendance).length};
   return { db: novo, vazio };
 }
 
@@ -8211,21 +8170,11 @@ function baseDadosVazia(d) {
   return !temAluno && !temPag && !temPresenca;
 }
 
-/* última cópia local com conteúdo (gravada a cada base boa) */
-const BOA_KEY = KEY + '-boa';
-function guardarBoa(d) {
-  if (!d || baseDadosVazia(d)) return;
-  try { localStorage.setItem(BOA_KEY, JSON.stringify(d)); } catch (e) {}
-}
-function snapshotBoa() {
-  try { const d = JSON.parse(localStorage.getItem(BOA_KEY) || 'null'); return d && typeof d === 'object' ? d : null; }
-  catch (e) { return null; }
-}
 
 let cloudPushTimer = null;
 let cloudTravaAvisada = false;
 function cloudPush() {
-  if (!CLOUD.ativo || CLOUD.offline) return;
+  if (!CLOUD.ativo || CLOUD.offline || CLOUD.conflict) return;
   CLOUD.pendente = true;
   clearTimeout(cloudPushTimer);
   cloudPushTimer = setTimeout(cloudPushAgora, 900);   /* agrupa várias edições seguidas */
@@ -8249,31 +8198,29 @@ function cloudDocs() {
 
 async function cloudPushAgora() {
   if (!CLOUD.ativo || CLOUD.offline || CLOUD.salvando) return;
-  /* trava de segurança: base vazia não sobrescreve a nuvem */
-  if (baseDadosVazia()) {
-    CLOUD.pendente = false;
-    if (!cloudTravaAvisada) {
-      cloudTravaAvisada = true;
-      toast('Envio bloqueado: a base aberta está vazia. A base do banco compartilhado não foi alterada.', { icon: 'shield', ms: 6000 });
-      registrarLog('Bloqueou envio de base vazia para a nuvem', 'proteção');
-    }
-    cloudPintar();
-    return;
-  }
   CLOUD.salvando = true; cloudPintar();
   try {
-    const linhas = cloudDocs().map(([doc_id, data]) => ({
-      doc_id, data, atualizado_por: (CLOUD.user && CLOUD.user.id) || null,
-      atualizado_em: new Date().toISOString()
+    const lote = cloudDocs().map(([doc_id, data]) => ({
+      doc_id, data, expected_version: Number(CLOUD.docVersions[doc_id]) || 0
     }));
-    await cloudFetch('/rest/v1/dojo_docs?on_conflict=doc_id', {
-      method: 'POST',
-      prefer: 'resolution=merge-duplicates,return=minimal',
-      body: JSON.stringify(linhas)
+    const resultado = await cloudFetch('/rest/v1/rpc/arandu_save_docs', {
+      method: 'POST', prefer: '', body: JSON.stringify({ p_docs: lote })
     });
-    CLOUD.pendente = false; CLOUD.erro = ''; CLOUD.ultimo = Date.now();
+    if (!resultado || resultado.status !== 'ok') {
+      CLOUD.conflict = true; CLOUD.pendente = false;
+      CLOUD.erro = 'Conflito: outro aparelho gravou uma versão mais nova. Sua alteração não foi enviada; não feche esta tela antes de exportar/recuperar a alteração.';
+      toast(CLOUD.erro, { icon: 'alert', ms: 9000 });
+      cloudPintar();
+      return;
+    }
+    CLOUD.docVersions = { ...CLOUD.docVersions, ...(resultado.versions || {}) };
+    CLOUD.pendente = false; CLOUD.erro = ''; CLOUD.conflict = false; CLOUD.ultimo = Date.now();
   } catch (e) {
     CLOUD.erro = e.message || 'falha ao enviar';
+    if (!navigator.onLine || /fetch|network|timeout/i.test(CLOUD.erro)) {
+      CLOUD.ativo = false; document.documentElement.classList.add('cloud-locked'); showCloudLogin();
+      const er=$('#cloudErro'); if(er)er.textContent='Conexão com o banco perdida. A tela foi bloqueada; não feche antes de recuperar alterações não confirmadas.';
+    }
   } finally {
     CLOUD.salvando = false;
     cloudPintar();
@@ -8285,27 +8232,8 @@ let cloudPollTimer = null;
 function cloudPoll() {
   clearInterval(cloudPollTimer);
   if (!CLOUD.ativo) return;
-  /* ---- rede de segurança: se a base da nuvem chegar vazia, restaura a última boa ---- */
-  (async () => {
-    try {
-      const linhas = await cloudFetch('/rest/v1/dojo_docs?select=doc_id,data');
-      const vals = (Array.isArray(linhas) ? linhas : [])
-        .filter(r => r.doc_id !== 'meta' && r.doc_id !== 'log')
-        .map(r => r.data || {});
-      const algumConteudo = vals.some(d => (d.lista || []).length > 0 || (d.presentes || []).length > 0);
-      if (vals.length && !algumConteudo) {
-        const boa = snapshotBoa();
-        if (boa && !baseDadosVazia(boa)) {
-          db = boa; save({ local: true });
-          toast('A base da nuvem chegou vazia. Restauramos a última cópia boa que estava aqui.', { icon: 'shield', ms: 7000 });
-          registrarLog('Restaurou base local: a nuvem chegou vazia', 'proteção');
-          scheduleRender();
-        }
-      }
-    } catch (e) { /* sem rede: segue o fluxo normal */ }
-  })();
   const sincronizar = async (forcar) => {
-    if (!CLOUD.ativo || CLOUD.offline || CLOUD.salvando || CLOUD.pendente) return;
+    if (!CLOUD.ativo || CLOUD.offline || CLOUD.salvando || CLOUD.pendente || CLOUD.conflict) return;
     if (document.visibilityState === 'hidden' && !forcar) return;
     try {
       const antes = JSON.stringify(db);
@@ -8324,10 +8252,12 @@ function cloudPoll() {
 
 async function cloudSair() {
   clearTimeout(cloudPushTimer);
-  try { await cloudPushAgora(); } catch (e) {}
-  CLOUD.ativo = false; CLOUD.user = null;
+  CLOUD.ativo = false; CLOUD.user = null; CLOUD.docVersions = {}; CLOUD.conflict = false;
+  db = BLANK();
   try { localStorage.removeItem(cloudSessionKey); } catch (e) {}
-  toast('Sessão encerrada.', { icon: 'checkCircle' });
+  document.documentElement.classList.add('cloud-locked');
+  showCloudLogin();
+  toast('Sessão encerrada; a base foi removida da memória deste aparelho.', { icon: 'checkCircle' });
   render();
   cloudPintar();
   /* sem conta, o acesso à base volta a ser pedido (v2.42: login, não PIN) */
@@ -8336,16 +8266,6 @@ async function cloudSair() {
 
 
 /* aplica uma base recém-importada (real ou de demonstração) */
-function aplicarBase(dados, origem, rotulo, arquivo) {
-  db = dados;
-  /* garante as chaves que o app espera */
-  ['students','payments','expenses','attendance','attendanceOpen','trainings','visitors','customPositions']
-    .forEach(k => { if (!db[k]) db[k] = (k === 'attendance' || k === 'attendanceOpen') ? {} : []; });
-  baseSnapshotMeta(origem, arquivo, db);
-  BASE.label = rotulo;
-  save({ local: true });
-  view.baseModo = origem;
-}
 
 
 /* ============================================================
@@ -8360,15 +8280,8 @@ function aplicarBase(dados, origem, rotulo, arquivo) {
    O PIN antigo deixou de existir na v2.42: os dados passam a ser protegidos
    pelo login de cada professor. */
 async function abrirGate() {
-  /* v2.42: sem PIN. A entrada quem resolve é cloudInit() — sessão salva,
-     login por nome ou a escolha "só neste aparelho". Aqui só resta liberar
-     a base local quando não existe banco configurado. */
-  if (!cloudConfigurado()) { view.baseModo = 'real'; return; }
-  if (!CLOUD.ativo && !$('#cloudLogin')) {
-    let local = null;
-    try { local = localStorage.getItem('arandu-cloud-local'); } catch (e) {}
-    if (local !== '1') showCloudLogin();     /* ainda não entrou nem escolheu */
-  }
+  document.documentElement.classList.add('cloud-locked');
+  if (!CLOUD.ativo) showCloudLogin();
 }
 
 function cloudLoginHTML() {
@@ -8389,8 +8302,6 @@ function cloudLoginHTML() {
         <div class="lock-erro" id="cloudErro"></div>
         <button class="btn btn--primary" style="width:100%;margin-top:10px" data-act="cloud-entrar">Entrar</button>
       </div>
-      <button class="link small" style="display:block;margin:16px auto 0" data-act="cloud-modo-local">Continuar só neste aparelho</button>
-
       <p class="small dim" style="text-align:center;margin-top:16px;font-size:10.5px;line-height:1.5">
         Ninguém se cadastra sozinho: o acesso é criado pelo Steven.</p>
     </div>
@@ -8425,11 +8336,9 @@ function cloudPintar() {
   const online = navigator.onLine !== false;
   let estado = 'ok', rotulo = '';
   /* o usuário desligou a nuvem neste aparelho: ponto cinza, sem enviar nem receber */
-  if (CLOUD.offline) { estado = 'offline'; rotulo = 'Nuvem desligada por você: só este aparelho vê os dados. Ligue em Ajustes → Desenvolvedor para compartilhar.'; }
-  /* sem banco configurado ou sem sessão: ponto cinza, não some */
-  else if (!cloudConfigurado()) { estado = 'offline'; rotulo = 'Nuvem desligada: a base fica só neste aparelho. Ative em Ajustes → Nuvem.'; }
-  else if (!CLOUD.ativo) { estado = 'offline'; rotulo = 'Sem sessão na nuvem: entre com o seu nome em Ajustes → Nuvem.'; }
-  else if (!online) { estado = 'offline'; rotulo = 'Sem internet — a base fica só neste aparelho até a conexão voltar.'; }
+  if (CLOUD.offline || !online) { estado = 'offline'; rotulo = 'Sem internet: acesso bloqueado até a conexão com o banco ser restabelecida.'; }
+  else if (!cloudConfigurado()) { estado = 'offline'; rotulo = 'Configuração do Supabase ausente; o app está bloqueado.'; }
+  else if (!CLOUD.ativo) { estado = 'offline'; rotulo = 'Sem sessão autenticada; o app está bloqueado até o login no Supabase.'; }
   else if (CLOUD.erro) { estado = 'erro'; rotulo = 'Falha ao falar com o banco: ' + CLOUD.erro; }
   else if (CLOUD.salvando) { estado = 'enviando'; rotulo = 'Enviando para o banco…'; }
   else if (CLOUD.pendente) { estado = 'enviando'; rotulo = 'Alterações na fila para enviar.'; }
@@ -8505,29 +8414,47 @@ async function cloudEstado(acao) {
     cloudPintar();
   }
 }
-window.addEventListener('online', cloudPintar);
-window.addEventListener('offline', cloudPintar);
+window.addEventListener('offline', () => {
+  CLOUD.ativo = false; CLOUD.offline = true;
+  document.documentElement.classList.add('cloud-locked');
+  showCloudLogin(); const e=$('#cloudErro'); if(e)e.textContent='Sem internet. O Arandu fica bloqueado até reconectar ao banco.';
+  cloudPintar();
+});
+window.addEventListener('online', async () => {
+  CLOUD.offline = false; cloudPintar();
+  const ok=await cloudSessaoSalva();
+  if(ok){try{await cloudPrimeiroContato();hideCloudLogin();document.documentElement.classList.remove('cloud-locked');cloudPoll();render();}catch(e){showCloudLogin();}}
+  else {document.documentElement.classList.add('cloud-locked');showCloudLogin();}
+});
 
 async function cloudInit() {
   try {
     const cfg = JSON.parse(localStorage.getItem('arandu-cloud-cfg') || 'null');
     if (cfg && cfg.url && cfg.key) { CLOUD.url = cloudLimparUrl(cfg.url); CLOUD.key = cfg.key; }
   } catch (e) {}
-  if (!cloudConfigurado()) return;          /* sem configuração: tudo local, como sempre */
-  if (cloudSessaoTentada) return;           /* a renovação da sessão acontece uma vez só */
+  document.documentElement.classList.add('cloud-locked');
+  if (cloudSessaoTentada) return;
   cloudSessaoTentada = true;
+  if (!cloudConfigurado()) {
+    showCloudLogin(); const er=$('#cloudErro'); if(er)er.textContent='Configuração da nuvem indisponível. Contate o administrador.';
+    return;
+  }
   const voltou = await cloudSessaoSalva();
   if (voltou) {
-    try { await cloudPull(); cloudPoll(); render(); view.baseModo = 'real'; } catch (e) { CLOUD.erro = e.message; }
+    try {
+      await cloudVerificarMigracao();
+      await cloudPrimeiroContato();
+      CLOUD.offline=false; hideCloudLogin(); document.documentElement.classList.remove('cloud-locked');
+      cloudPoll(); render(); view.baseModo = 'cloud';
+    } catch (e) {
+      CLOUD.ativo=false; CLOUD.erro=e.message||'Não foi possível carregar o banco.';
+      showCloudLogin(); const er=$('#cloudErro'); if(er)er.textContent=CLOUD.erro;
+    }
   } else {
-    /* "só neste aparelho" já foi escolhido: não pergunta de novo */
-    let local = null;
-    try { local = localStorage.getItem('arandu-cloud-local'); } catch (e) {}
-    if (local === '1') { view.baseModo = 'real'; render(); }
-    else { showCloudLogin();                /* primeira vez neste aparelho */
-      if (CLOUD.erro) { const e2 = $('#cloudErro'); if (e2) e2.textContent = 'Sem conexão com o banco. Verifique a internet.'; } }
+    showCloudLogin();
+    const er=$('#cloudErro'); if(er && !navigator.onLine)er.textContent='Sem internet. Conecte-se para entrar no banco.';
   }
-  cloudPintar();                            /* o ponto já nasce no estado certo */
+  cloudPintar();
 }
 
 /* ---------- atalho na home do celular (PWA) ---------- */
@@ -8673,40 +8600,6 @@ function validateBackup(data) {
   return true;
 }
 
-function importBackup() {
-  const input = document.createElement('input');
-  input.type = 'file';
-  input.accept = '.json,application/json';
-  input.onchange = () => {
-    const file = input.files && input.files[0];
-    if (!file) return;
-    if (file.size > BACKUP_MAX_BYTES) { toast('Backup maior que 10 MB; selecione um arquivo menor.'); return; }
-    const reader = new FileReader();
-    reader.onload = async () => {
-      try {
-        const data = JSON.parse(String(reader.result || ''));
-        validateBackup(data);
-        const ok = await confirmDialog({
-          title: 'Importar backup', confirmText: 'Importar',
-          message: `O arquivo tem ${data.students.length} alunos e ${(data.payments || []).length} mensalidades.\nOs dados atuais serão substituídos.`
-        });
-        if (!ok) return;
-        const cleaned = Object.assign(BLANK(), data);
-        cleaned.trainings ||= []; cleaned.visitors ||= []; cleaned.customPositions ||= [];
-        cleaned.attendance ||= {}; cleaned.attendanceOpen ||= {};
-        const cleanup = cleanFrequencyTestResidue(cleaned);
-        db = cleaned;
-        baseSnapshotMeta('import', file.name, db);
-        registrarLog(`Importou backup "${file.name}": ${db.students.length} alunos, ${db.payments.length} mensalidades`, 'backup');
-        if(cleanup.oldDates||cleanup.oldLogs) registrarLog(`Limpou resíduo de teste no backup: ${cleanup.oldDates} chamadas antigas e ${cleanup.oldLogs} eventos antigos; registros desde 23/11 preservados.`, 'backup');
-        save(); render(); toast('Backup importado.', { icon: 'checkCircle' });
-      } catch (e) { toast('Importação não aplicada: ' + (e?.message || 'erro de leitura')); }
-    };
-    reader.onerror = () => toast('Não foi possível ler o arquivo selecionado.');
-    reader.readAsText(file);
-  };
-  input.click();
-}
 function exportCSV() {
   const rows = [];
   const q = v => `"${String(v ?? '').replace(/"/g, '""')}"`;
@@ -8954,7 +8847,7 @@ migrateFrequencyTestResidue();
   applyTheme();
   /* aparelho que já tem conta na nuvem: não abre em modo de exemplo,
      nem por um instante — o login/sessão decide o que entra na tela */
-  try { view.baseModo = (cloudTemConfig() && localStorage.getItem(cloudSessionKey)) ? 'real' : view.baseModo; } catch (e) {}
+  view.baseModo = '';
   render();
   menuInit();
   topbarInit();
