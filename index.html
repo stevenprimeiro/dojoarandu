@@ -21,7 +21,7 @@
 <meta name="application-name" content="Arandu">
 <style>
 /* ============================================================
-   ARANDU · v2.90.18 — design system
+   ARANDU · v2.90.19 — design system
    Papel & tinta: editorial, quente, tátil.
    ============================================================ */
 :root{
@@ -119,9 +119,9 @@ body{
 body::before{
   content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
   /* Microtile SVG estático: evita rasterizar duas camadas de gradiente + blend em cada frame. */
-  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M-3 3L3 -3M0 12L12 0M9 15L15 9' stroke='%23bac0d0' stroke-opacity='.38' stroke-width='3'/%3E%3Cpath d='M-3 9L3 15M0 0L12 12M9 -3L15 3' stroke='%23060810' stroke-opacity='.42' stroke-width='3'/%3E%3C/svg%3E");background-size:12px 12px;opacity:.48;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M-3 3L3 -3M0 12L12 0M9 15L15 9' stroke='%23bac0d0' stroke-opacity='.38' stroke-width='3'/%3E%3Cpath d='M-3 9L3 15M0 0L12 12M9 -3L15 3' stroke='%23060810' stroke-opacity='.42' stroke-width='3'/%3E%3C/svg%3E");background-size:12px 12px;opacity:.17;
 }
-html[data-theme="dark"] body::before{opacity:.52}
+html[data-theme="dark"] body::before{opacity:.19}
 html[data-theme="dark"] body{background:
   radial-gradient(1100px 600px at 88% -10%, color-mix(in srgb,var(--vermilion) 34%,transparent), transparent 66%),
   radial-gradient(900px 520px at -8% 6%, color-mix(in srgb,var(--pal-2) 26%,transparent), transparent 64%),
@@ -790,7 +790,10 @@ tr:hover .td-actions{opacity:1}
   background:var(--volt);color:#20250a;
   font:750 8.5px/1.3 var(--cond);letter-spacing:.14em;text-transform:uppercase
 }
-.tag-live i{width:5px;height:5px;border-radius:50%;background:#20250a;animation:livePulse 1.9s var(--ease) infinite}
+.tag-live i{width:5px;height:5px;border-radius:50%;background:currentColor}
+.tag-live--live i{animation:livePulse 1.9s var(--ease) infinite}
+.tag-live--confirmed{background:color-mix(in srgb,var(--gold) 24%,var(--card));color:var(--gold)}
+.tag-live--done{background:var(--moss-soft);color:var(--moss)}
 .session-title small{display:block;font-size:11.5px;color:var(--ink-3);margin-top:2px}
 .session-head .tail{margin-left:auto;display:flex;align-items:center;gap:8px}
 .session-body{padding:16px 18px}
@@ -2019,8 +2022,8 @@ body.has-demo-banner .main{padding-bottom:74px}
 html.lowfx .card,html.lowfx .modal,html.lowfx .drawer,html.lowfx .cmdk,html.lowfx .dock,html.lowfx .topbar{backdrop-filter:none !important;-webkit-backdrop-filter:none !important}
 html.lowfx .dock{background:var(--paper-deep);box-shadow:0 -10px 30px -18px rgba(0,0,0,.9)}
 @media(max-width:900px), (update:slow), (prefers-reduced-data:reduce){
-  body::before{display:block!important;position:absolute!important;inset:0!important;opacity:.48!important;mix-blend-mode:normal!important}
-  html.lowfx body::before{display:block!important;position:absolute!important;inset:0!important;opacity:.48!important;mix-blend-mode:normal!important}
+  body::before{display:block!important;position:absolute!important;inset:0!important;opacity:.17!important;mix-blend-mode:normal!important}
+  html.lowfx body::before{display:block!important;position:absolute!important;inset:0!important;opacity:.17!important;mix-blend-mode:normal!important}
 }
 html.lowfx .enso,html.lowfx .hero::before{display:none}
 html.lowfx .view-anim>*{animation:none !important}
@@ -2394,7 +2397,7 @@ function hexA(hex, a) {
 }
 
 /* prefs de UI */
-const APP_VERSION = '2.90.18';
+const APP_VERSION = '2.90.19';
 /* assinatura do modelo de cobrança (fechamento novo + abertura com "outras pendências") */
 const WA_TPL_VER = 2;
 const WA_EMOJI_DEFAULT = '✅';
@@ -4686,10 +4689,27 @@ function dayStripHTML(dateStr) {
   </div>`;
 }
 
+function sessionTagState(dateStr,g,now=dojoDate()) {
+  if(!sessionOpen(dateStr,g)) return '';
+  if(dateStr<TODAY_ISO) return 'done';
+  if(dateStr>TODAY_ISO) return 'confirmed';
+  const cfg=GROUPS[g], wd=parseD(dateStr).getDay();
+  if(!cfg.days.includes(wd)) return 'confirmed';
+  const minute=t=>{const [h,m]=t.split(':').map(Number);return h*60+m;};
+  const at=now.getHours()*60+now.getMinutes();
+  return at<minute(cfg.start)?'confirmed':at>=minute(cfg.end)?'done':'live';
+}
+function sessionTagHTML(state) {
+  if(!state) return '';
+  const label=state==='live'?'Ao vivo':state==='done'?'Concluído':'Confirmado';
+  return `<span class="tag-live tag-live--${state}"><i></i>${label}</span>`;
+}
+
 function sessionCardHTML(g, dateStr) {
   const roster = rosterOf(g);
   const marked = attendanceOf(dateStr);
   const open = sessionOpen(dateStr, g);
+  const tagState = sessionTagState(dateStr,g);
   const present = roster.filter(s => marked.includes(s.id)).length;
   const wd = parseD(dateStr).getDay();
   const scheduled = GROUPS[g].days.includes(wd);
@@ -4700,7 +4720,7 @@ function sessionCardHTML(g, dateStr) {
         <div>
           <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap">
             <b>Treino ${g}</b>
-            ${open ? '<span class="tag-live"><i></i>ao vivo</span>' : ''}
+            ${sessionTagHTML(tagState)}
           </div>
           <small>${GROUPS[g].note} · ${GROUPS[g].time} · ${roster.length} aluno${roster.length === 1 ? '' : 's'}${!scheduled ? ' · fora do horário' : ''}</small>
         </div>

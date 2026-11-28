@@ -1,14 +1,15 @@
-# Arandu — versão 2.90.18
+# Arandu — versão 2.90.19
 
 **Tipo:** versão pública cloud-only  
-**App:** `dojo_arandu_v2-90-18.html`  
-**Pacote público:** `DojoArandu v2.90.18p.zip`
+**App:** `dojo_arandu_v2-90-19.html`  
+**Pacote público:** `DojoArandu v2.90.19p.zip`
 
 ## Resumo deste deploy
 
-- Corrige o custo visual associado à textura de carbono: a camada deixou de usar dois gradientes CSS repetidos, blend mode e posição fixed no perfil móvel. Agora usa um microtile SVG estático, sem mistura de camadas, e se desloca junto com a página em telas pequenas.
-- A textura continua visível no celular e no desktop. O teste de regressão confirma camada visível, `position:absolute` e `mix-blend-mode:normal` no viewport móvel.
-- Playwright e auditorias locais passaram. No benchmark de Chromium headless em viewport 390×844, o RAF marcou 60 FPS nos dois arquivos; essa simulação não reproduz o hardware do celular da usuária, mas não mostrou regressão na build corrigida.
+- Textura de carbono suavizada para ficar quase invisível, mantendo o padrão SVG estático de baixo custo que evita blend mode e dois gradientes móveis.
+- A tag no título de cada turma da Frequência agora depende do horário e da confirmação: **Confirmado** antes do horário, **Ao vivo** durante a janela da aula, **Concluído** depois do fim. Sem treino confirmado, não há tag de estado.
+- Status Adulto e Kids usam os horários configurados independentemente.
+- Playwright, auditoria de contraste e auditoria HTML/UX passaram.
 
 ## Documentação que acompanha cada deploy
 
